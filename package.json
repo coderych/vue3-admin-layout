@@ -1,0 +1,63 @@
+{
+  "name": "vue3-admin-layout",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "一个灵活的 Vue 管理后台布局组件",
+  "author": "YCH",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ych000717/vue3-admin-layout.git"
+  },
+  "keywords": [
+    "vue",
+    "admin",
+    "layout",
+    "dashboard",
+    "ui"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./dist/style.css": "./dist/vue3-admin-layout.css"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "dependencies": {
+    "@iconify/json": "^2.2.336",
+    "@iconify/utils": "^2.3.0",
+    "@vueuse/core": "^13.1.0",
+    "lodash-es": "^4.17.21",
+    "seemly": "^0.3.10",
+    "simplebar-vue": "^2.4.0",
+    "unocss": "^66.1.1"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.13.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^22.15.17",
+    "@unocss/eslint-plugin": "^66.1.1",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/tsconfig": "^0.7.0",
+    "eslint": "^9.26.0",
+    "eslint-plugin-format": "^1.0.1",
+    "less": "^4.3.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^4.5.3"
+  }
+}
