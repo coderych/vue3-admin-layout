@@ -53,15 +53,21 @@ const style = computed<CSSProperties>(() => {
     [CssVars.BorderColorInverted]: `rgb(50, 50, 50)`,
     [CssVars.TransitionDuration]: `0.2s`,
     [CssVars.TransitionBezier]: `cubic-bezier(0, 0, .2, 1)`,
+    [CssVars.ScrollbarSize]: `5px`,
+    [CssVars.ScrollbarBorderRadius]: `5px`,
   }
 
   if (isDark.value) {
     style[CssVars.BgColor] = `rgb(16, 16, 20)`
     style[CssVars.BaseColor] = `#18181C`
+    style[CssVars.ScrollbarColor] = `rgba(255, 255, 255, 0.2)`
+    style[CssVars.ScrollbarHoverColor] = `rgba(255, 255, 255, 0.3)`
   }
   else {
     style[CssVars.BgColor] = `#f0f2f5`
     style[CssVars.BaseColor] = `#fff`
+    style[CssVars.ScrollbarColor] = `rgba(0, 0, 0, 0.25)`
+    style[CssVars.ScrollbarHoverColor] = `rgba(0, 0, 0, 0.4)`
   }
 
   if (mode.value === 'top' || isMobile.value) {

@@ -23,7 +23,6 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const isDark = useDark()
   const renderMenu = computed(() => props.renderMenu)
   const cssVars = computed(() => props.cssVars)
-  // 显示侧边栏
   const show = ref(false)
 
   const header = computed(() => props.header)

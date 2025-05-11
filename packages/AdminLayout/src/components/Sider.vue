@@ -56,7 +56,7 @@ const siderStyle = computed<CSSProperties>(() => {
   if (headerFixed.value) {
     style.height = mode.value === 'side' ? `100vh` : `calc(100vh - ${_headerHeight.value}px)`
   }
-  if (!splitMenu.value) {
+  if (!splitMenu.value || mode.value === 'mix') {
     if (!isDark.value) {
       style.backgroundColor = siderTheme.value
     }

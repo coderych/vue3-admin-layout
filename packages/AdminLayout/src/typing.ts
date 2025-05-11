@@ -33,6 +33,10 @@ export enum CssVars {
   TextColorInverted = '--admin-layout-text-color-inverted',
   BorderColor = '--admin-layout-border-color',
   BorderColorInverted = '--admin-layout-border-color-inverted',
+  ScrollbarColor = '--admin-layout-scrollbar-color',
+  ScrollbarHoverColor = '--admin-layout-scrollbar-hover-color',
+  ScrollbarSize = '--admin-layout-scrollbar-size',
+  ScrollbarBorderRadius = '--admin-layout-scrollbar-border-radius',
 }
 
 export const adminLayoutProps = {
