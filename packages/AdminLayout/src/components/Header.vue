@@ -53,7 +53,8 @@ const scrollbarStyle = computed(() => {
 
 const headerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    height: `${_headerHeight.value}px`,
+    // 父容器有1px的边框，所以这里减去1px
+    height: `${_headerHeight.value - 1}px`,
   }
   if (inverted.value) {
     style.color = `${DefaultDarkColor.TextColor}`

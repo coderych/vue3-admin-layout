@@ -6,7 +6,7 @@ const isDark = useDark()
 </script>
 
 <template>
-  <AdminLayout :header-fixed="true" mode="side" sider-theme="#000" header-theme="#000">
+  <AdminLayout :header-fixed="true" mode="side" :split-menu="false">
     <template #header-prefix>
       <div @click="isDark = !isDark">
         {{ isDark ? '☀️' : '🌙' }}

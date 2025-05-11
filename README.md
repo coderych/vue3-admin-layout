@@ -20,6 +20,8 @@ npm install vue3-admin-layout
 
 ## 使用示例
 
+> 注：为了兼容不同ui框架，菜单需要自定义渲染。
+
 ### 基础使用
 
 ```vue
@@ -29,6 +31,7 @@ import { DashboardOutlined, SettingOutlined } from '@vicons/antd'
 import { useDark } from '@vueuse/core'
 import { ref } from 'vue'
 import { AdminLayout, Scrollbar } from 'vue3-admin-layout'
+import 'vue3-admin-layout/dist/style.css'
 
 // 布局配置
 const collapsed = ref(false)
@@ -104,6 +107,7 @@ const menuOptions = ref([
 <script setup>
 import { computed, ref } from 'vue'
 import { AdminLayout, CssVars } from 'vue3-admin-layout'
+import 'vue3-admin-layout/dist/style.css'
 
 const isDark = ref(false)
 
@@ -130,6 +134,7 @@ const cssVars = computed(() => ({
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 import { AdminLayout } from 'vue3-admin-layout'
+import 'vue3-admin-layout/dist/style.css'
 
 const isMobile = ref(false)
 const collapsed = ref(false)

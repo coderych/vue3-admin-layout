@@ -184,31 +184,13 @@ function renderContent() {
 
 <style lang="less">
 .border-bottom {
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: var(--admin-layout-border-color);
-  }
+  border-bottom: 1px solid var(--admin-layout-border-color);
+  box-sizing: border-box;
 }
 
 .border-right {
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 1px;
-    background-color: var(--admin-layout-border-color);
-  }
+  border-right: 1px solid var(--admin-layout-border-color);
+  box-sizing: border-box;
 }
 </style>
 
