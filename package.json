@@ -1,13 +1,13 @@
 {
   "name": "vue3-admin-layout",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "一个灵活的 Vue 管理后台布局组件",
   "author": "YCH",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/coderych/vue3-admin-layout.git"
+    "url": "git+https://github.com/coderych/vue3-admin-layout.git"
   },
   "keywords": [
     "vue",
