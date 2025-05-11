@@ -6,11 +6,25 @@ const isDark = useDark()
 </script>
 
 <template>
-  <AdminLayout :header-fixed="true" mode="side">
-    <template #header-suffix>
+  <AdminLayout :header-fixed="true" mode="side" sider-theme="#000" header-theme="#000">
+    <template #header-prefix>
       <div @click="isDark = !isDark">
         {{ isDark ? '☀️' : '🌙' }}
       </div>
+    </template>
+
+    <template #header>
+      <div class="w-10000px">
+        Header
+      </div>
+    </template>
+
+    <template #prefix>
+      Prefix
+    </template>
+
+    <template #suffix>
+      Suffix
     </template>
 
     <template #sider-left>
@@ -37,7 +51,9 @@ const isDark = useDark()
     </template>
 
     <div>
-      <h1>Hello World</h1>
+      <h1 v-for="i in 30" :key="i">
+        Hello World
+      </h1>
     </div>
   </AdminLayout>
 </template>

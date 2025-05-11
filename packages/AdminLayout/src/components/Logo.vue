@@ -27,7 +27,7 @@ const style = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <div v-if="logo && (logoUrl || title)" to="/" class="logo-container" :style="{ ...style }">
+  <div v-if="logo && (logoUrl || title)" class="logo-container" :style="{ ...style }">
     <img v-if="logoUrl" :src="logoUrl" alt="logo">
     <span v-if="title && !collapsed">{{ title }}</span>
   </div>

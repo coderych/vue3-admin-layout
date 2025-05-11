@@ -1,17 +1,15 @@
-import type { CSSProperties } from 'vue'
-import { toHexString } from 'seemly'
-import { CssVars } from './typing'
+import { rgba } from 'seemly'
 
 export function calculateInverted(color: string): boolean {
   if (color === 'transparent') {
     return false
   }
   try {
-    color = toHexString(color)
+    const rgbaColor = rgba(color)
 
-    const r = Number.parseInt(color.slice(1, 3), 16)
-    const g = Number.parseInt(color.slice(3, 5), 16)
-    const b = Number.parseInt(color.slice(5, 7), 16)
+    const r = rgbaColor[0]
+    const g = rgbaColor[1]
+    const b = rgbaColor[2]
     const luminance = 0.299 * r + 0.587 * g + 0.114 * b
 
     return luminance < 186
@@ -20,16 +18,6 @@ export function calculateInverted(color: string): boolean {
     console.error(error)
     return false
   }
-}
-
-export function borderStyle(position: string, inverted: boolean = false, bordered: boolean = true): CSSProperties {
-  const style: CSSProperties = {}
-  if (bordered) {
-    const color = inverted ? `var(${CssVars.BorderColorInverted})` : `var(${CssVars.BorderColor})`
-    style[`border-${position}` as any] = `1px solid ${color}`
-    style.boxSizing = 'border-box'
-  }
-  return style
 }
 
 export interface TreeOption {
@@ -62,8 +50,4 @@ export function getParentsKeys(tree: any[], option: TreeOption = {}): Map<string
 
   tree.forEach((node: any) => loop(node))
   return parentsKeys
-}
-
-export function getFontColor(inverted: boolean): string {
-  return inverted ? `var(${CssVars.TextColorInverted})` : `var(${CssVars.TextColor})`
 }

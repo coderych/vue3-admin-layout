@@ -27,16 +27,35 @@ export enum CssVars {
   PrimaryColor = '--primary-color',
   SiderCollapsedWidth = '--admin-layout-sider-collapsed-width',
   SiderWidth = '--admin-layout-sider-width',
+  HeaderHeight = '--admin-layout-header-height',
   TransitionDuration = '--admin-layout-transition-duration',
   TransitionBezier = '--admin-layout-transition-bezier',
   TextColor = '--admin-layout-text-color',
-  TextColorInverted = '--admin-layout-text-color-inverted',
   BorderColor = '--admin-layout-border-color',
-  BorderColorInverted = '--admin-layout-border-color-inverted',
   ScrollbarColor = '--admin-layout-scrollbar-color',
   ScrollbarHoverColor = '--admin-layout-scrollbar-hover-color',
   ScrollbarSize = '--admin-layout-scrollbar-size',
   ScrollbarBorderRadius = '--admin-layout-scrollbar-border-radius',
+}
+
+export const DefaultColor = {
+  BgColor: 'rgb(240, 242, 245)',
+  BaseColor: 'rgb(255,255,255)',
+  PrimaryColor: '#1890ff',
+  TextColor: 'rgb(51, 54, 57)',
+  BorderColor: 'rgb(239, 239, 245)',
+  ScrollbarColor: 'rgba(0, 0, 0, 0.25)',
+  ScrollbarHoverColor: 'rgba(0, 0, 0, 0.4)',
+}
+
+export const DefaultDarkColor = {
+  BgColor: 'rgb(16, 16, 20)',
+  BaseColor: 'rgb(24, 24, 28)',
+  PrimaryColor: '#409eff',
+  TextColor: 'rgba(255, 255, 255, 0.85)',
+  BorderColor: 'rgba(255, 255, 255, 0.09)',
+  ScrollbarColor: 'rgba(255, 255, 255, 0.3)',
+  ScrollbarHoverColor: 'rgba(255, 255, 255, 0.4)',
 }
 
 export const adminLayoutProps = {

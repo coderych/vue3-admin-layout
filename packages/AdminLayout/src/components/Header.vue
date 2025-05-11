@@ -3,8 +3,8 @@ import type { CSSProperties } from 'vue'
 import { computed } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { borderStyle, calculateInverted, getFontColor } from '../helper'
-import { CssVars } from '../typing'
+import { calculateInverted } from '../helper'
+import { CssVars, DefaultDarkColor } from '../typing'
 import Logo from './Logo.vue'
 
 defineSlots<{
@@ -33,17 +33,30 @@ const {
 
 const inverted = computed(() => calculateInverted(headerTheme.value) || isDark.value)
 
+const scrollbarStyle = computed(() => {
+  const style: CSSProperties = {
+    height: `${_headerHeight.value}px`,
+    backgroundColor: headerTheme.value,
+  }
+  if (isDark.value) {
+    style.backgroundColor = `var(${CssVars.BaseColor})`
+  }
+
+  if (inverted.value) {
+    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
+    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
+    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
+  }
+
+  return style
+})
+
 const headerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     height: `${_headerHeight.value}px`,
-    color: getFontColor(inverted.value),
-    ...borderStyle('bottom', inverted.value),
   }
-  if (!isDark.value) {
-    style.backgroundColor = headerTheme.value
-  }
-  else {
-    style.backgroundColor = `var(${CssVars.BaseColor})`
+  if (inverted.value) {
+    style.color = `${DefaultDarkColor.TextColor}`
   }
   return style
 })
@@ -54,7 +67,7 @@ function handleParentMenuClick(key: string) {
 </script>
 
 <template>
-  <Scrollbar x-scrollable>
+  <Scrollbar x-scrollable :style="scrollbarStyle" class="bordered">
     <div class="admin-layout-header" :style="headerStyle">
       <Logo v-if="mode !== 'side' && logo && !isMobile" />
       <div v-if="mode === 'mix' || (mode === 'side' && !splitMenu) || isMobile" class="hamburger" @click="toggleCollapsed(!collapsed)">
@@ -84,6 +97,20 @@ function handleParentMenuClick(key: string) {
 </template>
 
 <style scoped lang="less">
+.bordered {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--admin-layout-border-color);
+  }
+}
+
 .admin-layout-header {
   display: flex;
   align-items: center;

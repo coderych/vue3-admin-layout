@@ -3,7 +3,6 @@ import type { CSSProperties } from 'vue'
 import { computed, ref } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { borderStyle } from '../helper'
 import { CssVars } from '../typing'
 
 defineSlots<{
@@ -21,7 +20,6 @@ const {
   prefixFixed,
   _headerHeight,
   isFull,
-  isDark,
   suffixFixed,
 } = state
 const scrollbarRef = ref<any>()
@@ -29,6 +27,7 @@ const scrollbarRef = ref<any>()
 const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     backgroundColor: `var(${CssVars.BgColor})`,
+    color: `var(${CssVars.TextColor})`,
   }
   return style
 })
@@ -45,7 +44,6 @@ const prefixStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     height: `${_prefixHeight.value}px`,
     backgroundColor: `var(${CssVars.BaseColor})`,
-    ...borderStyle('bottom', isDark.value),
   }
   return style
 })
@@ -74,7 +72,7 @@ const innerStyle = computed<CSSProperties>(() => {
 <template>
   <div class="admin-layout-main" :style="mainStyle" :class="{ 'admin-layout-main--full': isFull }">
     <Scrollbar :class="{ 'h-screen': isFull }">
-      <div v-if="prefix" class="admin-layout-main-prefix" :style="prefixStyle">
+      <div v-if="prefix" class="admin-layout-main-prefix bordered" :style="prefixStyle">
         <slot name="prefix" v-bind="state" />
       </div>
       <div class="admin-layout-main-content" :style="contentStyle">
@@ -91,7 +89,7 @@ const innerStyle = computed<CSSProperties>(() => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="less">
 .admin-layout-main--full {
   position: fixed;
   top: 0;
@@ -109,6 +107,18 @@ const innerStyle = computed<CSSProperties>(() => {
   display: flex;
   align-items: center;
   will-change: transform;
+  position: relative;
+
+  &.bordered::after {
+    content: '';
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: var(--admin-layout-border-color);
+  }
 }
 
 .admin-layout-main-suffix {

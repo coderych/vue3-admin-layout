@@ -3,8 +3,8 @@ import type { CSSProperties } from 'vue'
 import { computed, ref, watch } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { borderStyle, calculateInverted, getFontColor } from '../helper'
-import { CssVars } from '../typing'
+import { calculateInverted } from '../helper'
+import { CssVars, DefaultDarkColor } from '../typing'
 import Logo from './Logo.vue'
 
 defineSlots<{
@@ -47,10 +47,8 @@ const inverted = computed(() => {
 
 const siderStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    'width': `100%`,
-    'color': getFontColor(inverted.value),
-    '--header-height': `${headerHeight.value}px`,
-    ...borderStyle('right', inverted.value, (!splitMenu.value && mode.value === 'side') || mode.value === 'mix'),
+    width: `100%`,
+    color: `var(${CssVars.TextColor})`,
   }
   // 固定头部
   if (headerFixed.value) {
@@ -64,6 +62,14 @@ const siderStyle = computed<CSSProperties>(() => {
       style.backgroundColor = `var(${CssVars.BaseColor})`
     }
   }
+
+  if (inverted.value) {
+    style.color = DefaultDarkColor.TextColor
+    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
+    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
+    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
+  }
+
   return style
 })
 
@@ -87,12 +93,9 @@ watch(show, (value) => {
 const leftStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     width: `var(${CssVars.SiderCollapsedWidth})`,
-    ...borderStyle('right', inverted.value),
+    backgroundColor: siderTheme.value,
   }
-  if (!isDark.value) {
-    style.backgroundColor = siderTheme.value
-  }
-  else {
+  if (isDark.value) {
     style.backgroundColor = `var(${CssVars.BaseColor})`
   }
   return style
@@ -101,6 +104,7 @@ const leftStyle = computed<CSSProperties>(() => {
 const rightStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     width: `${siderWidth.value}px !important`,
+    backgroundColor: siderTheme.value,
   }
   if (!siderFixed.value) {
     if (show.value) {
@@ -111,13 +115,7 @@ const rightStyle = computed<CSSProperties>(() => {
       style.transform = `translateX(-${siderWidth.value}px)`
     }
   }
-  else {
-    Object.assign(style, borderStyle('right', inverted.value))
-  }
-  if (!isDark.value) {
-    style.backgroundColor = siderTheme.value
-  }
-  else {
+  if (isDark.value) {
     style.backgroundColor = `var(${CssVars.BaseColor})`
   }
   return style
@@ -130,7 +128,7 @@ function handleParentMenuClick(key: string) {
 
 <template>
   <div
-    class="admin-layout-sider" :class="{ 'admin-layout-sider-split': splitMenu && mode === 'side' }"
+    class="admin-layout-sider" :class="{ 'admin-layout-sider-split': splitMenu && mode === 'side', 'bordered': (!splitMenu && mode === 'side') || mode === 'mix' }"
     :style="{ ...siderStyle, ...resolveStackingContextStyle }" @mouseleave="show = false" @mouseover="show = true"
   >
     <template v-if="(mode === 'side' && !splitMenu) || mode === 'mix'">
@@ -151,7 +149,7 @@ function handleParentMenuClick(key: string) {
       </slot>
     </template>
     <template v-else>
-      <div class="admin-layout-sider-split-left" :style="leftStyle" :class="{ collapsed }">
+      <div class="admin-layout-sider-split-left bordered" :style="leftStyle" :class="{ collapsed }">
         <slot name="left" v-bind="{ ...state, open: (value) => { show = value }, show }">
           <div v-if="logo && logoUrl" class="admin-layout-sider-split-left-logo">
             <img :src="logoUrl" alt="logo">
@@ -174,7 +172,7 @@ function handleParentMenuClick(key: string) {
           <div v-else class="i-ant-design:menu-unfold-outlined" />
         </div>
       </div>
-      <div class="admin-layout-sider-split-right" :style="rightStyle">
+      <div class="admin-layout-sider-split-right" :class="{ bordered: siderFixed }" :style="rightStyle">
         <slot name="right" v-bind="state">
           <div v-if="logo && title" class="admin-layout-sider-split-right-title">
             <span>
@@ -228,7 +226,7 @@ function handleParentMenuClick(key: string) {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: var(--header-height);
+      height: var(--admin-layout-header-height);
 
       & > img {
         height: 100%;
@@ -245,7 +243,7 @@ function handleParentMenuClick(key: string) {
     transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
 
     &-title {
-      height: var(--header-height);
+      height: var(--admin-layout-header-height);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -370,6 +368,22 @@ function handleParentMenuClick(key: string) {
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.bordered {
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    background-color: var(--admin-layout-border-color);
+    width: 1px;
   }
 }
 </style>

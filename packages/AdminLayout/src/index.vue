@@ -5,7 +5,7 @@ import { computed, h } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
 import { AppMain, Header, MobileSider, Sider } from './components'
 import { useAdminLayoutProvider } from './context'
-import { adminLayoutProps, CssVars } from './typing'
+import { adminLayoutProps, CssVars, DefaultColor, DefaultDarkColor } from './typing'
 
 const props = defineProps(adminLayoutProps)
 
@@ -30,6 +30,7 @@ const {
   header,
   mode,
   headerFixed,
+  headerHeight,
   _headerHeight,
   siderWidth,
   collapsed,
@@ -47,27 +48,29 @@ const {
 
 const style = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    [CssVars.TextColor]: `#333`,
-    [CssVars.TextColorInverted]: `#fff`,
-    [CssVars.BorderColor]: `rgb(224, 224, 230)`,
-    [CssVars.BorderColorInverted]: `rgb(50, 50, 50)`,
+    color: `${DefaultColor.TextColor}`,
     [CssVars.TransitionDuration]: `0.2s`,
     [CssVars.TransitionBezier]: `cubic-bezier(0, 0, .2, 1)`,
-    [CssVars.ScrollbarSize]: `5px`,
-    [CssVars.ScrollbarBorderRadius]: `5px`,
+    [CssVars.ScrollbarSize]: '5px',
+    [CssVars.ScrollbarBorderRadius]: '5px',
+    [CssVars.HeaderHeight]: `${headerHeight.value}px`,
+
+    // 颜色变量
+    [CssVars.TextColor]: DefaultColor.TextColor,
+    [CssVars.BgColor]: DefaultColor.BgColor,
+    [CssVars.BaseColor]: DefaultColor.BaseColor,
+    [CssVars.BorderColor]: DefaultColor.BorderColor,
+    [CssVars.ScrollbarColor]: DefaultColor.ScrollbarColor,
+    [CssVars.ScrollbarHoverColor]: DefaultColor.ScrollbarHoverColor,
   }
 
   if (isDark.value) {
-    style[CssVars.BgColor] = `rgb(16, 16, 20)`
-    style[CssVars.BaseColor] = `#18181C`
-    style[CssVars.ScrollbarColor] = `rgba(255, 255, 255, 0.2)`
-    style[CssVars.ScrollbarHoverColor] = `rgba(255, 255, 255, 0.3)`
-  }
-  else {
-    style[CssVars.BgColor] = `#f0f2f5`
-    style[CssVars.BaseColor] = `#fff`
-    style[CssVars.ScrollbarColor] = `rgba(0, 0, 0, 0.25)`
-    style[CssVars.ScrollbarHoverColor] = `rgba(0, 0, 0, 0.4)`
+    style[CssVars.TextColor] = DefaultDarkColor.TextColor
+    style[CssVars.BgColor] = DefaultDarkColor.BgColor
+    style[CssVars.BaseColor] = DefaultDarkColor.BaseColor
+    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
+    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
+    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
   }
 
   if (mode.value === 'top' || isMobile.value) {
