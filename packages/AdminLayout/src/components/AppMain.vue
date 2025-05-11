@@ -72,7 +72,7 @@ const innerStyle = computed<CSSProperties>(() => {
 <template>
   <div class="admin-layout-main" :style="mainStyle" :class="{ 'admin-layout-main--full': isFull }">
     <Scrollbar :class="{ 'h-screen': isFull }">
-      <div v-if="prefix" class="admin-layout-main-prefix bordered" :style="prefixStyle">
+      <div v-if="prefix" class="admin-layout-main-prefix border-bottom" :style="prefixStyle">
         <slot name="prefix" v-bind="state" />
       </div>
       <div class="admin-layout-main-content" :style="contentStyle">
@@ -108,17 +108,6 @@ const innerStyle = computed<CSSProperties>(() => {
   align-items: center;
   will-change: transform;
   position: relative;
-
-  &.bordered::after {
-    content: '';
-    display: block;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: var(--admin-layout-border-color);
-  }
 }
 
 .admin-layout-main-suffix {

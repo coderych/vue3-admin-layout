@@ -203,7 +203,7 @@ onUnmounted(() => {
 | ------------ | ------- | ------ | -------------------- |
 | prefix       | Boolean | true   | 是否显示前缀区域     |
 | prefixHeight | Number  | 36     | 前缀区域高度（像素） |
-| prefixFixed  | Boolean | false  | 是否固定前缀区域     |
+| prefixFixed  | Boolean | true   | 是否固定前缀区域     |
 
 ### 后缀区域配置
 
@@ -250,16 +250,30 @@ onUnmounted(() => {
 
 组件内部使用了以下CSS变量，可通过`cssVars`属性进行自定义：
 
-| 变量名                               | 说明               | 默认值                           |
-| ------------------------------------ | ------------------ | -------------------------------- |
-| --admin-layout-bg-color              | 背景颜色           | #f0f2f5（亮色）/ #101014（暗色） |
-| --admin-layout-base-color            | 基础颜色           | #fff（亮色）/ #18181C（暗色）    |
-| --primary-color                      | 主题色             | -                                |
-| --admin-layout-sider-collapsed-width | 侧边栏折叠宽度     | 根据props计算                    |
-| --admin-layout-sider-width           | 侧边栏宽度         | 根据props计算                    |
-| --admin-layout-transition-duration   | 过渡动画持续时间   | 0.2s                             |
-| --admin-layout-transition-bezier     | 过渡动画贝塞尔曲线 | cubic-bezier(0, 0, .2, 1)        |
-| --admin-layout-text-color            | 文本颜色           | #333                             |
-| --admin-layout-text-color-inverted   | 反色文本颜色       | #fff                             |
-| --admin-layout-border-color          | 边框颜色           | rgb(224, 224, 230)               |
-| --admin-layout-border-color-inverted | 反色边框颜色       | rgb(50, 50, 50)                  |
+| 变量名                                 | 说明               | 默认值                           |
+| -------------------------------------- | ------------------ | -------------------------------- |
+| --admin-layout-bg-color                | 背景颜色           | #f0f2f5（亮色）/ #101014（暗色） |
+| --admin-layout-base-color              | 基础颜色           | #fff（亮色）/ #18181C（暗色）    |
+| --primary-color                        | 主题色             | #1890ff（默认）                  |
+| --admin-layout-sider-collapsed-width   | 侧边栏折叠宽度     | 根据props计算                    |
+| --admin-layout-sider-width             | 侧边栏宽度         | 根据props计算                    |
+| --admin-layout-header-height           | 头部高度           | 48px（默认）                     |
+| --admin-layout-transition-duration     | 过渡动画持续时间   | 0.2s                             |
+| --admin-layout-transition-bezier       | 过渡动画贝塞尔曲线 | cubic-bezier(0, 0, .2, 1)        |
+| --admin-layout-text-color              | 文本颜色           | #333（亮色）/ #fff（暗色）       |
+| --admin-layout-border-color            | 边框颜色           | #e0e0e6（亮色）/ #303030（暗色） |
+| --admin-layout-scrollbar-color         | 滚动条颜色         | #e0e0e6（亮色）/ #303030（暗色） |
+| --admin-layout-scrollbar-hover-color   | 滚动条悬停颜色     | #bfbfbf（亮色）/ #505050（暗色） |
+| --admin-layout-scrollbar-size          | 滚动条宽度         | 5px                              |
+| --admin-layout-scrollbar-border-radius | 滚动条圆角         | 5px                              |
+
+## 兼容性
+
+- 支持 Vue 3.x 版本，不兼容 Vue 2.x。
+- 推荐使用现代浏览器，兼容性如下：
+  - Chrome ≥ 87
+  - Edge ≥ 88
+  - Firefox ≥ 78
+  - Safari ≥ 13
+- 移动端主流浏览器均有良好支持。
+- 依赖 CSS 变量、Flex 布局等现代特性，IE 浏览器不支持。

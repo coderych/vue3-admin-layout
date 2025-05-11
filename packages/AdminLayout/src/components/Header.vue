@@ -67,7 +67,7 @@ function handleParentMenuClick(key: string) {
 </script>
 
 <template>
-  <Scrollbar x-scrollable :style="scrollbarStyle" class="bordered">
+  <Scrollbar x-scrollable :style="scrollbarStyle" class="border-bottom">
     <div class="admin-layout-header" :style="headerStyle">
       <Logo v-if="mode !== 'side' && logo && !isMobile" />
       <div v-if="mode === 'mix' || (mode === 'side' && !splitMenu) || isMobile" class="hamburger" @click="toggleCollapsed(!collapsed)">
@@ -97,20 +97,6 @@ function handleParentMenuClick(key: string) {
 </template>
 
 <style scoped lang="less">
-.bordered {
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: var(--admin-layout-border-color);
-  }
-}
-
 .admin-layout-header {
   display: flex;
   align-items: center;

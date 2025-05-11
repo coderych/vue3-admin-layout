@@ -144,7 +144,7 @@ export const adminLayoutProps = {
   },
   prefixFixed: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: true,
   },
 
   suffix: {
