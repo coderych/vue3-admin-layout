@@ -1,7 +1,7 @@
 {
   "name": "vue3-admin-layout",
   "type": "module",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "一个灵活的 Vue 管理后台布局组件",
   "author": "YCH",
   "license": "MIT",
