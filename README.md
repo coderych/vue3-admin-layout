@@ -190,7 +190,7 @@ onUnmounted(() => {
 | header       | Boolean | true   | 是否显示头部     |
 | headerHeight | Number  | 48     | 头部高度（像素） |
 | headerTheme  | String  | '#fff' | 头部主题颜色     |
-| headerFixed  | Boolean | false  | 是否固定头部     |
+| headerFixed  | Boolean | true   | 是否固定头部     |
 
 ### 侧边栏配置
 

@@ -1,12 +1,29 @@
 <script setup lang="ts">
+import type { AdminLayoutProps } from '../packages'
 import { useDark } from '@vueuse/core'
+import { computed, ref } from 'vue'
 import { AdminLayout, Scrollbar } from '../packages'
 
 const isDark = useDark()
+const collapsed = ref(true)
+const siderFixed = ref(false)
+
+const props = computed<AdminLayoutProps>(() => ({
+  headerFixed: false,
+  // mode: 'side',
+  // mode: 'mix',
+  // mode: 'top',
+  // splitMenu: false,
+  title: 'Admin Layout',
+  // logo: false,
+  // isMobile: true,
+  // suffixFixed: true,
+  logoUrl: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80',
+}))
 </script>
 
 <template>
-  <AdminLayout :header-fixed="true" mode="side" :split-menu="false">
+  <AdminLayout v-bind="props" v-model:collapsed="collapsed" v-model:sider-fixed="siderFixed">
     <template #header-prefix>
       <div @click="isDark = !isDark">
         {{ isDark ? '☀️' : '🌙' }}
@@ -14,46 +31,51 @@ const isDark = useDark()
     </template>
 
     <template #header>
-      <div class="w-10000px">
-        Header
+      <div v-for="i in 30" :key="i" class="border-right w-100px">
+        {{ i }}
       </div>
     </template>
 
     <template #prefix>
-      Prefix
+      <div v-for="i in 30" :key="i" class="border-right w-100px">
+        {{ i }}
+      </div>
     </template>
 
     <template #suffix>
       Suffix
     </template>
 
-    <template #sider-left>
-      <Scrollbar>
-        <div v-for="i in 30" :key="i" style="height: 100px">
+    <template #sider-left="{ height }">
+      <Scrollbar :style="{ height }">
+        {{ height }}
+        <div v-for="i in 30" :key="i" class="border-bottom h-100px">
           {{ i }}
         </div>
       </Scrollbar>
     </template>
-    <template #sider-right>
-      <Scrollbar>
-        <div v-for="i in 30" :key="i" style="height: 100px">
+    <template #sider-right="{ height }">
+      <Scrollbar :style="{ height }">
+        {{ height }}
+        <div v-for="i in 30" :key="i" class="border-bottom h-100px">
           {{ i }}
         </div>
       </Scrollbar>
     </template>
 
-    <template #sider>
-      <Scrollbar>
-        <div v-for="i in 30" :key="i" style="height: 100px">
+    <template #sider="{ height }">
+      <Scrollbar :style="{ height }">
+        {{ height }}
+        <div v-for="i in 30" :key="i" class="border-bottom h-100px">
           {{ i }}
         </div>
       </Scrollbar>
     </template>
 
     <div>
-      <h1 v-for="i in 30" :key="i">
+      <div v-for="i in 30" :key="i" class="border-bottom h-100px border-red">
         Hello World
-      </h1>
+      </div>
     </div>
   </AdminLayout>
 </template>

@@ -110,7 +110,7 @@ export const adminLayoutProps = {
   },
   headerFixed: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: true,
   },
 
   sider: {
@@ -182,7 +182,11 @@ export const adminLayoutProps = {
 export type AdminLayoutProps = ExtractPublicPropTypes<typeof adminLayoutProps>
 export type _AdminLayoutProps = ExtractPropTypes<typeof adminLayoutProps>
 
-export interface SiderLeftProps extends AdminLayoutProps {
+export interface AdminSiderProps extends AdminLayoutProps {
+  height: string
+}
+
+export interface AdminSiderLeftProps extends AdminSiderProps {
   open: (show: boolean) => void
   show: boolean
 }

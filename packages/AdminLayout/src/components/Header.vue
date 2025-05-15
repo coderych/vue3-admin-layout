@@ -5,6 +5,7 @@ import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { calculateInverted } from '../helper'
 import { CssVars, DefaultDarkColor } from '../typing'
+import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
 
 defineSlots<{
@@ -71,10 +72,7 @@ function handleParentMenuClick(key: string) {
   <Scrollbar x-scrollable :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
     <div class="admin-layout-header" :style="headerStyle">
       <Logo v-if="mode !== 'side' && logo && !isMobile" />
-      <div v-if="mode === 'mix' || (mode === 'side' && !splitMenu) || isMobile" class="hamburger" @click="toggleCollapsed(!collapsed)">
-        <div v-if="!collapsed" class="i-ant-design:menu-fold-outlined" />
-        <div v-else class="i-ant-design:menu-unfold-outlined" />
-      </div>
+      <Hamburger v-if="isMobile" :value="collapsed" class="hamburger" @update:value="toggleCollapsed" />
       <slot v-if="!isMobile" name="prefix" v-bind="state" />
       <slot v-if="!isMobile" name="default" v-bind="state">
         <ul v-if="mode === 'mix' && splitMenu" class="first-level-menu">
@@ -165,23 +163,6 @@ function handleParentMenuClick(key: string) {
 }
 
 .hamburger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  transition: all 0.2s ease-out;
-  border-radius: 6px;
   margin: 0 6px;
-  transition: var(--admin-layout-transition);
-
-  & > div {
-    font-size: 18px;
-  }
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
 }
 </style>

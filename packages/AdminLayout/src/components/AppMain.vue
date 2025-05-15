@@ -21,6 +21,7 @@ const {
   _headerHeight,
   isFull,
   suffixFixed,
+  headerFixed,
 } = state
 const scrollbarRef = ref<any>()
 
@@ -34,7 +35,7 @@ const mainStyle = computed<CSSProperties>(() => {
 
 const contentStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
-  if (prefixFixed.value) {
+  if (prefixFixed.value && headerFixed.value) {
     style.height = `calc(100vh - ${_prefixHeight.value}px - ${isFull.value ? 0 : _headerHeight.value}px)`
   }
   return style
@@ -61,11 +62,14 @@ const suffixStyle = computed<CSSProperties>(() => {
 })
 
 const innerStyle = computed<CSSProperties>(() => {
-  const hegiht = `calc(100vh - ${_prefixHeight.value}px - ${_suffixHeight.value}px - ${isFull.value ? 0 : _headerHeight.value}px)`
-  return {
-    'minHeight': hegiht,
-    '--content-height': hegiht,
+  // 解决高度塌陷
+  const height = `calc(100vh - ${_prefixHeight.value}px - ${_suffixHeight.value}px - ${isFull.value ? 0 : _headerHeight.value}px)`
+
+  const style: CSSProperties = {
+    minHeight: height,
   }
+  style['--content-height'] = style.minHeight
+  return style
 })
 </script>
 

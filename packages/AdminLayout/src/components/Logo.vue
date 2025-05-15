@@ -41,6 +41,7 @@ const style = computed<CSSProperties>(() => {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  gap: 12px;
 }
 
 .logo-container img {
@@ -50,7 +51,6 @@ const style = computed<CSSProperties>(() => {
 .logo-container span {
   font-size: 18px;
   font-weight: 500;
-  margin-left: 12px;
   overflow: hidden;
   white-space: nowrap;
   font-weight: 700;

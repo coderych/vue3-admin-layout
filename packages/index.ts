@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import { AdminLayout } from './AdminLayout'
+import AdminLayout from './AdminLayout'
 import Scrollbar from './Scrollbar'
 
 import 'uno.css'

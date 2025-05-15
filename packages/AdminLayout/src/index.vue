@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutProps, SiderLeftProps } from './typing'
+import type { AdminLayoutProps, AdminSiderLeftProps, AdminSiderProps } from './typing'
+import { pick } from 'lodash-es'
 import { computed, h } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
 import { AppMain, Header, MobileSider, Sider } from './components'
@@ -17,9 +18,9 @@ const emit = defineEmits<{
 const slots = defineSlots<{
   'default': (props: AdminLayoutProps) => void
   'header': (props: AdminLayoutProps) => void
-  'sider': (props: AdminLayoutProps) => void
-  'sider-left': (props: SiderLeftProps) => void
-  'sider-right': (props: AdminLayoutProps) => void
+  'sider': (props: AdminSiderProps) => void
+  'sider-left': (props: AdminSiderLeftProps) => void
+  'sider-right': (props: AdminSiderProps) => void
   'prefix': (props: AdminLayoutProps) => void
   'suffix': (props: AdminLayoutProps) => void
   'header-prefix': (props: AdminLayoutProps) => void
@@ -115,6 +116,11 @@ const style = computed<CSSProperties>(() => {
   return style
 })
 
+// 最外层滚动条样式
+const scrollbarCssVars = computed<CSSProperties>(() => ({
+  ...pick(style.value, [CssVars.ScrollbarSize, CssVars.ScrollbarBorderRadius, CssVars.ScrollbarColor, CssVars.ScrollbarHoverColor]),
+}))
+
 const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     backgroundColor: `var(${CssVars.BgColor})`,
@@ -122,10 +128,6 @@ const mainStyle = computed<CSSProperties>(() => {
   if (headerFixed.value) {
     style.height = `calc(100vh - ${_headerHeight.value}px)`
   }
-  else {
-    style.minHeight = `calc(100vh - ${_headerHeight.value}px)`
-  }
-
   return style
 })
 
@@ -154,7 +156,7 @@ function renderSider() {
 }
 
 function renderContent() {
-  return h(AppMain, {}, {
+  return h(AppMain, { }, {
     default: slots.default,
     prefix: slots.prefix,
     suffix: slots.suffix,
@@ -163,7 +165,7 @@ function renderContent() {
 </script>
 
 <template>
-  <Scrollbar class="h-screen">
+  <Scrollbar class="h-screen" :style="scrollbarCssVars">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
       <header v-if="header" class="admin-layout-header-container">
         <component :is="renderHeader" />
@@ -190,6 +192,11 @@ function renderContent() {
 
 .border-right {
   border-right: 1px solid var(--admin-layout-border-color);
+  box-sizing: border-box;
+}
+
+.border-top {
+  border-top: 1px solid var(--admin-layout-border-color);
   box-sizing: border-box;
 }
 </style>
