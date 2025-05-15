@@ -69,7 +69,7 @@ const scrollHeight = computed(() => {
         <component
           :is="renderMenu({
             options: menuOptions,
-            inverted: isDark,
+            inverted,
             collapsedWidth: siderCollapsedWidth,
             value: `${activeKey}`,
             accordion,
