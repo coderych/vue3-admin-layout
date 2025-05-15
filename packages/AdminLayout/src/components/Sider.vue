@@ -249,7 +249,7 @@ function handleParentMenuClick(key: string) {
       height: var(--admin-layout-header-height);
 
       & > img {
-        height: 100%;
+        height: 95%;
         aspect-ratio: 1/1;
       }
     }

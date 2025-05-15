@@ -5,7 +5,8 @@ import { computed } from 'vue'
 import { Logo } from '.'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { CssVars } from '../typing'
+import { calculateInverted } from '../helper'
+import { CssVars, DefaultDarkColor } from '../typing'
 import Hamburger from './Hamburger.vue'
 
 defineSlots<{
@@ -24,14 +25,34 @@ const {
   siderCollapsedWidth,
   activeKey,
   accordion,
+  siderTheme,
   toggleCollapsed,
 } = state
+
+const inverted = computed(() => {
+  return calculateInverted(siderTheme.value) || isDark.value
+})
 
 const style = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     width: `${siderWidth.value}px`,
     backgroundColor: `var(${CssVars.BaseColor})`,
+    paddingBottom: '40px',
   }
+  if (!isDark.value) {
+    style.backgroundColor = siderTheme.value
+  }
+  else {
+    style.backgroundColor = `var(${CssVars.BaseColor})`
+  }
+
+  if (inverted.value) {
+    style.color = DefaultDarkColor.TextColor
+    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
+    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
+    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
+  }
+
   return style
 })
 
@@ -74,7 +95,6 @@ const scrollHeight = computed(() => {
   z-index: 101;
   height: 100vh;
   top: 0;
-  padding-bottom: 40px;
 
   &.collapsed {
     overflow: hidden;

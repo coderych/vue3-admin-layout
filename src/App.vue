@@ -9,7 +9,7 @@ const collapsed = ref(true)
 const siderFixed = ref(false)
 
 const props = computed<AdminLayoutProps>(() => ({
-  headerFixed: false,
+  // headerFixed: false,
   // mode: 'side',
   // mode: 'mix',
   // mode: 'top',
@@ -19,6 +19,7 @@ const props = computed<AdminLayoutProps>(() => ({
   // isMobile: true,
   // suffixFixed: true,
   logoUrl: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80',
+  siderTheme: '#07010E',
 }))
 </script>
 
@@ -73,6 +74,9 @@ const props = computed<AdminLayoutProps>(() => ({
     </template>
 
     <div>
+      <div @click="isDark = !isDark">
+        {{ isDark ? '☀️' : '🌙' }}
+      </div>
       <div v-for="i in 30" :key="i" class="border-bottom h-100px border-red">
         Hello World
       </div>
