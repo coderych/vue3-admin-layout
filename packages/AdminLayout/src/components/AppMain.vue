@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import { computed } from 'vue'
+import type { AdminLayoutContentProps } from '../typing'
+import { useElementSize } from '@vueuse/core'
+import { computed, ref, watchEffect } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { CssVars } from '../typing'
@@ -8,7 +10,7 @@ import { CssVars } from '../typing'
 defineSlots<{
   prefix: () => any
   suffix: () => any
-  default: () => any
+  default: (props: AdminLayoutContentProps) => any
 }>()
 
 const state = useAdminLayoutState()
@@ -60,12 +62,23 @@ const suffixStyle = computed<CSSProperties>(() => {
   return style
 })
 
-const innerStyle = computed<CSSProperties>(() => {
-  // 解决高度塌陷
-  const height = `calc(100vh - ${_prefixHeight.value}px - ${_suffixHeight.value}px - ${isFull.value ? 0 : _headerHeight.value}px)`
+const emptyRef = ref<HTMLDivElement>()
+const emptyStyle = ref<CSSProperties>({
+  position: 'fixed',
+  bottom: 0,
+  top: 0,
+  visibility: 'hidden',
+  left: '-9999px',
+})
+const { height: contentHeight } = useElementSize(emptyRef)
 
+watchEffect(() => {
+  emptyStyle.value.top = `${_prefixHeight.value + _suffixHeight.value + (isFull.value ? 0 : _headerHeight.value)}px`
+})
+
+const innerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    minHeight: height,
+    minHeight: `${contentHeight.value}px`,
   }
   style['--content-height'] = style.minHeight
   return style
@@ -81,11 +94,12 @@ const innerStyle = computed<CSSProperties>(() => {
       <div class="admin-layout-main-content" :style="contentStyle">
         <Scrollbar class="h-full" :native-scrollbar="!(headerFixed && prefixFixed)">
           <div :style="innerStyle">
-            <slot name="default" />
+            <slot name="default" v-bind="{ ...(state as any), contentHeight }" />
           </div>
           <div v-if="suffix" :style="suffixStyle" class="admin-layout-main-suffix">
             <slot name="suffix" />
           </div>
+          <div ref="emptyRef" :style="emptyStyle" />
         </Scrollbar>
       </div>
     </Scrollbar>

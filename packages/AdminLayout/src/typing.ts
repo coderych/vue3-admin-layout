@@ -182,11 +182,15 @@ export const adminLayoutProps = {
 export type AdminLayoutProps = ExtractPublicPropTypes<typeof adminLayoutProps>
 export type _AdminLayoutProps = ExtractPropTypes<typeof adminLayoutProps>
 
-export interface AdminSiderProps extends AdminLayoutProps {
+export interface AdminLayoutSiderProps extends AdminLayoutProps {
   height: string
 }
 
-export interface AdminSiderLeftProps extends AdminSiderProps {
+export interface AdminLayoutSiderLeftProps extends AdminLayoutSiderProps {
   open: (show: boolean) => void
   show: boolean
+}
+
+export interface AdminLayoutContentProps extends AdminLayoutProps {
+  contentHeight: number
 }

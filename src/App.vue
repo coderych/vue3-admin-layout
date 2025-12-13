@@ -1,36 +1,24 @@
 <script setup lang="ts">
-import type { AdminLayoutProps, LayoutType } from '../packages'
+import type { AdminLayoutProps } from '../packages'
 import { useDark } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { AdminLayout, Scrollbar } from '../packages'
 
 const isDark = useDark()
-const collapsed = ref(true)
-const siderFixed = ref(false)
-const headerFixed = ref(true)
-const prefixFixed = ref(true)
-const isFull = ref(false)
-const isMobile = ref(false)
-const mode = ref<LayoutType>('side')
-
-const props = computed<AdminLayoutProps>(() => ({
-  headerFixed: headerFixed.value,
-  prefixFixed: prefixFixed.value,
-  isFull: isFull.value,
-  isMobile: isMobile.value,
-  mode: mode.value,
-  // mode: 'side',
-  // mode: 'mix',
-  // mode: 'top',
-  // splitMenu: false,
+const props = ref<AdminLayoutProps>({
+  headerFixed: true,
+  prefixFixed: true,
+  isFull: false,
+  isMobile: false,
+  mode: 'side',
+  splitMenu: false,
   title: 'Admin Layout',
-  // logo: false,
-  // isMobile: true,
-  // suffixFixed: true,
+  suffixFixed: true,
   logoUrl: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif?imageView2/1/w/80/h/80',
-  // siderTheme: '#07010E',
-  // nativeScrollbar: true,
-}))
+  header: true,
+  prefix: true,
+  suffix: true,
+})
 
 function getCount() {
   const simplebarEls = document.querySelectorAll('.simplebar-wrapper')
@@ -43,7 +31,7 @@ function getCount() {
 </script>
 
 <template>
-  <AdminLayout v-bind="props" v-model:collapsed="collapsed" v-model:sider-fixed="siderFixed">
+  <AdminLayout v-bind="props">
     <template #header-prefix>
       <div @click="isDark = !isDark">
         {{ isDark ? '☀️' : '🌙' }}
@@ -92,43 +80,43 @@ function getCount() {
       </Scrollbar>
     </template>
 
-    <div>
-      <div @click="isDark = !isDark">
-        {{ isDark ? '☀️' : '🌙' }}
-      </div>
-      <div @click="headerFixed = !headerFixed">
-        headerFixed {{ headerFixed }}
-      </div>
-      <div @click="prefixFixed = !prefixFixed">
-        prefixFixed {{ prefixFixed }}
-      </div>
-      <div @click="isFull = !isFull">
-        isFull {{ isFull }}
-      </div>
-      <div @click="isMobile = !isMobile">
-        isMobile {{ isMobile }}
-      </div>
+    <template #default="{ contentHeight }">
+      <Scrollbar :style="{ height: `${contentHeight}px` }">
+        contentHeight: {{ contentHeight }}<br>
 
-      current mode: {{ mode }}
-      <div @click="mode = 'top'">
-        top
-      </div>
+        isDark: <input v-model="isDark" type="checkbox"><br>
+        headerFixed: <input v-model="props.headerFixed" type="checkbox"><br>
+        prefixFixed: <input v-model="props.prefixFixed" type="checkbox"><br>
+        suffixFixed: <input v-model="props.suffixFixed" type="checkbox"><br>
+        isFull: <input v-model="props.isFull" type="checkbox"><br>
+        isMobile: <input v-model="props.isMobile" type="checkbox"><br>
+        header: <input v-model="props.header" type="checkbox"><br>
+        prefix: <input v-model="props.prefix" type="checkbox"><br>
+        suffix: <input v-model="props.suffix" type="checkbox"><br>
+        mode:
+        <select v-model="props.mode">
+          <option value="top">
+            top
+          </option>
+          <option value="side">
+            side
+          </option>
+          <option value="mix">
+            mix
+          </option>
+        </select>
+        <br>
 
-      <div @click="mode = 'side'">
-        side
-      </div>
-
-      <div @click="mode = 'mix'">
-        mix
-      </div>
-      <div @click="getCount">
-        统计 Simplebar 数量
-      </div>
-      {{ props }}
-      <div v-for="i in 30" :key="i" class="border-bottom h-100px border-red">
-        Hello World
-      </div>
-    </div>
+        <button @click="getCount">
+          统计 Simplebar 数量
+        </button>
+        <br>
+        {{ props }}
+        <div v-for="i in 30" :key="i" class="border-bottom h-100px border-red">
+          Hello World
+        </div>
+      </Scrollbar>
+    </template>
   </AdminLayout>
 </template>
 

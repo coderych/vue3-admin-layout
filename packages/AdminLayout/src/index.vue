@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutProps, AdminSiderLeftProps, AdminSiderProps } from './typing'
+import type { AdminLayoutContentProps, AdminLayoutProps, AdminLayoutSiderLeftProps, AdminLayoutSiderProps } from './typing'
 import { pick } from 'lodash-es'
 import { computed, h } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
@@ -16,11 +16,11 @@ const emit = defineEmits<{
 }>()
 
 const slots = defineSlots<{
-  'default': (props: AdminLayoutProps) => void
+  'default': (props: AdminLayoutContentProps) => void
   'header': (props: AdminLayoutProps) => void
-  'sider': (props: AdminSiderProps) => void
-  'sider-left': (props: AdminSiderLeftProps) => void
-  'sider-right': (props: AdminSiderProps) => void
+  'sider': (props: AdminLayoutSiderProps) => void
+  'sider-left': (props: AdminLayoutSiderLeftProps) => void
+  'sider-right': (props: AdminLayoutSiderProps) => void
   'prefix': (props: AdminLayoutProps) => void
   'suffix': (props: AdminLayoutProps) => void
   'header-prefix': (props: AdminLayoutProps) => void

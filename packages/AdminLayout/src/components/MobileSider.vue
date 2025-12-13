@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminSiderProps } from '../typing'
+import type { AdminLayoutSiderProps } from '../typing'
 import { computed } from 'vue'
 import { Logo } from '.'
 import { Scrollbar } from '../../../Scrollbar'
@@ -10,7 +10,7 @@ import { CssVars, DefaultDarkColor } from '../typing'
 import Hamburger from './Hamburger.vue'
 
 defineSlots<{
-  default: (props: AdminSiderProps) => any
+  default: (props: AdminLayoutSiderProps) => any
 }>()
 
 const state = useAdminLayoutState()
