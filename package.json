@@ -43,7 +43,7 @@
     "@vueuse/core": "^13.1.0",
     "lodash-es": "^4.17.21",
     "seemly": "^0.3.10",
-    "simplebar-vue": "^2.4.0",
+    "simplebar-vue": "^2.4.2",
     "unocss": "^66.1.1"
   },
   "devDependencies": {

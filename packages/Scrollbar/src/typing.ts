@@ -9,6 +9,10 @@ export const scrollbarProps = {
     type: Boolean as PropType<boolean>,
     default: false,
   },
+  nativeScrollbar: {
+    type: Boolean as PropType<boolean>,
+    default: false,
+  },
 }
 
 export type ScrollbarProps = ExtractPublicPropTypes<typeof scrollbarProps>

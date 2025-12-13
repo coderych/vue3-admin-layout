@@ -165,7 +165,7 @@ function renderContent() {
 </script>
 
 <template>
-  <Scrollbar class="h-screen" :style="scrollbarCssVars">
+  <Scrollbar class="h-screen" :style="scrollbarCssVars" :native-scrollbar="!(!headerFixed && !isFull)">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
       <header v-if="header" class="admin-layout-header-container">
         <component :is="renderHeader" />
@@ -174,7 +174,7 @@ function renderContent() {
         <component :is="renderSider" />
       </aside>
       <main class="admin-layout-main-container" :style="mainStyle">
-        <Scrollbar>
+        <Scrollbar :native-scrollbar="!(headerFixed && !prefixFixed && !isFull)">
           <component :is="renderContent">
             <slot name="default" v-bind="props" />
           </component>

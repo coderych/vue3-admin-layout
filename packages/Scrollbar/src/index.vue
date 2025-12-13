@@ -17,9 +17,12 @@ defineExpose(new Proxy({}, {
 </script>
 
 <template>
-  <Simplebar ref="simplebarRef" :auto-hide="trigger === 'hover'" class="h-full" :class="{ 'overflow-x-hidden': !xScrollable }" v-bind="$attrs" @scroll="emit('scroll', $event)">
+  <Simplebar v-if="!nativeScrollbar" ref="simplebarRef" :auto-hide="trigger === 'hover'" class="h-full" v-bind="$attrs" @scroll="emit('scroll', $event)">
     <slot />
   </Simplebar>
+  <div v-else ref="simplebarRef" class="native-scrollbar h-full overflow-y-auto" :class="{ 'overflow-x': xScrollable }" v-bind="$attrs">
+    <slot />
+  </div>
 </template>
 
 <style lang="less">
@@ -27,6 +30,7 @@ defineExpose(new Proxy({}, {
   background-color: var(--admin-layout-scrollbar-color);
   border-radius: var(--admin-layout-scrollbar-border-radius);
   cursor: pointer;
+  transition-delay: 2s;
 }
 
 .simplebar-scrollbar.simplebar-visible.simplebar-hover::before {

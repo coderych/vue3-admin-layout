@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { CssVars } from '../typing'
@@ -23,7 +23,6 @@ const {
   suffixFixed,
   headerFixed,
 } = state
-const scrollbarRef = ref<any>()
 
 const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -75,12 +74,12 @@ const innerStyle = computed<CSSProperties>(() => {
 
 <template>
   <div class="admin-layout-main" :style="mainStyle" :class="{ 'admin-layout-main--full': isFull }">
-    <Scrollbar :class="{ 'h-screen': isFull }">
+    <Scrollbar :class="{ 'h-screen': isFull }" :native-scrollbar="!(isFull && !prefixFixed)">
       <div v-if="prefix" class="admin-layout-main-prefix border-bottom" :style="prefixStyle">
         <slot name="prefix" v-bind="state" />
       </div>
       <div class="admin-layout-main-content" :style="contentStyle">
-        <Scrollbar ref="scrollbarRef" class="h-full flex">
+        <Scrollbar class="h-full" :native-scrollbar="!(headerFixed && prefixFixed)">
           <div :style="innerStyle">
             <slot name="default" />
           </div>
