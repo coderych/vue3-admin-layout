@@ -192,5 +192,5 @@ export interface AdminLayoutSiderLeftProps extends AdminLayoutSiderProps {
 }
 
 export interface AdminLayoutContentProps extends AdminLayoutProps {
-  contentHeight: number
+  contentHeight?: number
 }
