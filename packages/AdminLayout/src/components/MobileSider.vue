@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutSiderProps } from '../typing'
+import type { AdminLayoutLogoProps, AdminLayoutSiderProps } from '../typing'
 import { computed } from 'vue'
 import { Logo } from '.'
 import { Scrollbar } from '../../../Scrollbar'
@@ -11,6 +11,7 @@ import Hamburger from './Hamburger.vue'
 
 defineSlots<{
   default: (props: AdminLayoutSiderProps) => any
+  logo: (props: AdminLayoutLogoProps) => any
 }>()
 
 const state = useAdminLayoutState()
@@ -63,9 +64,11 @@ const scrollHeight = computed(() => {
 
 <template>
   <div class="mobile-sider-container" :class="{ collapsed }" :style="style">
-    <Logo />
-    <slot name="default" v-bind="{ ...(state as any), height: scrollHeight }">
-      <Scrollbar :style="{ height: scrollHeight }">
+    <slot name="logo" v-bind="({ ...state, inverted, width: siderWidth, height: headerHeight, collapsed: false } as any)">
+      <Logo />
+    </slot>
+    <slot name="default" v-bind="({ ...state, scrollHeight } as any)">
+      <Scrollbar :style="{ scrollHeight }">
         <component
           :is="renderMenu({
             options: menuOptions,

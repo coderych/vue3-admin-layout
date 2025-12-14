@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutContentProps } from '../typing'
-import { useElementSize } from '@vueuse/core'
-import { computed, ref, watchEffect } from 'vue'
+import type { AdminLayoutContentProps, AdminLayoutProps } from '../typing'
+import { computed } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { CssVars } from '../typing'
 
 defineSlots<{
-  prefix: () => any
-  suffix: () => any
+  prefix: (props: AdminLayoutProps) => any
+  suffix: (props: AdminLayoutProps) => any
   default: (props: AdminLayoutContentProps) => any
+  overlay: (props: AdminLayoutContentProps) => any
 }>()
 
 const state = useAdminLayoutState()
@@ -24,6 +24,12 @@ const {
   isFull,
   suffixFixed,
   headerFixed,
+  contentTop,
+  contentHeight,
+  contentLeft,
+  overlayRef,
+  contentBottom,
+  contentWidth,
 } = state
 
 const mainStyle = computed<CSSProperties>(() => {
@@ -62,19 +68,14 @@ const suffixStyle = computed<CSSProperties>(() => {
   return style
 })
 
-const emptyRef = ref<HTMLDivElement>()
-const emptyStyle = ref<CSSProperties>({
+const overlayStyle = computed<CSSProperties>(() => ({
   position: 'fixed',
-  bottom: 0,
-  top: 0,
-  visibility: 'hidden',
-  left: '-9999px',
-})
-const { height: contentHeight } = useElementSize(emptyRef)
-
-watchEffect(() => {
-  emptyStyle.value.top = `${_prefixHeight.value + _suffixHeight.value + (isFull.value ? 0 : _headerHeight.value)}px`
-})
+  top: `${contentTop.value}px`,
+  left: `${contentLeft.value}px`,
+  bottom: `${contentBottom.value}px`,
+  right: 0,
+  zIndex: -999,
+}))
 
 const innerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -89,17 +90,19 @@ const innerStyle = computed<CSSProperties>(() => {
   <div class="admin-layout-main" :style="mainStyle" :class="{ 'admin-layout-main--full': isFull }">
     <Scrollbar :class="{ 'h-screen': isFull }" :native-scrollbar="!(isFull && !prefixFixed)">
       <div v-if="prefix" class="admin-layout-main-prefix border-bottom" :style="prefixStyle">
-        <slot name="prefix" v-bind="state" />
+        <slot name="prefix" v-bind="(state as any)" />
       </div>
       <div class="admin-layout-main-content" :style="contentStyle">
         <Scrollbar class="h-full" :native-scrollbar="!(headerFixed && prefixFixed)">
           <div :style="innerStyle">
-            <slot name="default" v-bind="{ ...(state as any), contentHeight }" />
+            <slot name="default" v-bind="({ ...state, contentHeight, contentWidth } as any)" />
           </div>
           <div v-if="suffix" :style="suffixStyle" class="admin-layout-main-suffix">
-            <slot name="suffix" />
+            <slot name="suffix" v-bind="(state as any)" />
           </div>
-          <div ref="emptyRef" :style="emptyStyle" />
+          <div ref="overlayRef" :style="overlayStyle">
+            <slot name="overlay" v-bind="({ ...state, contentHeight, contentWidth } as any)" />
+          </div>
         </Scrollbar>
       </div>
     </Scrollbar>

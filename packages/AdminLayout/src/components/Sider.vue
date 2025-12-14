@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutSiderLeftProps, AdminLayoutSiderProps } from '../typing'
-import { computed, ref, watch } from 'vue'
+import type { AdminLayoutLogoProps, AdminLayoutSiderProps } from '../typing'
+import { computed } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { calculateInverted } from '../helper'
@@ -11,8 +11,11 @@ import Logo from './Logo.vue'
 
 defineSlots<{
   default: (props: AdminLayoutSiderProps) => void
-  left: (props: AdminLayoutSiderLeftProps) => void
+  left: (props: AdminLayoutSiderProps) => void
   right: (props: AdminLayoutSiderProps) => void
+  logo: (props: AdminLayoutLogoProps) => void
+  leftLogo: (props: AdminLayoutLogoProps) => void
+  rightTitle: (props: AdminLayoutLogoProps) => void
 }>()
 
 const state = useAdminLayoutState()
@@ -36,10 +39,11 @@ const {
   childMenuOptions,
   isDark,
   renderMenu,
+  renderParentMenu,
   menuOptions,
   activeKey,
   accordion,
-  show,
+  _siderCollapsedWidth,
   toggleSiderFixed,
   toggleCollapsed,
 } = state
@@ -80,23 +84,6 @@ const siderStyle = computed<CSSProperties>(() => {
   return style
 })
 
-// 解决层叠上下文问题
-let timer: any
-const resolveStackingContextStyle = ref<CSSProperties>({})
-watch(show, (value) => {
-  if (value) {
-    timer && clearTimeout(timer)
-    resolveStackingContextStyle.value = {
-      zIndex: '100',
-    }
-  }
-  else {
-    timer = setTimeout(() => {
-      resolveStackingContextStyle.value = {}
-    }, 200)
-  }
-})
-
 const leftStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     width: `var(${CssVars.SiderCollapsedWidth})`,
@@ -112,17 +99,9 @@ const leftStyle = computed<CSSProperties>(() => {
 
 const rightStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    width: `${siderWidth.value}px !important`,
-    backgroundColor: siderTheme.value,
-  }
-  if (!siderFixed.value) {
-    if (show.value) {
-      style.boxShadow = `8px 0 15px ${!isDark.value ? `rgba(0, 0, 0, 0.03)` : `rgba(255, 255, 255, 0.03)`}`
-      style.transform = `translateX(0)`
-    }
-    else {
-      style.transform = `translateX(-${siderWidth.value}px)`
-    }
+    'width': `${siderWidth.value}px !important`,
+    'backgroundColor': siderTheme.value,
+    '--box-shadow': `8px 0 15px ${!isDark.value ? `rgba(0, 0, 0, 0.03)` : `rgba(255, 255, 255, 0.03)`}`,
   }
   if (isDark.value) {
     style.backgroundColor = `var(${CssVars.BaseColor})`
@@ -146,36 +125,53 @@ function handleParentMenuClick(key: string) {
     class="admin-layout-sider" :class="{
       'admin-layout-sider-split': splitMenu && mode === 'side',
       'border-right': (!splitMenu && mode === 'side') || mode === 'mix',
+      'admin-layout-sider__hover': !siderFixed && mode === 'side' && splitMenu,
     }"
-    :style="{ ...siderStyle, ...resolveStackingContextStyle }"
-    @mouseleave="show = false" @mouseover="show = true"
+    :style="{ ...siderStyle }"
   >
     <template v-if="(mode === 'side' && !splitMenu) || mode === 'mix'">
-      <Logo v-if="mode === 'side' && logo" :collapsed="collapsed" />
-      <slot name="default" v-bind="{ ...(state as any), height: scrollHeight.default }">
+      <slot v-if="mode === 'side' " name="logo" v-bind="({ ...state, width: collapsed ? siderCollapsedWidth : siderWidth, height: headerHeight, collapsed, inverted } as any)">
+        <Logo v-if="logo" :collapsed="collapsed" />
+      </slot>
+      <slot name="default" v-bind="({ ...state, scrollHeight: scrollHeight.default }as any)">
         <Scrollbar :style="{ height: scrollHeight.default }">
-          <component
-            :is="renderMenu({
-              options: splitMenu ? childMenuOptions : menuOptions,
-              collapsed,
-              collapsedWidth: siderCollapsedWidth,
-              inverted,
-              accordion,
-              value: `${activeKey}`,
-            })" v-if="renderMenu"
-          />
+          <template v-if="renderMenu">
+            <component
+              :is="renderMenu({
+                options: splitMenu ? childMenuOptions : menuOptions,
+                collapsed,
+                collapsedWidth: siderCollapsedWidth,
+                inverted,
+                accordion,
+                value: `${activeKey}`,
+              })"
+            />
+          </template>
         </Scrollbar>
       </slot>
       <Hamburger :value="collapsed" class="hamburger border-top" @update:value="toggleCollapsed" />
     </template>
     <template v-else>
       <div class="admin-layout-sider-split-left border-right" :style="leftStyle" :class="{ collapsed }">
-        <div v-if="logo && logoUrl" class="admin-layout-sider-split-left-logo">
-          <img :src="logoUrl" alt="logo">
-        </div>
-        <slot name="left" v-bind="{ ...(state as any), open: (value) => { show = value }, show, height: scrollHeight.left }">
+        <slot name="leftLogo" v-bind="({ ...state, width: _siderCollapsedWidth, height: headerHeight, collapsed, inverted } as any)">
+          <div v-if="logo && logoUrl" class="admin-layout-sider-split-left-logo">
+            <img :src="logoUrl" alt="logo">
+          </div>
+        </slot>
+        <slot name="left" v-bind="({ ...state, scrollHeight: scrollHeight.left } as any)">
           <Scrollbar :style="{ height: scrollHeight.left }">
-            <ul class="first-level-menu">
+            <template v-if="renderParentMenu">
+              <component
+                :is="renderParentMenu({
+                  options: parentMenuOptions,
+                  collapsed,
+                  inverted,
+                  accordion,
+                  value: `${parentKey}`,
+                })"
+              />
+            </template>
+            <ul v-else class="first-level-menu">
               <li v-for="item in parentMenuOptions" :key="item.key" class="first-level-menu-item" :class="{ active: item.key === parentKey }" @click="handleParentMenuClick(`${item.key}`)">
                 <div v-if="item" class="first-level-menu-item-icon">
                   <component :is="item.icon" />
@@ -190,12 +186,14 @@ function handleParentMenuClick(key: string) {
         <Hamburger :value="collapsed" class="hamburger" @update:value="toggleCollapsed" />
       </div>
       <div class="admin-layout-sider-split-right" :class="{ 'border-right': siderFixed }" :style="rightStyle">
-        <div v-if="logo && title" class="admin-layout-sider-split-right-title">
-          <span>
-            {{ title }}
-          </span>
-        </div>
-        <slot name="right" v-bind="{ ...(state as any), height: scrollHeight.right }">
+        <slot name="rightTitle" v-bind="({ ...state, width: siderWidth, height: headerHeight, collapsed, inverted } as any)">
+          <div v-if="logo && title" class="admin-layout-sider-split-right-title">
+            <span>
+              {{ title }}
+            </span>
+          </div>
+        </slot>
+        <slot name="right" v-bind="({ ...state, scrollHeight: scrollHeight.right } as any)">
           <Scrollbar :style="{ height: scrollHeight.right }">
             <component :is="renderMenu({ options: childMenuOptions, inverted, accordion, value: `${activeKey}`, collapsed: false })" v-if="renderMenu" />
           </Scrollbar>
@@ -215,6 +213,21 @@ function handleParentMenuClick(key: string) {
   position: relative;
 }
 
+.admin-layout-sider__hover {
+  .admin-layout-sider-split-right {
+    transform: translateX(-100%);
+    transition: transform var(--admin-layout-transition-duration);
+  }
+
+  &:hover {
+    .admin-layout-sider-split-right {
+      transform: translateX(0);
+      z-index: 100;
+      box-shadow: var(--box-shadow);
+    }
+  }
+}
+
 .admin-layout-sider-split {
   display: flex;
   flex-wrap: nowrap;
@@ -223,7 +236,7 @@ function handleParentMenuClick(key: string) {
     height: 100%;
     flex-shrink: 0;
     position: relative;
-    z-index: 20;
+    z-index: 101;
     overflow-x: hidden;
     box-sizing: border-box;
 
@@ -258,7 +271,7 @@ function handleParentMenuClick(key: string) {
   &-right {
     flex-shrink: 0;
     position: relative;
-    z-index: 15;
+    z-index: 100;
     height: 100%;
     transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
 

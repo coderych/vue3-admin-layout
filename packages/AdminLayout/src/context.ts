@@ -1,5 +1,5 @@
 import type { _AdminLayoutProps, MenuOption } from './typing'
-import { createInjectionState, useDark } from '@vueuse/core'
+import { createInjectionState, useDark, useElementSize } from '@vueuse/core'
 import { omit } from 'lodash-es'
 import { computed, ref, watch, watchEffect } from 'vue'
 import { getParentsKeys } from './helper'
@@ -22,9 +22,8 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const isFull = computed(() => props.isFull)
   const isDark = useDark()
   const renderMenu = computed(() => props.renderMenu)
+  const renderParentMenu = computed(() => props.renderParentMenu)
   const cssVars = computed(() => props.cssVars)
-  const show = ref(false)
-
   const header = computed(() => props.header)
   const headerHeight = computed(() => props.headerHeight)
   const headerTheme = computed(() => props.headerTheme)
@@ -35,8 +34,23 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const siderWidth = computed(() => props.siderWidth)
   const siderTheme = computed(() => props.siderTheme)
   const siderCollapsedWidth = computed(() => props.siderCollapsedWidth)
+  const _siderCollapsedWidth = computed(() => siderCollapsedWidth.value >= 80 || collapsed.value ? siderCollapsedWidth.value : siderCollapsedWidth.value / 0.6)
   const accordion = computed(() => props.accordion)
   const siderFixed = ref(props.siderFixed)
+  const _siderWidth = computed(() => {
+    if (!sider.value) {
+      return 0
+    }
+    if (mode.value === 'top' || isMobile.value) {
+      return 0
+    }
+    else if (mode.value === 'side' && splitMenu.value) {
+      return siderFixed.value ? siderWidth.value + _siderCollapsedWidth.value : _siderCollapsedWidth.value
+    }
+    else {
+      return collapsed.value ? siderCollapsedWidth.value : siderWidth.value
+    }
+  })
 
   const prefix = computed(() => props.prefix && Boolean(slots.prefix))
   const prefixHeight = computed(() => props.prefixHeight)
@@ -50,6 +64,15 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
 
   const activeKey = computed(() => props.activeKey)
   const parentKey = ref<string | null>()
+
+  const overlayRef = ref<HTMLDivElement>()
+  const { height: contentHeight, width: contentWidth } = useElementSize(overlayRef)
+  const contentTop = computed(() => {
+    return _prefixHeight.value + (isFull.value ? 0 : _headerHeight.value)
+  })
+  const contentLeft = computed(() => _siderWidth.value)
+  const contentBottom = computed(() => _suffixHeight.value)
+
   let parentsKeys = new Map<string, string[]>()
 
   const parentMenuOptions = computed<MenuOption[]>(() => {
@@ -107,8 +130,8 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     isFull,
     isDark,
     renderMenu,
+    renderParentMenu,
     cssVars,
-    show,
 
     header,
     headerHeight,
@@ -122,6 +145,8 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     siderCollapsedWidth,
     siderFixed,
     accordion,
+    _siderWidth,
+    _siderCollapsedWidth,
 
     prefix,
     prefixHeight,
@@ -137,6 +162,13 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     parentKey,
     parentMenuOptions,
     childMenuOptions,
+
+    overlayRef,
+    contentWidth,
+    contentHeight,
+    contentTop,
+    contentLeft,
+    contentBottom,
 
     toggleCollapsed,
     toggleSiderFixed,

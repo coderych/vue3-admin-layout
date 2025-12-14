@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutContentProps, AdminLayoutProps, AdminLayoutSiderLeftProps, AdminLayoutSiderProps } from './typing'
+import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutProps, AdminLayoutSiderProps } from './typing'
 import { pick } from 'lodash-es'
 import { computed, h } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
@@ -17,15 +17,24 @@ const emit = defineEmits<{
 
 const slots = defineSlots<{
   'default': (props: AdminLayoutContentProps) => void
-  'header': (props: AdminLayoutProps) => void
+  'header': (props: AdminLayoutHeaderProps) => void
   'sider': (props: AdminLayoutSiderProps) => void
-  'sider-left': (props: AdminLayoutSiderLeftProps) => void
+  'logo': (props: AdminLayoutLogoProps) => void
+  'sider-left': (props: AdminLayoutSiderProps) => void
+  'sider-left-logo': (props: AdminLayoutLogoProps) => void
   'sider-right': (props: AdminLayoutSiderProps) => void
+  'sider-right-title': (props: AdminLayoutLogoProps) => void
   'prefix': (props: AdminLayoutProps) => void
   'suffix': (props: AdminLayoutProps) => void
-  'header-prefix': (props: AdminLayoutProps) => void
-  'header-suffix': (props: AdminLayoutProps) => void
+  'header-prefix': (props: AdminLayoutHeaderProps) => void
+  'header-suffix': (props: AdminLayoutHeaderProps) => void
+  'content-overlay': (props: AdminLayoutContentProps) => void
 }>()
+
+const state = useAdminLayoutProvider(props, slots, {
+  onUpdateCollapsed: (value: boolean) => emit('update:collapsed', value),
+  onUpdateSiderFixed: (value: boolean) => emit('update:siderFixed', value),
+})
 
 const {
   header,
@@ -42,10 +51,12 @@ const {
   isDark,
   cssVars,
   sider,
-} = useAdminLayoutProvider(props, slots, {
-  onUpdateCollapsed: (value: boolean) => emit('update:collapsed', value),
-  onUpdateSiderFixed: (value: boolean) => emit('update:siderFixed', value),
-})
+  contentWidth,
+  contentHeight,
+  contentLeft,
+  contentTop,
+  contentBottom,
+} = state
 
 const style = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -136,6 +147,7 @@ function renderHeader() {
     default: slots.header,
     prefix: slots['header-prefix'],
     suffix: slots['header-suffix'],
+    logo: slots.logo,
   })
 }
 
@@ -143,6 +155,7 @@ function renderSider() {
   if (isMobile.value) {
     return h(MobileSider, {}, {
       default: slots.sider,
+      logo: slots.logo,
     })
   }
   if (mode.value === 'top') {
@@ -152,6 +165,9 @@ function renderSider() {
     default: slots.sider,
     left: slots['sider-left'],
     right: slots['sider-right'],
+    logo: slots.logo,
+    leftLogo: slots['sider-left-logo'],
+    rightTitle: slots['sider-right-title'],
   })
 }
 
@@ -160,8 +176,17 @@ function renderContent() {
     default: slots.default,
     prefix: slots.prefix,
     suffix: slots.suffix,
+    overlay: slots['content-overlay'],
   })
 }
+
+defineExpose({
+  contentWidth,
+  contentHeight,
+  contentLeft,
+  contentTop,
+  contentBottom,
+})
 </script>
 
 <template>
@@ -176,7 +201,7 @@ function renderContent() {
       <main class="admin-layout-main-container" :style="mainStyle">
         <Scrollbar :native-scrollbar="!(headerFixed && !prefixFixed && !isFull)">
           <component :is="renderContent">
-            <slot name="default" v-bind="props" />
+            <slot name="default" v-bind="(state as any)" />
           </component>
         </Scrollbar>
       </main>

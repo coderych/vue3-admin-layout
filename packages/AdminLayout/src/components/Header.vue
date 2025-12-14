@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
+import type { AdminLayoutHeaderProps, AdminLayoutLogoProps } from '../typing'
 import { computed } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
@@ -9,9 +10,10 @@ import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
 
 defineSlots<{
-  default: () => any
-  prefix: () => any
-  suffix: () => any
+  default: (props: AdminLayoutHeaderProps) => any
+  prefix: (props: AdminLayoutHeaderProps) => any
+  suffix: (props: AdminLayoutHeaderProps) => any
+  logo: (props: AdminLayoutLogoProps) => any
 }>()
 
 const state = useAdminLayoutState()
@@ -23,6 +25,7 @@ const {
   parentKey,
   splitMenu,
   renderMenu,
+  renderParentMenu,
   menuOptions,
   isDark,
   collapsed,
@@ -30,6 +33,8 @@ const {
   accordion,
   isMobile,
   toggleCollapsed,
+  siderWidth,
+  headerHeight,
 } = state
 
 const inverted = computed(() => calculateInverted(headerTheme.value) || isDark.value)
@@ -71,26 +76,43 @@ function handleParentMenuClick(key: string) {
 <template>
   <Scrollbar x-scrollable :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
     <div class="admin-layout-header" :style="headerStyle">
-      <Logo v-if="mode !== 'side' && logo && !isMobile" />
+      <slot
+        v-if="mode !== 'side' && !isMobile" name="logo"
+        v-bind="({ ...state, inverted, width: siderWidth, height: headerHeight, collapsed: false } as any)"
+      >
+        <Logo v-if="logo" />
+      </slot>
       <Hamburger v-if="isMobile" :value="collapsed" class="hamburger" @update:value="toggleCollapsed" />
-      <slot v-if="!isMobile" name="prefix" v-bind="state" />
-      <slot v-if="!isMobile" name="default" v-bind="state">
-        <ul v-if="mode === 'mix' && splitMenu" class="first-level-menu">
-          <li v-for="item in parentMenuOptions" :key="item.key" class="first-level-menu-item" :class="{ active: item.key === parentKey }" @click="handleParentMenuClick(`${item.key}`)">
-            <div v-if="item.icon" class="first-level-menu-item-icon">
-              <component :is="item.icon" />
-            </div>
-            <div class="first-level-menu-item-label">
-              {{ item.label }}
-            </div>
-          </li>
-        </ul>
+      <slot v-if="!isMobile" name="prefix" v-bind="({ ...state, inverted } as any)" />
+      <slot v-if="!isMobile" name="default" v-bind="({ ...state, inverted } as any)">
+        <template v-if="mode === 'mix' && splitMenu">
+          <template v-if="renderParentMenu">
+            <component
+              :is="renderParentMenu({
+                options: parentMenuOptions,
+                mode: 'horizontal',
+                inverted,
+                value: `${parentKey}`,
+              })"
+            />
+          </template>
+          <ul v-else class="first-level-menu">
+            <li v-for="item in parentMenuOptions" :key="item.key" class="first-level-menu-item" :class="{ active: item.key === parentKey }" @click="handleParentMenuClick(`${item.key}`)">
+              <div v-if="item.icon" class="first-level-menu-item-icon">
+                <component :is="item.icon" />
+              </div>
+              <div class="first-level-menu-item-label">
+                {{ item.label }}
+              </div>
+            </li>
+          </ul>
+        </template>
         <div v-else-if="mode === 'top' && renderMenu" class="flex-1">
           <component :is="renderMenu({ options: menuOptions, mode: 'horizontal', inverted, accordion })" />
         </div>
       </slot>
       <div class="ml-auto" />
-      <slot name="suffix" v-bind="state" />
+      <slot name="suffix" v-bind="({ ...state, inverted } as any)" />
     </div>
   </Scrollbar>
 </template>

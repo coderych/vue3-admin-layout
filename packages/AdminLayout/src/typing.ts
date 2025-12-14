@@ -169,6 +169,10 @@ export const adminLayoutProps = {
     type: Function as PropType<(props: MenuProps) => any>,
     default: undefined,
   },
+  renderParentMenu: {
+    type: Function as PropType<(props: MenuProps) => any>,
+    default: undefined,
+  },
   activeKey: {
     type: String as PropType<string>,
     default: undefined,
@@ -182,15 +186,30 @@ export const adminLayoutProps = {
 export type AdminLayoutProps = ExtractPublicPropTypes<typeof adminLayoutProps>
 export type _AdminLayoutProps = ExtractPropTypes<typeof adminLayoutProps>
 
-export interface AdminLayoutSiderProps extends AdminLayoutProps {
-  height: string
+export interface AdminLayoutHeaderProps extends AdminLayoutProps {
+  inverted: boolean
 }
 
-export interface AdminLayoutSiderLeftProps extends AdminLayoutSiderProps {
-  open: (show: boolean) => void
-  show: boolean
+export interface AdminLayoutSiderProps extends AdminLayoutProps {
+  scrollHeight: string
 }
 
 export interface AdminLayoutContentProps extends AdminLayoutProps {
+  contentWidth?: number
   contentHeight?: number
+}
+
+export interface AdminLayoutLogoProps extends AdminLayoutProps {
+  width: number
+  height: number
+  collapsed: boolean
+  inverted: boolean
+}
+
+export interface AdminLayoutInstance {
+  contentWidth: number
+  contentHeight: number
+  contentTop: number
+  contentLeft: number
+  contentBottom: number
 }
