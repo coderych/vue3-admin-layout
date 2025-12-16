@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutHeaderProps, AdminLayoutLogoProps } from '../typing'
+import type { AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps } from '../typing'
 import { computed } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
@@ -14,27 +14,29 @@ defineSlots<{
   prefix: (props: AdminLayoutHeaderProps) => any
   suffix: (props: AdminLayoutHeaderProps) => any
   logo: (props: AdminLayoutLogoProps) => any
+  menu: (props: AdminLayoutMenuProps) => any
+  parentMenu: (props: AdminLayoutMenuProps) => any
 }>()
 
 const state = useAdminLayoutState()
 const {
+  header,
   headerTheme,
+  headerHeight,
   _headerHeight,
   mode,
   parentMenuOptions,
   parentKey,
   splitMenu,
-  renderMenu,
-  renderParentMenu,
   menuOptions,
   isDark,
   collapsed,
   logo,
-  accordion,
   isMobile,
+  headerFixed,
   toggleCollapsed,
   siderWidth,
-  headerHeight,
+  activeKey,
 } = state
 
 const inverted = computed(() => calculateInverted(headerTheme.value) || isDark.value)
@@ -71,48 +73,62 @@ const headerStyle = computed<CSSProperties>(() => {
 function handleParentMenuClick(key: string) {
   parentKey.value = key
 }
+
+const headerProps = computed<AdminLayoutHeaderProps>(() => ({
+  state,
+  inverted: inverted.value,
+  height: headerHeight.value,
+  _height: _headerHeight.value,
+  fixed: headerFixed.value,
+  theme: headerTheme.value,
+  show: header.value,
+}))
+const logoProps = computed<AdminLayoutLogoProps>(() => ({
+  inverted: inverted.value,
+  width: siderWidth.value,
+  height: _headerHeight.value,
+  collapsed: false,
+  state,
+}))
+const menuProps = computed<AdminLayoutMenuProps>(() => ({
+  mode: 'horizontal',
+  inverted: inverted.value,
+  collapsed: false,
+  state,
+}))
 </script>
 
 <template>
   <Scrollbar x-scrollable :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
     <div class="admin-layout-header" :style="headerStyle">
-      <slot
-        v-if="mode !== 'side' && !isMobile" name="logo"
-        v-bind="({ ...state, inverted, width: siderWidth, height: headerHeight, collapsed: false } as any)"
-      >
-        <Logo v-if="logo" />
-      </slot>
-      <Hamburger v-if="isMobile" :value="collapsed" class="hamburger" @update:value="toggleCollapsed" />
-      <slot v-if="!isMobile" name="prefix" v-bind="({ ...state, inverted } as any)" />
-      <slot v-if="!isMobile" name="default" v-bind="({ ...state, inverted } as any)">
-        <template v-if="mode === 'mix' && splitMenu">
-          <template v-if="renderParentMenu">
-            <component
-              :is="renderParentMenu({
-                options: parentMenuOptions,
-                mode: 'horizontal',
-                inverted,
-                value: `${parentKey}`,
-              })"
-            />
-          </template>
-          <ul v-else class="first-level-menu">
-            <li v-for="item in parentMenuOptions" :key="item.key" class="first-level-menu-item" :class="{ active: item.key === parentKey }" @click="handleParentMenuClick(`${item.key}`)">
-              <div v-if="item.icon" class="first-level-menu-item-icon">
+      <slot v-if="!isMobile" name="default" v-bind="headerProps">
+        <slot v-if="mode !== 'side' && !isMobile" name="logo" v-bind="logoProps">
+          <Logo v-if="logo" />
+        </slot>
+        <Hamburger v-if="isMobile" :value="collapsed" class="admin-layout-header__hamburger" @update:value="toggleCollapsed" />
+        <slot v-if="!isMobile" name="prefix" v-bind="headerProps" />
+        <slot v-if="mode === 'mix' && splitMenu" name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
+          <ul class="admin-layout-header__parent-menu">
+            <li
+              v-for="item in parentMenuOptions" :key="item.key"
+              class="admin-layout-header__parent-menu-item" :class="{ active: item.key === parentKey }"
+              @click="handleParentMenuClick(`${item.key}`)"
+            >
+              <div v-if="item.icon" class="admin-layout-header__parent-menu-item-icon">
                 <component :is="item.icon" />
               </div>
-              <div class="first-level-menu-item-label">
+              <div class="admin-layout-header__parent-menu-item-label">
                 {{ item.label }}
               </div>
             </li>
           </ul>
-        </template>
-        <div v-else-if="mode === 'top' && renderMenu" class="flex-1">
-          <component :is="renderMenu({ options: menuOptions, mode: 'horizontal', inverted, accordion })" />
+        </slot>
+        <div v-else-if="mode === 'top'" class="flex-1">
+          <slot name="menu" v-bind="{ ...menuProps, options: menuOptions, value: `${activeKey}` }" />
         </div>
+        <div class="ml-auto" />
+        <slot name="suffix" v-bind="headerProps" />
       </slot>
-      <div class="ml-auto" />
-      <slot name="suffix" v-bind="({ ...state, inverted } as any)" />
     </div>
   </Scrollbar>
 </template>
@@ -126,65 +142,65 @@ function handleParentMenuClick(key: string) {
   & > * {
     flex-shrink: 0;
   }
-}
 
-.first-level-menu {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  list-style: none;
-  height: 100%;
-
-  &-item {
-    height: 76%;
-    padding: 0 12px;
+  &__parent-menu {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border-radius: 6px;
     gap: 6px;
-    transition: var(--admin-layout-transition);
+    list-style: none;
+    height: 100%;
 
-    &:hover:not(.active) {
-      color: var(--primary-color);
-      background-color: rgba(0, 0, 0, 0.05);
-
-      .first-level-menu-item-icon {
-        transform: scale(1.2);
-      }
-    }
-
-    &.active {
-      background-color: var(--primary-color);
-      color: #fff;
-
-      .first-level-menu-item-icon {
-        transform: scale(1.1);
-      }
-    }
-
-    &-icon {
-      font-size: 18px;
-      width: 20px;
-      height: 20px;
+    &-item {
+      height: 76%;
+      padding: 0 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease-out;
-    }
+      cursor: pointer;
+      border-radius: 6px;
+      gap: 6px;
+      transition: var(--admin-layout-transition);
 
-    &-label {
-      max-width: 80px;
-      font-size: 12px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      &:hover:not(.active) {
+        color: var(--primary-color);
+        background-color: rgba(0, 0, 0, 0.05);
+
+        .admin-layout-header__parent-menu-item-icon {
+          transform: scale(1.2);
+        }
+      }
+
+      &.active {
+        background-color: var(--primary-color);
+        color: #fff;
+
+        .admin-layout-header__parent-menu-item-icon {
+          transform: scale(1.1);
+        }
+      }
+
+      &-icon {
+        font-size: 18px;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease-out;
+      }
+
+      &-label {
+        max-width: 80px;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
-}
 
-.hamburger {
-  margin: 0 6px;
+  &__hamburger {
+    margin: 0 6px;
+  }
 }
 </style>

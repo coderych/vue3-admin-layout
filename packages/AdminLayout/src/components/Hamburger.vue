@@ -7,14 +7,14 @@ function toggle(value: boolean) {
 </script>
 
 <template>
-  <div class="hamburger-container" @click="toggle(!collapsed)">
+  <div class="hamburger" @click="toggle(!collapsed)">
     <div v-if="!collapsed" class="i-ant-design:menu-fold-outlined" />
     <div v-else class="i-ant-design:menu-unfold-outlined" />
   </div>
 </template>
 
 <style scoped lang="less">
-.hamburger-container {
+.hamburger {
   border-radius: 6px;
   width: 28px;
   height: 28px;

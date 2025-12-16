@@ -1,28 +1,28 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutContentProps, AdminLayoutProps } from '../typing'
+import type { AdminLayoutContentProps } from '../typing'
 import { computed } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { CssVars } from '../typing'
 
 defineSlots<{
-  prefix: (props: AdminLayoutProps) => any
-  suffix: (props: AdminLayoutProps) => any
+  header: (props: AdminLayoutContentProps) => any
+  footer: (props: AdminLayoutContentProps) => any
   default: (props: AdminLayoutContentProps) => any
   overlay: (props: AdminLayoutContentProps) => any
 }>()
 
 const state = useAdminLayoutState()
 const {
-  prefix,
-  _prefixHeight,
-  suffix,
-  _suffixHeight,
-  prefixFixed,
+  contentHeader,
+  _contentHeaderHeight,
+  contentFooter,
+  _contentFooterHeight,
+  contentHeaderFixed,
   _headerHeight,
   isFull,
-  suffixFixed,
+  contentFooterFixed,
   headerFixed,
   contentTop,
   contentHeight,
@@ -42,26 +42,26 @@ const mainStyle = computed<CSSProperties>(() => {
 
 const contentStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
-  if (prefixFixed.value && headerFixed.value) {
-    style.height = `calc(100vh - ${_prefixHeight.value}px - ${isFull.value ? 0 : _headerHeight.value}px)`
+  if (contentHeaderFixed.value && headerFixed.value) {
+    style.height = `calc(100vh - ${_contentHeaderHeight.value}px - ${isFull.value ? 0 : _headerHeight.value}px)`
   }
   return style
 })
 
-const prefixStyle = computed<CSSProperties>(() => {
+const contentHeaderStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    height: `${_prefixHeight.value}px`,
+    height: `${_contentHeaderHeight.value}px`,
     backgroundColor: `var(${CssVars.BaseColor})`,
   }
   return style
 })
 
-const suffixStyle = computed<CSSProperties>(() => {
+const contentFooterStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    height: `${_suffixHeight.value}px`,
+    height: `${_contentFooterHeight.value}px`,
     backgroundColor: `var(${CssVars.BgColor})`,
   }
-  if (suffixFixed.value) {
+  if (contentFooterFixed.value) {
     style.position = 'sticky'
     style.bottom = 0
   }
@@ -84,24 +84,31 @@ const innerStyle = computed<CSSProperties>(() => {
   style['--content-height'] = style.minHeight
   return style
 })
+
+const contentProps = computed<AdminLayoutContentProps>(() => ({
+  height: contentHeight.value,
+  width: contentWidth.value,
+  scrollHeight: `${contentHeight.value}px`,
+  state,
+}))
 </script>
 
 <template>
   <div class="admin-layout-main" :style="mainStyle" :class="{ 'admin-layout-main--full': isFull }">
-    <Scrollbar :class="{ 'h-screen': isFull }" :native-scrollbar="!(isFull && !prefixFixed)">
-      <div v-if="prefix" class="admin-layout-main-prefix border-bottom" :style="prefixStyle">
-        <slot name="prefix" v-bind="(state as any)" />
+    <Scrollbar :class="{ 'h-screen': isFull }" :native-scrollbar="!(isFull && !contentHeaderFixed)">
+      <div v-if="contentHeader" class="admin-layout-main__header border-bottom" :style="contentHeaderStyle">
+        <slot name="header" v-bind="contentProps" />
       </div>
-      <div class="admin-layout-main-content" :style="contentStyle">
-        <Scrollbar class="h-full" :native-scrollbar="!(headerFixed && prefixFixed)">
+      <div class="admin-layout-main__content" :style="contentStyle">
+        <Scrollbar class="h-full" :native-scrollbar="!(headerFixed && contentHeaderFixed)">
           <div :style="innerStyle">
-            <slot name="default" v-bind="({ ...state, contentHeight, contentWidth } as any)" />
+            <slot name="default" v-bind="contentProps" />
           </div>
-          <div v-if="suffix" :style="suffixStyle" class="admin-layout-main-suffix">
-            <slot name="suffix" v-bind="(state as any)" />
+          <div v-if="contentFooter" :style="contentFooterStyle" class="admin-layout-main__footer">
+            <slot name="footer" v-bind="contentProps" />
           </div>
           <div ref="overlayRef" :style="overlayStyle">
-            <slot name="overlay" v-bind="({ ...state, contentHeight, contentWidth } as any)" />
+            <slot name="overlay" v-bind="contentProps" />
           </div>
         </Scrollbar>
       </div>
@@ -110,30 +117,36 @@ const innerStyle = computed<CSSProperties>(() => {
 </template>
 
 <style scoped lang="less">
-.admin-layout-main--full {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 11;
-  overflow: hidden;
-}
+.admin-layout-main {
+  &--full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 11;
+    overflow: hidden;
+  }
 
-.admin-layout-main-prefix {
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  will-change: transform;
-  position: relative;
-}
+  &__header {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    will-change: transform;
+    position: relative;
+  }
 
-.admin-layout-main-suffix {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 11;
+  &__content {
+    display: block;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 11;
+  }
 }
 </style>

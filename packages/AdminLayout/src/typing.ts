@@ -1,4 +1,5 @@
 import type { Component, ExtractPropTypes, ExtractPublicPropTypes, PropType } from 'vue'
+import type { AdminLayoutState } from './context'
 
 export type LayoutType = 'side' | 'mix' | 'top'
 
@@ -134,28 +135,28 @@ export const adminLayoutProps = {
     default: true,
   },
 
-  prefix: {
+  contentHeader: {
     type: Boolean as PropType<boolean>,
     default: true,
   },
-  prefixHeight: {
+  contentHeaderHeight: {
     type: Number as PropType<number>,
     default: 36,
   },
-  prefixFixed: {
+  contentHeaderFixed: {
     type: Boolean as PropType<boolean>,
     default: true,
   },
 
-  suffix: {
+  contentFooter: {
     type: Boolean as PropType<boolean>,
     default: true,
   },
-  suffixHeight: {
+  contentFooterHeight: {
     type: Number as PropType<number>,
     default: 32,
   },
-  suffixFixed: {
+  contentFooterFixed: {
     type: Boolean as PropType<boolean>,
     default: false,
   },
@@ -165,14 +166,6 @@ export const adminLayoutProps = {
     default: false,
   },
 
-  renderMenu: {
-    type: Function as PropType<(props: MenuProps) => any>,
-    default: undefined,
-  },
-  renderParentMenu: {
-    type: Function as PropType<(props: MenuProps) => any>,
-    default: undefined,
-  },
   activeKey: {
     type: String as PropType<string>,
     default: undefined,
@@ -186,30 +179,51 @@ export const adminLayoutProps = {
 export type AdminLayoutProps = ExtractPublicPropTypes<typeof adminLayoutProps>
 export type _AdminLayoutProps = ExtractPropTypes<typeof adminLayoutProps>
 
-export interface AdminLayoutHeaderProps extends AdminLayoutProps {
+export interface AdminLayoutHeaderProps {
+  state: AdminLayoutState
   inverted: boolean
+  height: number
+  _height: number
+  fixed: boolean
+  theme: string
+  show: boolean
 }
 
-export interface AdminLayoutSiderProps extends AdminLayoutProps {
+export interface AdminLayoutSiderProps {
+  state: AdminLayoutState
+  show: boolean
+  fixed: boolean
+  theme: string
+  width: number
+  _width: number
+  collapsedWidth: number
+  _collapsedWidth: number
+  inverted: boolean
+  headerHeight: number
+  collapsed: boolean
+  toggleCollapsed: (collapsed: boolean) => void
+  toggleFixed: (fixed: boolean) => void
+}
+
+export interface AdminLayoutContentProps {
+  height: number
+  width: number
   scrollHeight: string
+  state: AdminLayoutState
 }
 
-export interface AdminLayoutContentProps extends AdminLayoutProps {
-  contentWidth?: number
-  contentHeight?: number
-}
-
-export interface AdminLayoutLogoProps extends AdminLayoutProps {
+export interface AdminLayoutLogoProps {
+  state: AdminLayoutState
   width: number
   height: number
-  collapsed: boolean
   inverted: boolean
+  collapsed: boolean
+}
+
+export interface AdminLayoutMenuProps extends MenuProps {
+  state: AdminLayoutState
 }
 
 export interface AdminLayoutInstance {
-  contentWidth: number
-  contentHeight: number
-  contentTop: number
-  contentLeft: number
-  contentBottom: number
+  state: AdminLayoutState
 }

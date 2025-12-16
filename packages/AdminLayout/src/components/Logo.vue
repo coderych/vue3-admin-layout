@@ -27,14 +27,14 @@ const style = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <div v-if="logo && (logoUrl || title)" class="logo-container" :style="{ ...style }">
+  <div v-if="logo && (logoUrl || title)" class="logo" :style="{ ...style }">
     <img v-if="logoUrl" :src="logoUrl" alt="logo">
     <span v-if="title && !collapsed">{{ title }}</span>
   </div>
 </template>
 
-<style scoped>
-.logo-container {
+<style scoped lang="less">
+.logo {
   flex-shrink: 0;
   overflow: hidden;
   display: flex;
@@ -42,18 +42,18 @@ const style = computed<CSSProperties>(() => {
   justify-content: center;
   text-decoration: none;
   gap: 12px;
-}
 
-.logo-container img {
-  height: 68%;
-}
+  & img {
+    height: 68%;
+  }
 
-.logo-container span {
-  font-size: 18px;
-  font-weight: 500;
-  overflow: hidden;
-  white-space: nowrap;
-  font-weight: 700;
-  color: var(--primary-color);
+  & span {
+    font-size: 18px;
+    font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
 }
 </style>

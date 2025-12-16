@@ -17,7 +17,11 @@ defineExpose(new Proxy({}, {
 </script>
 
 <template>
-  <Simplebar v-if="!nativeScrollbar" ref="simplebarRef" :auto-hide="trigger === 'hover'" class="h-full" v-bind="$attrs" @scroll="emit('scroll', $event)">
+  <Simplebar
+    v-if="!nativeScrollbar" v-bind="$attrs" ref="simplebarRef"
+    :class="{ 'overflow-x-hidden': !xScrollable }" :auto-hide="trigger === 'hover'"
+    class="h-full" @scroll="emit('scroll', $event)"
+  >
     <slot />
   </Simplebar>
   <div v-else ref="simplebarRef" class="native-scrollbar h-full overflow-y-auto" :class="{ 'overflow-x': xScrollable }" v-bind="$attrs">

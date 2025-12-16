@@ -21,8 +21,6 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const title = computed(() => props.title)
   const isFull = computed(() => props.isFull)
   const isDark = useDark()
-  const renderMenu = computed(() => props.renderMenu)
-  const renderParentMenu = computed(() => props.renderParentMenu)
   const cssVars = computed(() => props.cssVars)
   const header = computed(() => props.header)
   const headerHeight = computed(() => props.headerHeight)
@@ -52,15 +50,15 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     }
   })
 
-  const prefix = computed(() => props.prefix && Boolean(slots.prefix))
-  const prefixHeight = computed(() => props.prefixHeight)
-  const prefixFixed = computed(() => props.prefixFixed)
-  const _prefixHeight = computed(() => prefix.value ? prefixHeight.value : 0)
+  const contentHeader = computed(() => props.contentHeader && Boolean(slots['content-header']))
+  const contentHeaderHeight = computed(() => props.contentHeaderHeight)
+  const contentHeaderFixed = computed(() => props.contentHeaderFixed)
+  const _contentHeaderHeight = computed(() => contentHeader.value ? contentHeaderHeight.value : 0)
 
-  const suffix = computed(() => props.suffix && Boolean(slots.suffix))
-  const suffixHeight = computed(() => props.suffixHeight)
-  const suffixFixed = computed(() => props.suffixFixed)
-  const _suffixHeight = computed(() => suffix.value ? suffixHeight.value : 0)
+  const contentFooter = computed(() => props.contentFooter && Boolean(slots['content-footer']))
+  const contentFooterHeight = computed(() => props.contentFooterHeight)
+  const contentFooterFixed = computed(() => props.contentFooterFixed)
+  const _contentFooterHeight = computed(() => contentFooter.value ? contentFooterHeight.value : 0)
 
   const activeKey = computed(() => props.activeKey)
   const parentKey = ref<string | null>()
@@ -68,10 +66,10 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const overlayRef = ref<HTMLDivElement>()
   const { height: contentHeight, width: contentWidth } = useElementSize(overlayRef)
   const contentTop = computed(() => {
-    return _prefixHeight.value + (isFull.value ? 0 : _headerHeight.value)
+    return _contentHeaderHeight.value + (isFull.value ? 0 : _headerHeight.value)
   })
   const contentLeft = computed(() => _siderWidth.value)
-  const contentBottom = computed(() => _suffixHeight.value)
+  const contentBottom = computed(() => _contentFooterHeight.value)
 
   let parentsKeys = new Map<string, string[]>()
 
@@ -129,8 +127,6 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     title,
     isFull,
     isDark,
-    renderMenu,
-    renderParentMenu,
     cssVars,
 
     header,
@@ -148,15 +144,15 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     _siderWidth,
     _siderCollapsedWidth,
 
-    prefix,
-    prefixHeight,
-    prefixFixed,
-    _prefixHeight,
+    contentHeader,
+    contentHeaderHeight,
+    contentHeaderFixed,
+    _contentHeaderHeight,
 
-    suffix,
-    suffixHeight,
-    suffixFixed,
-    _suffixHeight,
+    contentFooter,
+    contentFooterHeight,
+    contentFooterFixed,
+    _contentFooterHeight,
 
     activeKey,
     parentKey,
@@ -179,4 +175,5 @@ const [useAdminLayoutProvider, useAdminLayoutInject] = createInjectionState(admi
 
 export { useAdminLayoutProvider }
 
-export const useAdminLayoutState = (): ReturnType<typeof adminLayoutState> => useAdminLayoutInject()!
+export type AdminLayoutState = ReturnType<typeof useAdminLayoutProvider>
+export const useAdminLayoutState = (): AdminLayoutState => useAdminLayoutInject()!

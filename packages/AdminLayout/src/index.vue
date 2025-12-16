@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutProps, AdminLayoutSiderProps } from './typing'
+import type { AdminLayoutState } from './context'
+import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps } from './typing'
 import { pick } from 'lodash-es'
 import { computed, h } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
@@ -16,19 +17,25 @@ const emit = defineEmits<{
 }>()
 
 const slots = defineSlots<{
-  'default': (props: AdminLayoutContentProps) => void
-  'header': (props: AdminLayoutHeaderProps) => void
-  'sider': (props: AdminLayoutSiderProps) => void
+  'default': (props: AdminLayoutState) => void
   'logo': (props: AdminLayoutLogoProps) => void
-  'sider-left': (props: AdminLayoutSiderProps) => void
-  'sider-left-logo': (props: AdminLayoutLogoProps) => void
-  'sider-right': (props: AdminLayoutSiderProps) => void
-  'sider-right-title': (props: AdminLayoutLogoProps) => void
-  'prefix': (props: AdminLayoutProps) => void
-  'suffix': (props: AdminLayoutProps) => void
+  'header': (props: AdminLayoutHeaderProps) => void
   'header-prefix': (props: AdminLayoutHeaderProps) => void
   'header-suffix': (props: AdminLayoutHeaderProps) => void
+  'sider': (props: AdminLayoutSiderProps) => void
+  'sider-header': (props: AdminLayoutSiderProps) => void
+  'sider-footer': (props: AdminLayoutSiderProps) => void
+  'sider-left': (props: AdminLayoutSiderProps) => void
+  'sider-left-header': (props: AdminLayoutSiderProps) => void
+  'sider-left-footer': (props: AdminLayoutSiderProps) => void
+  'sider-right': (props: AdminLayoutSiderProps) => void
+  'sider-right-header': (props: AdminLayoutSiderProps) => void
+  'sider-right-footer': (props: AdminLayoutSiderProps) => void
+  'content-header': (props: AdminLayoutContentProps) => void
+  'content-footer': (props: AdminLayoutContentProps) => void
   'content-overlay': (props: AdminLayoutContentProps) => void
+  'menu': (props: AdminLayoutMenuProps) => void
+  'parent-menu': (props: AdminLayoutMenuProps) => void
 }>()
 
 const state = useAdminLayoutProvider(props, slots, {
@@ -51,11 +58,6 @@ const {
   isDark,
   cssVars,
   sider,
-  contentWidth,
-  contentHeight,
-  contentLeft,
-  contentTop,
-  contentBottom,
 } = state
 
 const style = computed<CSSProperties>(() => {
@@ -148,6 +150,8 @@ function renderHeader() {
     prefix: slots['header-prefix'],
     suffix: slots['header-suffix'],
     logo: slots.logo,
+    menu: slots.menu,
+    parentMenu: slots['parent-menu'],
   })
 }
 
@@ -156,6 +160,9 @@ function renderSider() {
     return h(MobileSider, {}, {
       default: slots.sider,
       logo: slots.logo,
+      menu: slots.menu,
+      header: slots['sider-header'],
+      footer: slots['sider-footer'],
     })
   }
   if (mode.value === 'top') {
@@ -166,42 +173,44 @@ function renderSider() {
     left: slots['sider-left'],
     right: slots['sider-right'],
     logo: slots.logo,
-    leftLogo: slots['sider-left-logo'],
-    rightTitle: slots['sider-right-title'],
+    header: slots['sider-header'],
+    footer: slots['sider-footer'],
+    leftHeader: slots['sider-left-header'],
+    leftFooter: slots['sider-left-footer'],
+    rightHeader: slots['sider-right-header'],
+    rightFooter: slots['sider-right-footer'],
+    menu: slots.menu,
+    parentMenu: slots['parent-menu'],
   })
 }
 
 function renderContent() {
   return h(AppMain, { }, {
     default: slots.default,
-    prefix: slots.prefix,
-    suffix: slots.suffix,
+    header: slots['content-header'],
+    footer: slots['content-footer'],
     overlay: slots['content-overlay'],
   })
 }
 
 defineExpose({
-  contentWidth,
-  contentHeight,
-  contentLeft,
-  contentTop,
-  contentBottom,
+  state,
 })
 </script>
 
 <template>
   <Scrollbar class="h-screen" :style="scrollbarCssVars" :native-scrollbar="!(!headerFixed && !isFull)">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
-      <header v-if="header" class="admin-layout-header-container">
+      <header v-if="header" class="admin-layout__header">
         <component :is="renderHeader" />
       </header>
-      <aside v-if="sider" class="admin-layout-sider-container">
+      <aside v-if="sider" class="admin-layout__sider">
         <component :is="renderSider" />
       </aside>
-      <main class="admin-layout-main-container" :style="mainStyle">
-        <Scrollbar :native-scrollbar="!(headerFixed && !prefixFixed && !isFull)">
+      <main class="admin-layout__main" :style="mainStyle">
+        <Scrollbar :native-scrollbar="!(headerFixed && !contentHeaderFixed && !isFull)">
           <component :is="renderContent">
-            <slot name="default" v-bind="(state as any)" />
+            <slot name="default" v-bind="state" />
           </component>
         </Scrollbar>
       </main>
@@ -248,19 +257,19 @@ defineExpose({
       'main';
     grid-template-columns: minmax(0, 1fr);
   }
-}
 
-.admin-layout-header-container {
-  grid-area: header;
-}
+  &__header {
+    grid-area: header;
+  }
 
-.admin-layout-sider-container {
-  grid-area: sider;
-  display: flex;
-}
+  &__sider {
+    grid-area: sider;
+    display: flex;
+  }
 
-.admin-layout-main-container {
-  grid-area: main;
-  z-index: 99;
+  &__main {
+    grid-area: main;
+    z-index: 99;
+  }
 }
 </style>
