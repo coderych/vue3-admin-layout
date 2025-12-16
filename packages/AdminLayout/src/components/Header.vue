@@ -101,7 +101,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 <template>
   <Scrollbar x-scrollable :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
     <div class="admin-layout-header" :style="headerStyle">
-      <slot v-if="!isMobile" name="default" v-bind="headerProps">
+      <slot name="default" v-bind="headerProps">
         <slot v-if="mode !== 'side' && !isMobile" name="logo" v-bind="logoProps">
           <Logo v-if="logo" />
         </slot>

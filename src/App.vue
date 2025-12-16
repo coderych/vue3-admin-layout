@@ -46,12 +46,12 @@ function click(value: any) {
       </div>
     </template>
 
-    <template #header="slotProps">
-      <!-- <div v-for="i in 30" :key="i" class="border-right w-100px">
-        {{ i }}
-      </div> -->
-      <div :style="{ height: `${slotProps.state?.headerHeight.value}px` }" @click="click(slotProps)">
+    <template #header-suffix="slotProps">
+      <div :style="{ height: `${slotProps.height}px` }" @click="click(slotProps)">
         click
+      </div>
+      <div v-for="i in 30" :key="i" class="border-right w-100px">
+        {{ i }}
       </div>
     </template>
 
