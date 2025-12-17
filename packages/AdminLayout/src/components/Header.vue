@@ -102,30 +102,32 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
   <Scrollbar x-scrollable :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
     <div class="admin-layout-header" :style="headerStyle">
       <slot name="default" v-bind="headerProps">
-        <slot v-if="mode !== 'side' && !isMobile" name="logo" v-bind="logoProps">
+        <slot v-if="(mode === 'mix' || mode === 'top') && !isMobile" name="logo" v-bind="logoProps">
           <Logo v-if="logo" />
         </slot>
         <Hamburger v-if="isMobile" :value="collapsed" class="admin-layout-header__hamburger" @update:value="toggleCollapsed" />
-        <slot v-if="!isMobile" name="prefix" v-bind="headerProps" />
-        <slot v-if="mode === 'mix' && splitMenu" name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
-          <ul class="admin-layout-header__parent-menu">
-            <li
-              v-for="item in parentMenuOptions" :key="item.key"
-              class="admin-layout-header__parent-menu-item" :class="{ active: item.key === parentKey }"
-              @click="handleParentMenuClick(`${item.key}`)"
-            >
-              <div v-if="item.icon" class="admin-layout-header__parent-menu-item-icon">
-                <component :is="item.icon" />
-              </div>
-              <div class="admin-layout-header__parent-menu-item-label">
-                {{ item.label }}
-              </div>
-            </li>
-          </ul>
-        </slot>
-        <div v-else-if="mode === 'top'" class="flex-1">
-          <slot name="menu" v-bind="{ ...menuProps, options: menuOptions, value: `${activeKey}` }" />
-        </div>
+        <slot name="prefix" v-bind="headerProps" />
+        <template v-if="!isMobile">
+          <slot v-if="mode === 'mix' && splitMenu" name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
+            <ul class="admin-layout-header__parent-menu">
+              <li
+                v-for="item in parentMenuOptions" :key="item.key"
+                class="admin-layout-header__parent-menu-item" :class="{ active: item.key === parentKey }"
+                @click="handleParentMenuClick(`${item.key}`)"
+              >
+                <div v-if="item.icon" class="admin-layout-header__parent-menu-item-icon">
+                  <component :is="item.icon" />
+                </div>
+                <div class="admin-layout-header__parent-menu-item-label">
+                  {{ item.label }}
+                </div>
+              </li>
+            </ul>
+          </slot>
+          <div v-else-if="mode === 'top' && !isMobile" class="flex-1">
+            <slot name="menu" v-bind="{ ...menuProps, options: menuOptions, value: `${activeKey}` }" />
+          </div>
+        </template>
         <div class="ml-auto" />
         <slot name="suffix" v-bind="headerProps" />
       </slot>
