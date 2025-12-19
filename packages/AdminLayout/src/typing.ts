@@ -1,4 +1,5 @@
 import type { Component, ExtractPropTypes, ExtractPublicPropTypes, PropType } from 'vue'
+import type { ScrollbarProps } from '../../Scrollbar'
 import type { AdminLayoutState } from './context'
 
 export type LayoutType = 'side' | 'mix' | 'top'
@@ -33,10 +34,6 @@ export enum CssVars {
   TransitionBezier = '--admin-layout-transition-bezier',
   TextColor = '--admin-layout-text-color',
   BorderColor = '--admin-layout-border-color',
-  ScrollbarColor = '--admin-layout-scrollbar-color',
-  ScrollbarHoverColor = '--admin-layout-scrollbar-hover-color',
-  ScrollbarSize = '--admin-layout-scrollbar-size',
-  ScrollbarBorderRadius = '--admin-layout-scrollbar-border-radius',
 }
 
 export const DefaultColor = {
@@ -45,8 +42,6 @@ export const DefaultColor = {
   PrimaryColor: '#1890ff',
   TextColor: 'rgb(51, 54, 57)',
   BorderColor: 'rgb(239, 239, 245)',
-  ScrollbarColor: 'rgba(0, 0, 0, 0.25)',
-  ScrollbarHoverColor: 'rgba(0, 0, 0, 0.4)',
 }
 
 export const DefaultDarkColor = {
@@ -55,8 +50,6 @@ export const DefaultDarkColor = {
   PrimaryColor: '#409eff',
   TextColor: 'rgba(255, 255, 255, 0.85)',
   BorderColor: 'rgba(255, 255, 255, 0.09)',
-  ScrollbarColor: 'rgba(255, 255, 255, 0.3)',
-  ScrollbarHoverColor: 'rgba(255, 255, 255, 0.4)',
 }
 
 export const adminLayoutProps = {
@@ -173,6 +166,10 @@ export const adminLayoutProps = {
   cssVars: {
     type: Object as PropType<Record<CssVars | string, string>>,
     default: () => ({}),
+  },
+
+  scrollbarProps: {
+    type: Object as PropType<ScrollbarProps>,
   },
 }
 

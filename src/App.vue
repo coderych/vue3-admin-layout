@@ -20,6 +20,13 @@ const props = ref<AdminLayoutProps>({
   header: true,
   contentHeader: true,
   contentFooter: true,
+  headerTheme: '#000',
+  siderTheme: '#000',
+  scrollbarProps: {
+    size: 5,
+    autoHide: false,
+    inverted: false,
+  },
 })
 
 function getCount() {
@@ -113,7 +120,6 @@ function click(value: any) {
     </template> -->
 
     <template #default="{ contentHeight }">
-      <Test />
       contentHeight: {{ contentHeight }}<br>
 
       isDark: <input v-model="isDark" type="checkbox"><br>

@@ -12,12 +12,15 @@ import Logo from './Logo.vue'
 defineSlots<{
   default: (props: AdminLayoutSiderProps) => void
   header: (props: AdminLayoutSiderProps) => void
+  content: (props: AdminLayoutSiderProps) => void
   footer: (props: AdminLayoutSiderProps) => void
   left: (props: AdminLayoutSiderProps) => void
   leftHeader: (props: AdminLayoutSiderProps) => void
+  leftContent: (props: AdminLayoutSiderProps) => void
   leftFooter: (props: AdminLayoutSiderProps) => void
   right: (props: AdminLayoutSiderProps) => void
   rightHeader: (props: AdminLayoutSiderProps) => void
+  rightContent: (props: AdminLayoutSiderProps) => void
   rightFooter: (props: AdminLayoutSiderProps) => void
   logo: (props: AdminLayoutLogoProps) => void
   menu: (props: AdminLayoutMenuProps) => void
@@ -51,6 +54,8 @@ const {
   _siderCollapsedWidth,
   toggleSiderFixed,
   toggleCollapsed,
+  scrollbarProps,
+  isFull,
 } = state
 
 const inverted = computed(() => {
@@ -63,14 +68,10 @@ const siderStyle = computed<CSSProperties>(() => {
     color: `var(${CssVars.TextColor})`,
     boxSizing: 'border-box',
   }
-  // 固定头部
   if (headerFixed.value) {
     style.height = mode.value === 'side' ? `100vh` : `calc(100vh - ${_headerHeight.value}px)`
   }
   if (!splitMenu.value || mode.value === 'mix') {
-    // 汉堡包预留空间
-    // style.paddingBottom = '40px'
-
     if (!isDark.value) {
       style.backgroundColor = siderTheme.value
     }
@@ -82,8 +83,6 @@ const siderStyle = computed<CSSProperties>(() => {
   if (inverted.value) {
     style.color = DefaultDarkColor.TextColor
     style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
-    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
-    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
   }
 
   return style
@@ -93,8 +92,6 @@ const leftStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     width: `var(${CssVars.SiderCollapsedWidth})`,
     backgroundColor: siderTheme.value,
-    // 汉堡包预留空间
-    // paddingBottom: '40px',
   }
   if (isDark.value) {
     style.backgroundColor = `var(${CssVars.BaseColor})`
@@ -159,6 +156,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       'admin-layout-sider--split': splitMenu && mode === 'side',
       'border-right': (!splitMenu && mode === 'side') || mode === 'mix',
       'admin-layout-sider--split__hover': !siderFixed && mode === 'side' && splitMenu,
+      'admin-layout-sider--hide': isFull,
     }"
     :style="{ ...siderStyle }"
   >
@@ -169,8 +167,10 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
             <Logo v-if="logo" :collapsed="collapsed" />
           </slot>
         </slot>
-        <Scrollbar class="flex-1">
-          <slot name="menu" v-bind="{ ...menuProps, options: splitMenu ? childMenuOptions : menuOptions }" />
+        <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
+          <slot name="content" v-bind="{ ...siderProps }">
+            <slot name="menu" v-bind="{ ...menuProps, options: splitMenu ? childMenuOptions : menuOptions }" />
+          </slot>
         </Scrollbar>
         <slot name="footer" v-bind="siderProps">
           <div class="admin-layout-sider__hamburger">
@@ -187,21 +187,23 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
               <img :src="logoUrl" alt="logo">
             </div>
           </slot>
-          <Scrollbar class="flex-1">
-            <slot name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
-              <ul class="admin-layout-sider__split-left__parent-menu">
-                <li
-                  v-for="item in parentMenuOptions" :key="item.key" class="admin-layout-sider__split-left__parent-menu-item"
-                  :class="{ active: item.key === parentKey }" @click="handleParentMenuClick(`${item.key}`)"
-                >
-                  <div v-if="item" class="admin-layout-sider__split-left__parent-menu-item-icon">
-                    <component :is="item.icon" />
-                  </div>
-                  <div class="admin-layout-sider__split-left__parent-menu-item-label">
-                    {{ item.label }}
-                  </div>
-                </li>
-              </ul>
+          <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
+            <slot name="leftContent" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
+              <slot name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
+                <ul class="admin-layout-sider__split-left__parent-menu">
+                  <li
+                    v-for="item in parentMenuOptions" :key="item.key" class="admin-layout-sider__split-left__parent-menu-item"
+                    :class="{ active: item.key === parentKey }" @click="handleParentMenuClick(`${item.key}`)"
+                  >
+                    <div v-if="item" class="admin-layout-sider__split-left__parent-menu-item-icon">
+                      <component :is="item.icon" />
+                    </div>
+                    <div class="admin-layout-sider__split-left__parent-menu-item-label">
+                      {{ item.label }}
+                    </div>
+                  </li>
+                </ul>
+              </slot>
             </slot>
           </Scrollbar>
           <slot name="leftFooter" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
@@ -220,8 +222,10 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
               </span>
             </div>
           </slot>
-          <Scrollbar class="flex-1">
-            <slot name="menu" v-bind="{ ...menuProps, options: childMenuOptions, collapsed: false }" />
+          <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
+            <slot name="rightContent" v-bind="{ ...siderProps }">
+              <slot name="menu" v-bind="{ ...menuProps, options: childMenuOptions, collapsed: false }" />
+            </slot>
           </Scrollbar>
 
           <slot name="rightFooter" v-bind="{ ...siderProps }">
@@ -258,6 +262,15 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
           box-shadow: var(--box-shadow);
         }
       }
+    }
+  }
+
+  &--hide {
+    .admin-layout-sider__split-left {
+      z-index: auto;
+    }
+    .admin-layout-sider__split-right {
+      z-index: auto;
     }
   }
 

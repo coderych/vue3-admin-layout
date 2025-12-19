@@ -30,6 +30,7 @@ const {
   overlayRef,
   contentBottom,
   contentWidth,
+  scrollbarProps,
 } = state
 
 const mainStyle = computed<CSSProperties>(() => {
@@ -95,12 +96,12 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
 
 <template>
   <div class="admin-layout-main" :style="mainStyle" :class="{ 'admin-layout-main--full': isFull }">
-    <Scrollbar :class="{ 'h-screen': isFull }" :native-scrollbar="!(isFull && !contentHeaderFixed)">
+    <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(isFull && !contentHeaderFixed), height: isFull ? '100vh' : '100%' }">
       <div v-if="contentHeader" class="admin-layout-main__header border-bottom" :style="contentHeaderStyle">
         <slot name="header" v-bind="contentProps" />
       </div>
       <div class="admin-layout-main__content" :style="contentStyle">
-        <Scrollbar class="h-full" :native-scrollbar="!(headerFixed && contentHeaderFixed)">
+        <Scrollbar v-bind="{ ...scrollbarProps, height: '100%', nativeScrollbar: !(headerFixed && contentHeaderFixed) }">
           <div :style="innerStyle">
             <slot name="default" v-bind="contentProps" />
           </div>
@@ -126,7 +127,6 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
     bottom: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 11;
     overflow: hidden;
   }
 

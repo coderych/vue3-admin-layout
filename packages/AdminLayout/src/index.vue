@@ -2,7 +2,6 @@
 import type { CSSProperties } from 'vue'
 import type { AdminLayoutState } from './context'
 import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps } from './typing'
-import { pick } from 'lodash-es'
 import { computed, h } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
 import { AppMain, Header, MobileSider, Sider } from './components'
@@ -24,12 +23,15 @@ const slots = defineSlots<{
   'header-suffix': (props: AdminLayoutHeaderProps) => void
   'sider': (props: AdminLayoutSiderProps) => void
   'sider-header': (props: AdminLayoutSiderProps) => void
+  'sider-content': (props: AdminLayoutSiderProps) => void
   'sider-footer': (props: AdminLayoutSiderProps) => void
   'sider-left': (props: AdminLayoutSiderProps) => void
   'sider-left-header': (props: AdminLayoutSiderProps) => void
+  'sider-left-content': (props: AdminLayoutSiderProps) => void
   'sider-left-footer': (props: AdminLayoutSiderProps) => void
   'sider-right': (props: AdminLayoutSiderProps) => void
   'sider-right-header': (props: AdminLayoutSiderProps) => void
+  'sider-right-content': (props: AdminLayoutSiderProps) => void
   'sider-right-footer': (props: AdminLayoutSiderProps) => void
   'content-header': (props: AdminLayoutContentProps) => void
   'content-footer': (props: AdminLayoutContentProps) => void
@@ -65,8 +67,6 @@ const style = computed<CSSProperties>(() => {
     color: `${DefaultColor.TextColor}`,
     [CssVars.TransitionDuration]: `0.2s`,
     [CssVars.TransitionBezier]: `cubic-bezier(0, 0, .2, 1)`,
-    [CssVars.ScrollbarSize]: '5px',
-    [CssVars.ScrollbarBorderRadius]: '5px',
     [CssVars.HeaderHeight]: `${headerHeight.value}px`,
 
     // 颜色变量
@@ -74,8 +74,6 @@ const style = computed<CSSProperties>(() => {
     [CssVars.BgColor]: DefaultColor.BgColor,
     [CssVars.BaseColor]: DefaultColor.BaseColor,
     [CssVars.BorderColor]: DefaultColor.BorderColor,
-    [CssVars.ScrollbarColor]: DefaultColor.ScrollbarColor,
-    [CssVars.ScrollbarHoverColor]: DefaultColor.ScrollbarHoverColor,
   }
 
   if (isDark.value) {
@@ -83,8 +81,6 @@ const style = computed<CSSProperties>(() => {
     style[CssVars.BgColor] = DefaultDarkColor.BgColor
     style[CssVars.BaseColor] = DefaultDarkColor.BaseColor
     style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
-    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
-    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
   }
 
   if (mode.value === 'top' || isMobile.value) {
@@ -129,11 +125,6 @@ const style = computed<CSSProperties>(() => {
   return style
 })
 
-// 最外层滚动条样式
-const scrollbarCssVars = computed<CSSProperties>(() => ({
-  ...pick(style.value, [CssVars.ScrollbarSize, CssVars.ScrollbarBorderRadius, CssVars.ScrollbarColor, CssVars.ScrollbarHoverColor]),
-}))
-
 const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     backgroundColor: `var(${CssVars.BgColor})`,
@@ -162,6 +153,7 @@ function renderSider() {
       logo: slots.logo,
       menu: slots.menu,
       header: slots['sider-header'],
+      content: slots['sider-content'],
       footer: slots['sider-footer'],
     })
   }
@@ -176,8 +168,10 @@ function renderSider() {
     header: slots['sider-header'],
     footer: slots['sider-footer'],
     leftHeader: slots['sider-left-header'],
+    leftContent: slots['sider-left-content'],
     leftFooter: slots['sider-left-footer'],
     rightHeader: slots['sider-right-header'],
+    rightContent: slots['sider-right-content'],
     rightFooter: slots['sider-right-footer'],
     menu: slots.menu,
     parentMenu: slots['parent-menu'],
@@ -199,7 +193,7 @@ defineExpose({
 </script>
 
 <template>
-  <Scrollbar class="h-screen" :style="scrollbarCssVars" :native-scrollbar="!(!headerFixed && !isFull)">
+  <Scrollbar v-bind="{ ...scrollbarProps, height: '100vh', nativeScrollbar: !(!headerFixed && !isFull) }">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
       <header v-if="header" class="admin-layout__header">
         <component :is="renderHeader" />
@@ -208,7 +202,7 @@ defineExpose({
         <component :is="renderSider" />
       </aside>
       <main class="admin-layout__main" :style="mainStyle">
-        <Scrollbar :native-scrollbar="!(headerFixed && !contentHeaderFixed && !isFull)">
+        <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(headerFixed && !contentHeaderFixed && !isFull), height: '100%' }">
           <component :is="renderContent">
             <slot name="default" v-bind="state" />
           </component>

@@ -12,6 +12,7 @@ import Hamburger from './Hamburger.vue'
 defineSlots<{
   default: (props: AdminLayoutSiderProps) => any
   header: (props: AdminLayoutSiderProps) => any
+  content: (props: AdminLayoutSiderProps) => any
   footer: (props: AdminLayoutSiderProps) => any
   logo: (props: AdminLayoutLogoProps) => any
   menu: (props: AdminLayoutMenuProps) => any
@@ -30,6 +31,7 @@ const {
   toggleCollapsed,
   toggleSiderFixed,
   sider,
+  scrollbarProps,
 } = state
 
 const inverted = computed(() => {
@@ -51,8 +53,6 @@ const style = computed<CSSProperties>(() => {
   if (inverted.value) {
     style.color = DefaultDarkColor.TextColor
     style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
-    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
-    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
   }
 
   return style
@@ -99,8 +99,10 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
           <Logo />
         </slot>
       </slot>
-      <Scrollbar class="flex-1">
-        <slot name="menu" v-bind="menuProps" />
+      <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
+        <slot name="content" v-bind="siderProps">
+          <slot name="menu" v-bind="menuProps" />
+        </slot>
       </Scrollbar>
 
       <slot name="footer" v-bind="siderProps">

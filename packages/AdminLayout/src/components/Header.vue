@@ -37,13 +37,13 @@ const {
   toggleCollapsed,
   siderWidth,
   activeKey,
+  scrollbarProps,
 } = state
 
 const inverted = computed(() => calculateInverted(headerTheme.value) || isDark.value)
 
 const scrollbarStyle = computed(() => {
   const style: CSSProperties = {
-    height: `${_headerHeight.value}px`,
     backgroundColor: headerTheme.value,
   }
   if (isDark.value) {
@@ -52,8 +52,6 @@ const scrollbarStyle = computed(() => {
 
   if (inverted.value) {
     style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
-    style[CssVars.ScrollbarColor] = DefaultDarkColor.ScrollbarColor
-    style[CssVars.ScrollbarHoverColor] = DefaultDarkColor.ScrollbarHoverColor
   }
 
   return style
@@ -99,7 +97,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 </script>
 
 <template>
-  <Scrollbar x-scrollable :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
+  <Scrollbar v-bind="{ ...scrollbarProps, xScrollable: true, inverted, height: `${_headerHeight}px` }" :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
     <div class="admin-layout-header" :style="headerStyle">
       <slot name="default" v-bind="headerProps">
         <slot v-if="(mode === 'mix' || mode === 'top') && !isMobile" name="logo" v-bind="logoProps">

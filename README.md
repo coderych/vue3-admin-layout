@@ -29,13 +29,14 @@ import AdminLayout from 'vue3-admin-layout'
 
 ### 基础配置
 
-| 属性名      | 类型                      | 默认值   | 说明                                     |
-| ----------- | ------------------------- | -------- | ---------------------------------------- |
-| `mode`      | `'side' \| 'mix' \|'top'` | `'side'` | 布局模式                                 |
-| `splitMenu` | `boolean`                 | `true`   | 是否拆分菜单（仅在 side/mix 模式下有效） |
-| `collapsed` | `boolean`                 | `false`  | 侧边栏是否折叠                           |
-| `isMobile`  | `boolean`                 | `false`  | 是否移动端模式                           |
-| `isFull`    | `boolean`                 | `false`  | 是否全屏模式                             |
+| 属性名           | 类型                      | 默认值   | 说明                                     |
+| ---------------- | ------------------------- | -------- | ---------------------------------------- |
+| `mode`           | `'side' \| 'mix' \|'top'` | `'side'` | 布局模式                                 |
+| `splitMenu`      | `boolean`                 | `true`   | 是否拆分菜单（仅在 side/mix 模式下有效） |
+| `collapsed`      | `boolean`                 | `fals1e` | 侧边栏是否折叠                           |
+| `isMobile`       | `boolean`                 | `false`  | 是否移动端模式                           |
+| `isFull`         | `boolean`                 | `false`  | 是否全屏模式                             |
+| `scrollbarProps` | `ScrollbarProps`          | `{}`     | 滚动条配置                               |
 
 ### Logo 配置
 
@@ -110,17 +111,20 @@ import AdminLayout from 'vue3-admin-layout'
 
 ### 侧边栏插槽
 
-| 插槽名               | 参数                             | 说明             |
-| -------------------- | -------------------------------- | ---------------- |
-| `sider`              | `(props: AdminLayoutSiderProps)` | 侧边栏主区域     |
-| `sider-header`       | `(props: AdminLayoutSiderProps)` | 侧边栏头部       |
-| `sider-footer`       | `(props: AdminLayoutSiderProps)` | 侧边栏底部       |
-| `sider-left`         | `(props: AdminLayoutSiderProps)` | 拆分菜单左侧区域 |
-| `sider-left-header`  | `(props: AdminLayoutSiderProps)` | 拆分菜单左侧头部 |
-| `sider-left-footer`  | `(props: AdminLayoutSiderProps)` | 拆分菜单左侧底部 |
-| `sider-right`        | `(props: AdminLayoutSiderProps)` | 拆分菜单右侧区域 |
-| `sider-right-header` | `(props: AdminLayoutSiderProps)` | 拆分菜单右侧头部 |
-| `sider-right-footer` | `(props: AdminLayoutSiderProps)` | 拆分菜单右侧底部 |
+| 插槽名                | 参数                             | 说明                         |
+| --------------------- | -------------------------------- | ---------------------------- |
+| `sider`               | `(props: AdminLayoutSiderProps)` | 侧边栏主区域                 |
+| `sider-header`        | `(props: AdminLayoutSiderProps)` | 侧边栏头部                   |
+| `sider-content`       | `(props: AdminLayoutSiderProps)` | 侧边栏内容（优先级大于菜单） |
+| `sider-footer`        | `(props: AdminLayoutSiderProps)` | 侧边栏底部                   |
+| `sider-left`          | `(props: AdminLayoutSiderProps)` | 拆分菜单左侧区域             |
+| `sider-left-header`   | `(props: AdminLayoutSiderProps)` | 拆分菜单左侧头部             |
+| `sider-left-content`  | `(props: AdminLayoutSiderProps)` | 拆分菜单左侧内容             |
+| `sider-left-footer`   | `(props: AdminLayoutSiderProps)` | 拆分菜单左侧底部             |
+| `sider-right`         | `(props: AdminLayoutSiderProps)` | 拆分菜单右侧区域             |
+| `sider-right-header`  | `(props: AdminLayoutSiderProps)` | 拆分菜单右侧头部             |
+| `sider-right-content` | `(props: AdminLayoutSiderProps)` | 拆分菜单右侧内容             |
+| `sider-right-footer`  | `(props: AdminLayoutSiderProps)` | 拆分菜单右侧底部             |
 
 ### 内容区域插槽
 
@@ -148,6 +152,19 @@ interface MenuOption {
   icon?: Component // Vue 组件
   children?: MenuOption[]
   [key: string]: any
+}
+```
+
+### ScrollbarProps 滚动条配置
+
+```typescript
+interface ScrollbarProps {
+  autoHide?: boolean
+  xScrollable?: boolean
+  nativeScrollbar?: boolean
+  size?: number
+  height?: string
+  inverted?: boolean
 }
 ```
 
@@ -297,12 +314,6 @@ function handleCollapsed(collapsed) {
   --admin-layout-sider-width: 200px;
   --admin-layout-sider-collapsed-width: 48px;
 
-  /* 滚动条 */
-  --admin-layout-scrollbar-size: 5px;
-  --admin-layout-scrollbar-border-radius: 5px;
-  --admin-layout-scrollbar-color: rgba(0, 0, 0, 0.25);
-  --admin-layout-scrollbar-hover-color: rgba(0, 0, 0, 0.4);
-
   /* 过渡动画 */
   --admin-layout-transition-duration: 0.2s;
   --admin-layout-transition-bezier: cubic-bezier(0, 0, 0.2, 1);
@@ -379,11 +390,9 @@ function toggleSidebar() {
 
 ## 注意事项
 
-1. 菜单图标：需要将图标组件使用 `markRaw()` 包装。
+1. 样式：使用时请导入样式文件。
 2. 路由集成：可以与 Vue Router 结合使用，通过 `activeKey` 控制当前激活菜单。
-3. 响应式：移动端适配建议使用 `useWindowSize` 等工具判断。
-4. 性能：大型菜单数据建议使用虚拟滚动优化。
-5. 样式覆盖：可以通过 `cssVars` 或深度选择器覆盖组件样式。
+3. 样式覆盖：可以通过 `cssVars` 或深度选择器覆盖组件样式。
 
 ## 故障排除
 
@@ -398,8 +407,3 @@ function toggleSidebar() {
 - 检查 CSS 变量是否被覆盖。
 - 确认组件库样式是否正确导入。
 - 检查是否有样式冲突。
-
-### 响应式问题
-
-- 确认 `isMobile` prop 是否正确传递。
-- 检查移动端断点设置。

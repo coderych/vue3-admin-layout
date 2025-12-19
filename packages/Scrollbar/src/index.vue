@@ -1,14 +1,26 @@
 <script setup lang="ts">
+import type { CSSProperties } from 'vue'
+import { useDark } from '@vueuse/core'
 import Simplebar from 'simplebar-vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { scrollbarProps } from './typing'
 import 'simplebar-vue/dist/simplebar.min.css'
 
-defineProps(scrollbarProps)
+const props = defineProps(scrollbarProps)
 
 const emit = defineEmits(['scroll'])
 
 const simplebarRef = ref<any>()
+
+const isDark = useDark()
+
+const style = computed<CSSProperties>(() => ({
+  'height': props.height,
+  'overflow-x': props.xScrollable ? 'visible' : 'hidden',
+  '--scrollbar-size': `${props.size}px`,
+  '--scrollbar-color': isDark.value || props.inverted ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.25)',
+  '--scrollbar-hover-color': isDark.value || props.inverted ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+}))
 
 defineExpose(new Proxy({}, {
   get: (_, key) => simplebarRef.value?.[key],
@@ -17,39 +29,35 @@ defineExpose(new Proxy({}, {
 </script>
 
 <template>
-  <Simplebar
-    v-if="!nativeScrollbar" v-bind="$attrs" ref="simplebarRef"
-    :class="{ 'overflow-x-hidden': !xScrollable }" :auto-hide="trigger === 'hover'"
-    class="h-full" @scroll="emit('scroll', $event)"
-  >
+  <Simplebar v-if="!nativeScrollbar" ref="simplebarRef" v-bind="$attrs" :auto-hide="autoHide" :style="style" @scroll="emit('scroll', $event)">
     <slot />
   </Simplebar>
-  <div v-else ref="simplebarRef" class="native-scrollbar h-full overflow-y-auto" :class="{ 'overflow-x': xScrollable }" v-bind="$attrs">
+  <div v-else ref="simplebarRef" v-bind="$attrs" :style="style">
     <slot />
   </div>
 </template>
 
 <style lang="less">
 .simplebar-scrollbar::before {
-  background-color: var(--admin-layout-scrollbar-color);
-  border-radius: var(--admin-layout-scrollbar-border-radius);
+  background-color: var(--scrollbar-color);
+  border-radius: 5px;
   cursor: pointer;
   transition-delay: 2s;
 }
 
 .simplebar-scrollbar.simplebar-visible.simplebar-hover::before {
-  background-color: var(--admin-layout-scrollbar-hover-color);
+  background-color: var(--scrollbar-hover-color);
 }
 
 .simplebar-horizontal {
   .simplebar-scrollbar::before {
-    height: var(--admin-layout-scrollbar-size) !important;
+    height: var(--scrollbar-size) !important;
   }
 }
 
 .simplebar-vertical {
   .simplebar-scrollbar::before {
-    width: var(--admin-layout-scrollbar-size) !important;
+    width: var(--scrollbar-size) !important;
   }
 }
 </style>

@@ -1,9 +1,9 @@
-import type { ExtractPublicPropTypes, PropType } from 'vue'
+import type { ExtractPropTypes, ExtractPublicPropTypes, PropType } from 'vue'
 
 export const scrollbarProps = {
-  trigger: {
-    type: String as PropType<'hover' | 'none'>,
-    default: 'hover',
+  autoHide: {
+    type: Boolean as PropType<boolean>,
+    default: true,
   },
   xScrollable: {
     type: Boolean as PropType<boolean>,
@@ -13,6 +13,18 @@ export const scrollbarProps = {
     type: Boolean as PropType<boolean>,
     default: false,
   },
+  size: {
+    type: Number as PropType<number>,
+    default: 5,
+  },
+  height: {
+    type: String as PropType<string>,
+  },
+  inverted: {
+    type: Boolean as PropType<boolean>,
+    default: false,
+  },
 }
 
 export type ScrollbarProps = ExtractPublicPropTypes<typeof scrollbarProps>
+export type _ScrollbarProps = ExtractPropTypes<typeof scrollbarProps>
