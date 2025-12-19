@@ -29,10 +29,22 @@ defineExpose(new Proxy({}, {
 </script>
 
 <template>
-  <Simplebar v-if="!nativeScrollbar" ref="simplebarRef" v-bind="$attrs" :auto-hide="autoHide" :style="style" @scroll="emit('scroll', $event)">
+  <Simplebar
+    v-if="!nativeScrollbar"
+    ref="simplebarRef"
+    v-bind="$attrs"
+    :auto-hide="autoHide"
+    :style="style"
+    @scroll="emit('scroll', $event)"
+  >
     <slot />
   </Simplebar>
-  <div v-else ref="simplebarRef" v-bind="$attrs" :style="style">
+  <div
+    v-else
+    ref="simplebarRef"
+    v-bind="$attrs"
+    :style="style"
+  >
     <slot />
   </div>
 </template>

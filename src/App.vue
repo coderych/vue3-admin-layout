@@ -54,16 +54,27 @@ function click(value: any) {
     </template>
 
     <template #header-suffix="slotProps">
-      <div :style="{ height: `${slotProps.height}px` }" @click="click(slotProps)">
+      <div
+        :style="{ height: `${slotProps.height}px` }"
+        @click="click(slotProps)"
+      >
         click
       </div>
-      <div v-for="i in 30" :key="i" class="border-right w-100px">
+      <div
+        v-for="i in 30"
+        :key="i"
+        class="border-right w-100px"
+      >
         {{ i }}
       </div>
     </template>
 
     <template #content-header>
-      <div v-for="i in 40" :key="i" class="border-right w-100px">
+      <div
+        v-for="i in 40"
+        :key="i"
+        class="border-right w-100px"
+      >
         {{ i }}
       </div>
     </template>
@@ -82,7 +93,11 @@ function click(value: any) {
     <template #menu="menuProps">
       Menu:
       {{ menuProps }}
-      <div v-for="i in 30" :key="i" class="border-bottom h-100px">
+      <div
+        v-for="i in 30"
+        :key="i"
+        class="border-bottom h-100px"
+      >
         {{ i }}
       </div>
     </template>
@@ -151,7 +166,11 @@ function click(value: any) {
         统计 Simplebar 数量
       </button>
       <br>
-      <div v-for="i in 30" :key="i" class="border-bottom h-100px border-red">
+      <div
+        v-for="i in 30"
+        :key="i"
+        class="border-bottom h-100px border-red"
+      >
         Hello World
       </div>
     </template>

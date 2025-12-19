@@ -32,7 +32,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "lint:fix": "eslint . --fix --cache"
   },
   "peerDependencies": {
     "vue": "^3.0.0"

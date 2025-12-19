@@ -152,7 +152,8 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 
 <template>
   <div
-    class="admin-layout-sider" :class="{
+    class="admin-layout-sider"
+    :class="{
       'admin-layout-sider--split': splitMenu && mode === 'side',
       'border-right': (!splitMenu && mode === 'side') || mode === 'mix',
       'admin-layout-sider--split__hover': !siderFixed && mode === 'side' && splitMenu,
@@ -192,8 +193,11 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
               <slot name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
                 <ul class="admin-layout-sider__split-left__parent-menu">
                   <li
-                    v-for="item in parentMenuOptions" :key="item.key" class="admin-layout-sider__split-left__parent-menu-item"
-                    :class="{ active: item.key === parentKey }" @click="handleParentMenuClick(`${item.key}`)"
+                    v-for="item in parentMenuOptions"
+                    :key="item.key"
+                    class="admin-layout-sider__split-left__parent-menu-item"
+                    :class="{ active: item.key === parentKey }"
+                    @click="handleParentMenuClick(`${item.key}`)"
                   >
                     <div v-if="item" class="admin-layout-sider__split-left__parent-menu-item-icon">
                       <component :is="item.icon" />

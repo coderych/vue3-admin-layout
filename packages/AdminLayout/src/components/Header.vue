@@ -103,14 +103,21 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
         <slot v-if="(mode === 'mix' || mode === 'top') && !isMobile" name="logo" v-bind="logoProps">
           <Logo v-if="logo" />
         </slot>
-        <Hamburger v-if="isMobile" :value="collapsed" class="admin-layout-header__hamburger" @update:value="toggleCollapsed" />
+        <Hamburger
+          v-if="isMobile"
+          :value="collapsed"
+          class="admin-layout-header__hamburger"
+          @update:value="toggleCollapsed"
+        />
         <slot name="prefix" v-bind="headerProps" />
         <template v-if="!isMobile">
           <slot v-if="mode === 'mix' && splitMenu" name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
             <ul class="admin-layout-header__parent-menu">
               <li
-                v-for="item in parentMenuOptions" :key="item.key"
-                class="admin-layout-header__parent-menu-item" :class="{ active: item.key === parentKey }"
+                v-for="item in parentMenuOptions"
+                :key="item.key"
+                :class="{ active: item.key === parentKey }"
+                class="admin-layout-header__parent-menu-item"
                 @click="handleParentMenuClick(`${item.key}`)"
               >
                 <div v-if="item.icon" class="admin-layout-header__parent-menu-item-icon">
