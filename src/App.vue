@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AdminLayoutInstance, AdminLayoutProps } from '../packages'
 import { useDark } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { AdminLayout } from '../packages'
 
 const isDark = useDark()
@@ -42,7 +42,14 @@ const state = computed(() => adminLayoutRef.value?.state)
 
 function click(value: any) {
   console.log(value)
+  console.log(value.state.isDark)
+  console.log(state.value)
+  console.log(adminLayoutRef.value?.state?.isDark)
 }
+
+watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
+  console.log('isDark change', value)
+})
 </script>
 
 <template>
@@ -55,7 +62,7 @@ function click(value: any) {
 
     <template #header-suffix="slotProps">
       <div
-        :style="{ height: `${slotProps.height}px` }"
+        :style="{ height: `${slotProps.state.headerHeight}px` }"
         @click="click(slotProps)"
       >
         click

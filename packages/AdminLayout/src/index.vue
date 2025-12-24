@@ -2,7 +2,7 @@
 import type { CSSProperties } from 'vue'
 import type { AdminLayoutState } from './context'
 import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps } from './typing'
-import { computed, h } from 'vue'
+import { computed, h, proxyRefs } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
 import { AppMain, Header, MobileSider, Sider } from './components'
 import { useAdminLayoutProvider } from './context'
@@ -188,7 +188,7 @@ function renderContent() {
 }
 
 defineExpose({
-  state,
+  state: proxyRefs(state),
 })
 </script>
 

@@ -1,4 +1,4 @@
-import type { Component, ExtractPropTypes, ExtractPublicPropTypes, PropType } from 'vue'
+import type { Component, ExtractPropTypes, ExtractPublicPropTypes, PropType, ShallowUnwrapRef } from 'vue'
 import type { ScrollbarProps } from '../../Scrollbar'
 import type { AdminLayoutState } from './context'
 
@@ -177,7 +177,7 @@ export type AdminLayoutProps = ExtractPublicPropTypes<typeof adminLayoutProps>
 export type _AdminLayoutProps = ExtractPropTypes<typeof adminLayoutProps>
 
 export interface AdminLayoutHeaderProps {
-  state: AdminLayoutState
+  state: ShallowUnwrapRef<AdminLayoutState>
   inverted: boolean
   height: number
   _height: number
@@ -187,7 +187,7 @@ export interface AdminLayoutHeaderProps {
 }
 
 export interface AdminLayoutSiderProps {
-  state: AdminLayoutState
+  state: ShallowUnwrapRef<AdminLayoutState>
   show: boolean
   fixed: boolean
   theme: string
@@ -203,14 +203,14 @@ export interface AdminLayoutSiderProps {
 }
 
 export interface AdminLayoutContentProps {
+  state: ShallowUnwrapRef<AdminLayoutState>
   height: number
   width: number
   scrollHeight: string
-  state: AdminLayoutState
 }
 
 export interface AdminLayoutLogoProps {
-  state: AdminLayoutState
+  state: ShallowUnwrapRef<AdminLayoutState>
   width: number
   height: number
   inverted: boolean
@@ -218,9 +218,9 @@ export interface AdminLayoutLogoProps {
 }
 
 export interface AdminLayoutMenuProps extends MenuProps {
-  state: AdminLayoutState
+  state: ShallowUnwrapRef<AdminLayoutState>
 }
 
 export interface AdminLayoutInstance {
-  state: AdminLayoutState
+  state: ShallowUnwrapRef<AdminLayoutState>
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 import type { AdminLayoutContentProps } from '../typing'
-import { computed } from 'vue'
+import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { CssVars } from '../typing'
@@ -87,10 +87,10 @@ const innerStyle = computed<CSSProperties>(() => {
 })
 
 const contentProps = computed<AdminLayoutContentProps>(() => ({
+  state: proxyRefs(state),
   height: contentHeight.value,
   width: contentWidth.value,
   scrollHeight: `${contentHeight.value}px`,
-  state,
 }))
 </script>
 

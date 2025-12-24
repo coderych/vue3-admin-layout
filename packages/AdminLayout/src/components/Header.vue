@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 import type { AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps } from '../typing'
-import { computed } from 'vue'
+import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { calculateInverted } from '../helper'
@@ -73,7 +73,7 @@ function handleParentMenuClick(key: string) {
 }
 
 const headerProps = computed<AdminLayoutHeaderProps>(() => ({
-  state,
+  state: proxyRefs(state),
   inverted: inverted.value,
   height: headerHeight.value,
   _height: _headerHeight.value,
@@ -82,17 +82,17 @@ const headerProps = computed<AdminLayoutHeaderProps>(() => ({
   show: header.value,
 }))
 const logoProps = computed<AdminLayoutLogoProps>(() => ({
+  state: proxyRefs(state),
   inverted: inverted.value,
   width: siderWidth.value,
   height: _headerHeight.value,
   collapsed: false,
-  state,
 }))
 const menuProps = computed<AdminLayoutMenuProps>(() => ({
+  state: proxyRefs(state),
   mode: 'horizontal',
   inverted: inverted.value,
   collapsed: false,
-  state,
 }))
 </script>
 
