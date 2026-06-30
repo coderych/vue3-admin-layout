@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { AdminLayoutState } from './context'
 import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps } from './typing'
 import { computed, h, proxyRefs } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
@@ -16,7 +15,7 @@ const emit = defineEmits<{
 }>()
 
 const slots = defineSlots<{
-  'default': (props: AdminLayoutState) => void
+  'default': (props: AdminLayoutContentProps) => void
   'logo': (props: AdminLayoutLogoProps) => void
   'header': (props: AdminLayoutHeaderProps) => void
   'header-prefix': (props: AdminLayoutHeaderProps) => void
@@ -60,6 +59,8 @@ const {
   isDark,
   cssVars,
   sider,
+  skin,
+  hasSkin,
 } = state
 
 const style = computed<CSSProperties>(() => {
@@ -119,6 +120,17 @@ const style = computed<CSSProperties>(() => {
   }
 
   Object.assign(style, cssVars.value)
+
+  // skin 毛玻璃效果
+  if (hasSkin.value) {
+    style.backgroundImage = `url(${skin.value})`
+    style.backgroundSize = 'cover'
+    style.backgroundPosition = 'center'
+    style.backgroundRepeat = 'no-repeat'
+    style[CssVars.SkinBlur] = style[CssVars.SkinBlur] || 'blur(20px)'
+    style[CssVars.SkinBgLight] = style[CssVars.SkinBgLight] || 'rgba(255,255,255,0.18)'
+  }
+
   // 过渡效果
   style.transition = `all ${style[CssVars.TransitionDuration]} ${style[CssVars.TransitionBezier]}`
 
@@ -126,8 +138,12 @@ const style = computed<CSSProperties>(() => {
 })
 
 const mainStyle = computed<CSSProperties>(() => {
-  const style: CSSProperties = {
-    backgroundColor: `var(${CssVars.BgColor})`,
+  const style: CSSProperties = {}
+  if (hasSkin.value) {
+    style.backgroundColor = 'transparent'
+  }
+  else {
+    style.backgroundColor = `var(${CssVars.BgColor})`
   }
   if (headerFixed.value) {
     style.height = `calc(100vh - ${_headerHeight.value}px)`
@@ -179,7 +195,7 @@ function renderSider() {
 }
 
 function renderContent() {
-  return h(AppMain, { }, {
+  return h(AppMain, {}, {
     default: slots.default,
     header: slots['content-header'],
     footer: slots['content-footer'],

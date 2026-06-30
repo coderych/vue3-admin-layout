@@ -1,22 +1,34 @@
+import type { CSSProperties } from 'vue'
 import { rgba } from 'seemly'
+import { CssVars } from './typing'
 
 export function calculateInverted(color: string): boolean {
   if (color === 'transparent') {
     return false
   }
   try {
-    const rgbaColor = rgba(color)
-
-    const r = rgbaColor[0]
-    const g = rgbaColor[1]
-    const b = rgbaColor[2]
+    const [r, g, b] = rgba(color)
     const luminance = 0.299 * r + 0.587 * g + 0.114 * b
-
     return luminance < 186
   }
   catch (error) {
     console.error(error)
     return false
+  }
+}
+
+export function applySkinStyles(style: CSSProperties, isDark: boolean, options?: { blur?: boolean, border?: 'right' | 'bottom' }): void {
+  style.backgroundColor = `var(${CssVars.SkinBgLight})`
+  if (options?.blur !== false) {
+    style.backdropFilter = `var(${CssVars.SkinBlur})`
+    style.WebkitBackdropFilter = `var(${CssVars.SkinBlur})`
+  }
+  const borderColor = `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.2)'}`
+  if (options?.border === 'right') {
+    style.borderRight = borderColor
+  }
+  else if (options?.border === 'bottom') {
+    style.borderBottom = borderColor
   }
 }
 

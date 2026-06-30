@@ -4,7 +4,7 @@ import type { AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps 
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { calculateInverted } from '../helper'
+import { applySkinStyles, calculateInverted } from '../helper'
 import { CssVars, DefaultDarkColor } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
@@ -56,9 +56,11 @@ const {
   toggleCollapsed,
   scrollbarProps,
   isFull,
+  hasSkin,
 } = state
 
 const inverted = computed(() => {
+  if (hasSkin.value) return false
   return calculateInverted(siderTheme.value) || isDark.value
 })
 
@@ -71,11 +73,22 @@ const siderStyle = computed<CSSProperties>(() => {
   if (headerFixed.value) {
     style.height = mode.value === 'side' ? `100vh` : `calc(100vh - ${_headerHeight.value}px)`
   }
-  if (!splitMenu.value || mode.value === 'mix') {
+
+  const isSplit = splitMenu.value && mode.value === 'side'
+
+  if (hasSkin.value) {
+    if (!isSplit) {
+      // 非 split 模式：main sider 就是可见面板，需要毛玻璃效果
+      // split 模式：main sider 是透明容器，不加 backdrop-filter（否则创建层叠上下文，
+      // 会困住 split-right 的 z-index，导致它显示在 content 下方）
+      applySkinStyles(style, isDark.value, { border: 'right' })
+    }
+  }
+  else if (!splitMenu.value || mode.value === 'mix') {
     style.backgroundColor = isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value
   }
 
-  if (inverted.value) {
+  if (inverted.value && !hasSkin.value) {
     style.color = DefaultDarkColor.TextColor
     style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
   }
@@ -83,16 +96,33 @@ const siderStyle = computed<CSSProperties>(() => {
   return style
 })
 
-const leftStyle = computed<CSSProperties>(() => ({
-  width: `var(${CssVars.SiderCollapsedWidth})`,
-  backgroundColor: isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value,
-}))
+const leftStyle = computed<CSSProperties>(() => {
+  const style: CSSProperties = {
+    width: `var(${CssVars.SiderCollapsedWidth})`,
+  }
+  if (hasSkin.value) {
+    applySkinStyles(style, isDark.value, { border: 'right' })
+  }
+  else {
+    style.backgroundColor = isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value
+  }
+  return style
+})
 
-const rightStyle = computed<CSSProperties>(() => ({
-  'width': `${siderWidth.value}px !important`,
-  'backgroundColor': isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value,
-  '--box-shadow': `8px 0 15px ${isDark.value ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)'}`,
-}))
+const rightStyle = computed<CSSProperties>(() => {
+  const style: CSSProperties = {
+    'width': `${siderWidth.value}px !important`,
+    '--box-shadow': `8px 0 15px ${isDark.value ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)'}`,
+  }
+  if (hasSkin.value) {
+    applySkinStyles(style, false)
+    style['--box-shadow'] = `8px 0 15px ${isDark.value ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`
+  }
+  else {
+    style.backgroundColor = isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value
+  }
+  return style
+})
 
 function handleParentMenuClick(key: string) {
   parentKey.value = key
@@ -140,6 +170,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       'admin-layout-sider--split': splitMenu && mode === 'side',
       'border-right': (!splitMenu && mode === 'side') || mode === 'mix',
       'admin-layout-sider--split-hover': !siderFixed && mode === 'side' && splitMenu,
+      'admin-layout-sider--skin': hasSkin,
       'admin-layout-sider--hide': isFull,
     }"
     :style="{ ...siderStyle }"
@@ -419,6 +450,21 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     &:hover {
       background-color: rgba(0, 0, 0, 0.1);
     }
+  }
+}
+
+// skin 模式下：折叠时隐藏右侧面板，hover 时显示
+.admin-layout-sider--split-hover.admin-layout-sider--skin {
+  .admin-layout-sider__split-right {
+    // 基态：visibility 延迟到 transform 动画结束后再隐藏
+    transition: transform var(--admin-layout-transition-duration), visibility 0s linear var(--admin-layout-transition-duration);
+    visibility: hidden;
+  }
+
+  &:hover .admin-layout-sider__split-right {
+    // hover：立即显示，transform 开始滑入动画
+    transition: transform var(--admin-layout-transition-duration), box-shadow var(--admin-layout-transition-duration), visibility 0s linear 0s;
+    visibility: visible;
   }
 }
 </style>

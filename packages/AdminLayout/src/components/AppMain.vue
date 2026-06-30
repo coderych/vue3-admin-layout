@@ -4,6 +4,7 @@ import type { AdminLayoutContentProps } from '../typing'
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
+import { applySkinStyles } from '../helper'
 import { CssVars } from '../typing'
 
 defineSlots<{
@@ -25,18 +26,28 @@ const {
   contentFooterFixed,
   headerFixed,
   contentTop,
-  contentHeight,
+  overlayHeight,
   contentLeft,
   overlayRef,
   contentBottom,
+  overlayWidth,
   contentWidth,
   scrollbarProps,
+  hasSkin,
 } = state
 
-const mainStyle = computed<CSSProperties>(() => ({
-  backgroundColor: `var(${CssVars.BgColor})`,
-  color: `var(${CssVars.TextColor})`,
-}))
+const mainStyle = computed<CSSProperties>(() => {
+  const style: CSSProperties = {
+    color: `var(${CssVars.TextColor})`,
+  }
+  if (hasSkin.value) {
+    applySkinStyles(style, false)
+  }
+  else {
+    style.backgroundColor = `var(${CssVars.BgColor})`
+  }
+  return style
+})
 
 const contentStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
@@ -49,7 +60,12 @@ const contentStyle = computed<CSSProperties>(() => {
 const contentHeaderStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     height: `${_contentHeaderHeight.value}px`,
-    backgroundColor: `var(${CssVars.BaseColor})`,
+  }
+  if (hasSkin.value) {
+    applySkinStyles(style, false)
+  }
+  else {
+    style.backgroundColor = `var(${CssVars.BaseColor})`
   }
   return style
 })
@@ -57,7 +73,12 @@ const contentHeaderStyle = computed<CSSProperties>(() => {
 const contentFooterStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     height: `${_contentFooterHeight.value}px`,
-    backgroundColor: `var(${CssVars.BgColor})`,
+  }
+  if (hasSkin.value) {
+    applySkinStyles(style, false)
+  }
+  else {
+    style.backgroundColor = `var(${CssVars.BgColor})`
   }
   if (contentFooterFixed.value) {
     style.position = 'sticky'
@@ -77,7 +98,7 @@ const overlayStyle = computed<CSSProperties>(() => ({
 
 const innerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    minHeight: `${contentHeight.value}px`,
+    minHeight: `${overlayHeight.value}px`,
   }
   style['--content-height'] = style.minHeight
   return style
@@ -85,9 +106,10 @@ const innerStyle = computed<CSSProperties>(() => {
 
 const contentProps = computed<AdminLayoutContentProps>(() => ({
   state: proxyRefs(state),
-  height: contentHeight.value,
-  width: contentWidth.value,
-  scrollHeight: `${contentHeight.value}px`,
+  height: overlayHeight.value,
+  width: overlayWidth.value,
+  scrollHeight: `${overlayHeight.value}px`,
+  contentWidth: contentWidth.value,
 }))
 </script>
 

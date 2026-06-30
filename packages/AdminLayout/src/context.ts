@@ -37,18 +37,13 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const accordion = computed(() => props.accordion)
   const siderFixed = ref(props.siderFixed)
   const _siderWidth = computed(() => {
-    if (!sider.value) {
+    if (!sider.value || mode.value === 'top' || isMobile.value) {
       return 0
     }
-    if (mode.value === 'top' || isMobile.value) {
-      return 0
-    }
-    else if (mode.value === 'side' && splitMenu.value) {
+    if (mode.value === 'side' && splitMenu.value) {
       return siderFixed.value ? siderWidth.value + _siderCollapsedWidth.value : _siderCollapsedWidth.value
     }
-    else {
-      return collapsed.value ? siderCollapsedWidth.value : siderWidth.value
-    }
+    return collapsed.value ? siderCollapsedWidth.value : siderWidth.value
   })
 
   const contentHeader = computed(() => props.contentHeader && Boolean(slots['content-header']))
@@ -64,8 +59,18 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const activeKey = computed(() => props.activeKey)
   const parentKey = ref<string | null>()
 
+  const skin = computed(() => props.skin)
+  const hasSkin = computed(() => !!skin.value)
+  const contentWidth = computed(() => {
+    const val = props.contentWidth
+    if (typeof val === 'number' || /^\d+$/.test(val)) {
+      return `${val}px`
+    }
+    return val
+  })
+
   const overlayRef = ref<HTMLDivElement>()
-  const { height: contentHeight, width: contentWidth } = useElementSize(overlayRef)
+  const { height: overlayHeight, width: overlayWidth } = useElementSize(overlayRef)
   const contentTop = computed(() => {
     return _contentHeaderHeight.value + (isFull.value ? 0 : _headerHeight.value)
   })
@@ -83,11 +88,8 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     if (!parentMenu) {
       return []
     }
-    const children = parentMenu?.children || []
-    if (children.length === 0) {
-      return [parentMenu]
-    }
-    return children
+    const children = parentMenu.children || []
+    return children.length === 0 ? [parentMenu] : children
   })
 
   watchEffect(() => {
@@ -161,9 +163,13 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     parentMenuOptions,
     childMenuOptions,
 
-    overlayRef,
+    skin,
+    hasSkin,
     contentWidth,
-    contentHeight,
+
+    overlayRef,
+    overlayWidth,
+    overlayHeight,
     contentTop,
     contentLeft,
     contentBottom,

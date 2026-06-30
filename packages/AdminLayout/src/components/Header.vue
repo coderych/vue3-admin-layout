@@ -4,7 +4,7 @@ import type { AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { calculateInverted } from '../helper'
+import { applySkinStyles, calculateInverted } from '../helper'
 import { CssVars, DefaultDarkColor } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
@@ -38,6 +38,7 @@ const {
   siderWidth,
   activeKey,
   scrollbarProps,
+  hasSkin,
 } = state
 
 const inverted = computed(() => calculateInverted(headerTheme.value) || isDark.value)
@@ -46,11 +47,15 @@ const scrollbarStyle = computed(() => {
   const style: CSSProperties = {
     backgroundColor: headerTheme.value,
   }
-  if (isDark.value) {
+
+  if (hasSkin.value) {
+    applySkinStyles(style, isDark.value, { border: 'bottom' })
+  }
+  else if (isDark.value) {
     style.backgroundColor = `var(${CssVars.BaseColor})`
   }
 
-  if (inverted.value) {
+  if (inverted.value && !hasSkin.value) {
     style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
   }
 

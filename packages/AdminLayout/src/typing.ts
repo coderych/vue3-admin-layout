@@ -18,7 +18,7 @@ export interface MenuProps {
 export interface MenuOption {
   key?: string
   label?: string
-  icon?: Component
+  icon?: Component | string
   children?: MenuOption[]
   [key: string]: any
 }
@@ -34,6 +34,8 @@ export enum CssVars {
   TransitionBezier = '--admin-layout-transition-bezier',
   TextColor = '--admin-layout-text-color',
   BorderColor = '--admin-layout-border-color',
+  SkinBlur = '--admin-layout-skin-blur',
+  SkinBgLight = '--admin-layout-skin-bg-light',
 }
 
 export const DefaultColor = {
@@ -123,6 +125,10 @@ export const adminLayoutProps = {
     type: String as PropType<string>,
     default: '#fff',
   },
+  skin: {
+    type: String as PropType<string>,
+    default: undefined,
+  },
   siderFixed: {
     type: Boolean as PropType<boolean>,
     default: true,
@@ -152,6 +158,11 @@ export const adminLayoutProps = {
   contentFooterFixed: {
     type: Boolean as PropType<boolean>,
     default: false,
+  },
+
+  contentWidth: {
+    type: [String, Number] as PropType<string | number>,
+    default: '100%',
   },
 
   accordion: {
@@ -207,6 +218,7 @@ export interface AdminLayoutContentProps {
   height: number
   width: number
   scrollHeight: string
+  contentWidth: string
 }
 
 export interface AdminLayoutLogoProps {
