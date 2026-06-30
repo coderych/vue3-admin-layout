@@ -38,25 +38,14 @@ const inverted = computed(() => {
   return calculateInverted(siderTheme.value) || isDark.value
 })
 
-const style = computed<CSSProperties>(() => {
-  const style: CSSProperties = {
-    width: `${siderWidth.value}px`,
-    backgroundColor: `var(${CssVars.BaseColor})`,
-  }
-  if (!isDark.value) {
-    style.backgroundColor = siderTheme.value
-  }
-  else {
-    style.backgroundColor = `var(${CssVars.BaseColor})`
-  }
-
-  if (inverted.value) {
-    style.color = DefaultDarkColor.TextColor
-    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
-  }
-
-  return style
-})
+const style = computed<CSSProperties>(() => ({
+  width: `${siderWidth.value}px`,
+  backgroundColor: isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value,
+  ...(inverted.value && {
+    color: DefaultDarkColor.TextColor,
+    [CssVars.BorderColor]: DefaultDarkColor.BorderColor,
+  }),
+}))
 
 const siderProps = computed<AdminLayoutSiderProps>(() => ({
   state: proxyRefs(state),
@@ -91,7 +80,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 </script>
 
 <template>
-  <div class="mobile-sider" :class="{ collapsed }" :style="style">
+  <div class="admin-layout-mobile-sider" :class="{ 'admin-layout-mobile-sider--collapsed': collapsed }" :style="style">
     <slot name="default" v-bind="siderProps">
       <slot name="header" v-bind="siderProps">
         <slot name="logo" v-bind="logoProps">
@@ -105,34 +94,33 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       </Scrollbar>
 
       <slot name="footer" v-bind="siderProps">
-        <div class="mobile-sider__hamburger">
+        <div class="admin-layout-mobile-sider__hamburger">
           <Hamburger :value="collapsed" @update:value="toggleCollapsed" />
         </div>
       </slot>
     </slot>
   </div>
-  <div class="mobile-sider__mask" :class="{ show: !collapsed }" @click="toggleCollapsed(true)" />
+  <div class="admin-layout-mobile-sider__mask" :class="{ 'admin-layout-mobile-sider__mask--show': !collapsed }" @click="toggleCollapsed(true)" />
 </template>
 
 <style scoped lang="less">
-.mobile-sider {
+.admin-layout-mobile-sider {
   height: 100vh;
   max-width: 100%;
   position: fixed;
   left: 0;
   transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
-  z-index: 101;
-  height: 100vh;
+  z-index: 7;
   top: 0;
   display: flex;
   flex-direction: column;
 
-  &.collapsed {
+  &--collapsed {
     overflow: hidden;
     transform: translateX(-100%);
   }
 
-  &:not(.collapsed) {
+  &:not(&--collapsed) {
     box-shadow: 8px 0 15px rgba(0, 0, 0, 0.1);
   }
 
@@ -151,12 +139,12 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+    z-index: 6;
     transition: opacity var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
     opacity: 0;
     visibility: hidden;
 
-    &.show {
+    &--show {
       opacity: 1;
       visibility: visible;
     }

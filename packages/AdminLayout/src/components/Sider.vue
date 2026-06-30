@@ -72,12 +72,7 @@ const siderStyle = computed<CSSProperties>(() => {
     style.height = mode.value === 'side' ? `100vh` : `calc(100vh - ${_headerHeight.value}px)`
   }
   if (!splitMenu.value || mode.value === 'mix') {
-    if (!isDark.value) {
-      style.backgroundColor = siderTheme.value
-    }
-    else {
-      style.backgroundColor = `var(${CssVars.BaseColor})`
-    }
+    style.backgroundColor = isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value
   }
 
   if (inverted.value) {
@@ -88,28 +83,16 @@ const siderStyle = computed<CSSProperties>(() => {
   return style
 })
 
-const leftStyle = computed<CSSProperties>(() => {
-  const style: CSSProperties = {
-    width: `var(${CssVars.SiderCollapsedWidth})`,
-    backgroundColor: siderTheme.value,
-  }
-  if (isDark.value) {
-    style.backgroundColor = `var(${CssVars.BaseColor})`
-  }
-  return style
-})
+const leftStyle = computed<CSSProperties>(() => ({
+  width: `var(${CssVars.SiderCollapsedWidth})`,
+  backgroundColor: isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value,
+}))
 
-const rightStyle = computed<CSSProperties>(() => {
-  const style: CSSProperties = {
-    'width': `${siderWidth.value}px !important`,
-    'backgroundColor': siderTheme.value,
-    '--box-shadow': `8px 0 15px ${!isDark.value ? `rgba(0, 0, 0, 0.03)` : `rgba(255, 255, 255, 0.03)`}`,
-  }
-  if (isDark.value) {
-    style.backgroundColor = `var(${CssVars.BaseColor})`
-  }
-  return style
-})
+const rightStyle = computed<CSSProperties>(() => ({
+  'width': `${siderWidth.value}px !important`,
+  'backgroundColor': isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value,
+  '--box-shadow': `8px 0 15px ${isDark.value ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)'}`,
+}))
 
 function handleParentMenuClick(key: string) {
   parentKey.value = key
@@ -156,7 +139,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     :class="{
       'admin-layout-sider--split': splitMenu && mode === 'side',
       'border-right': (!splitMenu && mode === 'side') || mode === 'mix',
-      'admin-layout-sider--split__hover': !siderFixed && mode === 'side' && splitMenu,
+      'admin-layout-sider--split-hover': !siderFixed && mode === 'side' && splitMenu,
       'admin-layout-sider--hide': isFull,
     }"
     :style="{ ...siderStyle }"
@@ -181,28 +164,28 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       </slot>
     </template>
     <template v-else>
-      <div class="admin-layout-sider__split-left border-right" :style="leftStyle" :class="{ collapsed }">
+      <div class="admin-layout-sider__split-left border-right" :style="leftStyle" :class="{ 'admin-layout-sider-left--collapsed': collapsed }">
         <slot name="left" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
           <slot name="leftHeader" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
-            <div v-if="logo && logoUrl" class="admin-layout-sider__split-left-logo">
+            <div v-if="logo && logoUrl" class="admin-layout-sider-left__logo">
               <img :src="logoUrl" alt="logo">
             </div>
           </slot>
           <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
             <slot name="leftContent" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
               <slot name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
-                <ul class="admin-layout-sider__split-left__parent-menu">
+                <ul class="admin-layout-sider-left__menu">
                   <li
                     v-for="item in parentMenuOptions"
                     :key="item.key"
-                    class="admin-layout-sider__split-left__parent-menu-item"
-                    :class="{ active: item.key === parentKey }"
+                    class="admin-layout-sider-left__menu-item"
+                    :class="{ 'admin-layout-sider-left__menu-item--active': item.key === parentKey }"
                     @click="handleParentMenuClick(`${item.key}`)"
                   >
-                    <div v-if="item" class="admin-layout-sider__split-left__parent-menu-item-icon">
+                    <div v-if="item" class="admin-layout-sider-left__menu-icon">
                       <component :is="item.icon" />
                     </div>
-                    <div class="admin-layout-sider__split-left__parent-menu-item-label">
+                    <div class="admin-layout-sider-left__menu-label">
                       {{ item.label }}
                     </div>
                   </li>
@@ -220,7 +203,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       <div class="admin-layout-sider__split-right" :class="{ 'border-right': siderFixed }" :style="rightStyle">
         <slot name="right" v-bind="{ ...siderProps }">
           <slot name="rightHeader" v-bind="{ ...siderProps }">
-            <div v-if="logo && title" class="admin-layout-sider__split-right-title">
+            <div v-if="logo && title" class="admin-layout-sider-right__title">
               <span>
                 {{ title }}
               </span>
@@ -233,7 +216,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
           </Scrollbar>
 
           <slot name="rightFooter" v-bind="{ ...siderProps }">
-            <div class="admin-layout-sider__split-right-fixed-switch" @click="toggleSiderFixed(!siderFixed)">
+            <div class="admin-layout-sider-right__fixed-switch" @click="toggleSiderFixed(!siderFixed)">
               <div v-if="!siderFixed" class="i-lucide:pin" />
               <div v-else class="i-lucide:pin-off" />
             </div>
@@ -253,7 +236,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
   &--split {
     flex-direction: row;
 
-    &__hover {
+    &-hover {
       .admin-layout-sider__split-right {
         transform: translateX(-100%);
         transition: transform var(--admin-layout-transition-duration);
@@ -262,7 +245,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       &:hover {
         .admin-layout-sider__split-right {
           transform: translateX(0);
-          z-index: 100;
+          z-index: 3;
           box-shadow: var(--box-shadow);
         }
       }
@@ -278,162 +261,36 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     }
   }
 
-  &__split {
+  &__split-left {
+    height: 100%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 4;
+    overflow-x: hidden;
+    box-sizing: border-box;
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    flex-direction: column;
 
-    &-left {
-      height: 100%;
-      flex-shrink: 0;
-      position: relative;
-      z-index: 101;
-      overflow-x: hidden;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-
-      &.collapsed {
-        .admin-layout-sider__split-left-logo {
-          & > img {
-            height: 75%;
-            aspect-ratio: 1/1;
-          }
-        }
-
-        .admin-layout-sider__split-left__parent-menu-item {
-          &-label {
-            display: none;
-          }
-        }
+    &--collapsed {
+      .admin-layout-sider-left__logo > img {
+        height: 75%;
+        aspect-ratio: 1/1;
       }
 
-      &-logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: var(--admin-layout-header-height);
-
-        & > img {
-          height: 95%;
-          aspect-ratio: 1/1;
-        }
-      }
-
-      &__parent-menu {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 6px;
-        list-style: none;
-        margin-top: 6px;
-        will-change: transform;
-
-        &-item {
-          width: 76%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          aspect-ratio: 1/1;
-          border-radius: 6px;
-          padding: 0 3px;
-          gap: 6px;
-          transition: background-color var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
-          box-sizing: border-box;
-
-          &:hover:not(.active) {
-            color: var(--primary-color);
-            background-color: rgba(0, 0, 0, 0.05);
-
-            .admin-layout-sider__split-left__parent-menu-item-icon {
-              transform: scale(1.2);
-            }
-          }
-
-          &.active {
-            background-color: var(--primary-color);
-            color: #fff;
-
-            .admin-layout-sider__split-left__parent-menu-item-icon {
-              transform: scale(1.1);
-            }
-          }
-
-          &-icon {
-            font-size: 18px;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
-          }
-
-          &-label {
-            width: 100%;
-            font-size: 12px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: center;
-          }
-        }
+      .admin-layout-sider-left__menu-label {
+        display: none;
       }
     }
+  }
 
-    &-right {
-      flex-shrink: 0;
-      position: relative;
-      z-index: 100;
-      height: 100%;
-      transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
-      display: flex;
-      flex-direction: column;
-
-      &-title {
-        height: var(--admin-layout-header-height);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary-color);
-        width: 100%;
-        overflow: hidden;
-
-        & > span {
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          font-size: 20px;
-          font-weight: 700;
-          width: calc(100% - 60px);
-          text-align: center;
-        }
-      }
-    }
-
-    &-right-fixed-switch {
-      position: absolute;
-      bottom: 6px;
-      right: 6px;
-      z-index: 110;
-      cursor: pointer;
-      border-radius: 6px;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      box-sizing: border-box;
-      background-color: rgba(0, 0, 0, 0.05);
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-      }
-    }
+  &__split-right {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 3;
+    height: 100%;
+    transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
+    display: flex;
+    flex-direction: column;
   }
 
   &__hamburger {
@@ -442,6 +299,126 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+}
+
+.admin-layout-sider-left {
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--admin-layout-header-height);
+
+    & > img {
+      height: 95%;
+      aspect-ratio: 1/1;
+    }
+  }
+
+  &__menu {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+    margin-top: 6px;
+    will-change: transform;
+  }
+
+  &__menu-item {
+    width: 76%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    aspect-ratio: 1/1;
+    border-radius: 6px;
+    padding: 0 3px;
+    gap: 6px;
+    transition: background-color var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
+    box-sizing: border-box;
+
+    &:hover:not(&--active) {
+      color: var(--primary-color);
+      background-color: rgba(0, 0, 0, 0.05);
+
+      .admin-layout-sider-left__menu-icon {
+        transform: scale(1.2);
+      }
+    }
+
+    &--active {
+      background-color: var(--primary-color);
+      color: #fff;
+
+      .admin-layout-sider-left__menu-icon {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  &__menu-icon {
+    font-size: 18px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
+  }
+
+  &__menu-label {
+    width: 100%;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+  }
+}
+
+.admin-layout-sider-right {
+  &__title {
+    height: var(--admin-layout-header-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    width: 100%;
+    overflow: hidden;
+
+    & > span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 20px;
+      font-weight: 700;
+      width: calc(100% - 60px);
+      text-align: center;
+    }
+  }
+
+  &__fixed-switch {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    z-index: 5;
+    cursor: pointer;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
   }
 }
 </style>

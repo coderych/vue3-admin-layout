@@ -263,7 +263,7 @@ defineExpose({
 
   &__main {
     grid-area: main;
-    z-index: 99;
+    z-index: 1;
   }
 }
 </style>

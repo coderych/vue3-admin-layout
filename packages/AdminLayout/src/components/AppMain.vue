@@ -33,13 +33,10 @@ const {
   scrollbarProps,
 } = state
 
-const mainStyle = computed<CSSProperties>(() => {
-  const style: CSSProperties = {
-    backgroundColor: `var(${CssVars.BgColor})`,
-    color: `var(${CssVars.TextColor})`,
-  }
-  return style
-})
+const mainStyle = computed<CSSProperties>(() => ({
+  backgroundColor: `var(${CssVars.BgColor})`,
+  color: `var(${CssVars.TextColor})`,
+}))
 
 const contentStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
@@ -146,7 +143,7 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 11;
+    z-index: 2;
   }
 }
 </style>

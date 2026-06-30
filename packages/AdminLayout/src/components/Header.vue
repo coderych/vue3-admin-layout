@@ -116,14 +116,14 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
               <li
                 v-for="item in parentMenuOptions"
                 :key="item.key"
-                :class="{ active: item.key === parentKey }"
+                :class="{ 'admin-layout-header__parent-menu-item--active': item.key === parentKey }"
                 class="admin-layout-header__parent-menu-item"
                 @click="handleParentMenuClick(`${item.key}`)"
               >
-                <div v-if="item.icon" class="admin-layout-header__parent-menu-item-icon">
+                <div v-if="item.icon" class="admin-layout-header__parent-menu-icon">
                   <component :is="item.icon" />
                 </div>
-                <div class="admin-layout-header__parent-menu-item-label">
+                <div class="admin-layout-header__parent-menu-label">
                   {{ item.label }}
                 </div>
               </li>
@@ -168,41 +168,41 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       gap: 6px;
       transition: var(--admin-layout-transition);
 
-      &:hover:not(.active) {
+      &:hover:not(&--active) {
         color: var(--primary-color);
         background-color: rgba(0, 0, 0, 0.05);
 
-        .admin-layout-header__parent-menu-item-icon {
+        .admin-layout-header__parent-menu-icon {
           transform: scale(1.2);
         }
       }
 
-      &.active {
+      &--active {
         background-color: var(--primary-color);
         color: #fff;
 
-        .admin-layout-header__parent-menu-item-icon {
+        .admin-layout-header__parent-menu-icon {
           transform: scale(1.1);
         }
       }
+    }
 
-      &-icon {
-        font-size: 18px;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.2s ease-out;
-      }
+    &-icon {
+      font-size: 18px;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease-out;
+    }
 
-      &-label {
-        max-width: 80px;
-        font-size: 12px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+    &-label {
+      max-width: 80px;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 

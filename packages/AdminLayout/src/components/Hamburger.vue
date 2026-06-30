@@ -1,20 +1,16 @@
 <script setup lang="ts">
 const collapsed = defineModel('value', { default: false })
-
-function toggle(value: boolean) {
-  collapsed.value = value
-}
 </script>
 
 <template>
-  <div class="hamburger" @click="toggle(!collapsed)">
+  <div class="admin-layout-hamburger" @click="collapsed = !collapsed">
     <div v-if="!collapsed" class="i-ant-design:menu-fold-outlined" />
     <div v-else class="i-ant-design:menu-unfold-outlined" />
   </div>
 </template>
 
 <style scoped lang="less">
-.hamburger {
+.admin-layout-hamburger {
   border-radius: 6px;
   width: 28px;
   height: 28px;
@@ -22,7 +18,7 @@ function toggle(value: boolean) {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 120;
+  z-index: 8;
   transition: background-color var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
   font-size: 16px;
   box-sizing: border-box;
