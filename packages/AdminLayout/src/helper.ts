@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'vue'
+import type { MenuOption, MenuOptionLabel } from './typing'
 import { rgba } from 'seemly'
 import { CssVars } from './typing'
 
@@ -62,4 +63,11 @@ export function getParentsKeys(tree: any[], option: TreeOption = {}): Map<string
 
   tree.forEach((node: any) => loop(node))
   return parentsKeys
+}
+
+export function getLabel(label: MenuOptionLabel | undefined, option: MenuOption): string {
+  if (typeof label === 'function') {
+    return label(option)
+  }
+  return label ?? ''
 }

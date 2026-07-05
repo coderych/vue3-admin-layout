@@ -4,7 +4,7 @@ import type { AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applySkinStyles, calculateInverted } from '../helper'
+import { applySkinStyles, calculateInverted, getLabel } from '../helper'
 import { CssVars, DefaultDarkColor } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
@@ -129,7 +129,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
                   <component :is="item.icon" />
                 </div>
                 <div class="admin-layout-header__parent-menu-label">
-                  {{ item.label }}
+                  {{ getLabel(item.label, item) }}
                 </div>
               </li>
             </ul>

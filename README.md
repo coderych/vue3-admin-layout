@@ -78,7 +78,7 @@ import 'vue3-admin-layout/dist/style.css'
 
 | 属性名 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `menuOptions` | `MenuOption[]` | `[]` | 菜单配置数组 |
+| `menuOptions` | `MenuOption[]` | `[]` | 菜单配置数组，`label` 支持字符串或函数 |
 | `accordion` | `boolean` | `false` | 是否手风琴模式 |
 | `activeKey` | `string` | `undefined` | 当前激活的菜单项 key |
 
@@ -178,11 +178,20 @@ import 'vue3-admin-layout/dist/style.css'
 ```ts
 interface MenuOption {
   key?: string
-  label?: string
+  label?: string | ((option: MenuOption) => string)
   icon?: Component | string  // Vue 组件或 iconify 图标字符串
   children?: MenuOption[]
   [key: string]: any
 }
+```
+
+`label` 支持函数形式，可根据菜单项动态生成文本：
+
+```ts
+const menuOptions: MenuOption[] = [
+  { key: 'home', label: '首页' },
+  { key: 'user', label: (opt) => `用户: ${opt.key}` },
+]
 ```
 
 ### ScrollbarProps
@@ -225,13 +234,14 @@ import type {
   AdminLayoutLogoProps,
   AdminLayoutMenuProps,
   MenuOption,
+  MenuOptionLabel,
   MenuProps,
   LayoutType,
   CssVars,
 } from 'vue3-admin-layout'
 
 // 工具函数
-import { calculateInverted, getParentsKeys } from 'vue3-admin-layout'
+import { calculateInverted, getParentsKeys, getLabel } from 'vue3-admin-layout'
 ```
 
 ## CSS 变量

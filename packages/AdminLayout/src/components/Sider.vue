@@ -4,7 +4,7 @@ import type { AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps 
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applySkinStyles, calculateInverted } from '../helper'
+import { applySkinStyles, calculateInverted, getLabel } from '../helper'
 import { CssVars, DefaultDarkColor } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
@@ -60,7 +60,8 @@ const {
 } = state
 
 const inverted = computed(() => {
-  if (hasSkin.value) return false
+  if (hasSkin.value)
+    return false
   return calculateInverted(siderTheme.value) || isDark.value
 })
 
@@ -217,7 +218,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
                       <component :is="item.icon" />
                     </div>
                     <div class="admin-layout-sider-left__menu-label">
-                      {{ item.label }}
+                      {{ getLabel(item.label, item) }}
                     </div>
                   </li>
                 </ul>
@@ -457,13 +458,18 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 .admin-layout-sider--split-hover.admin-layout-sider--skin {
   .admin-layout-sider__split-right {
     // 基态：visibility 延迟到 transform 动画结束后再隐藏
-    transition: transform var(--admin-layout-transition-duration), visibility 0s linear var(--admin-layout-transition-duration);
+    transition:
+      transform var(--admin-layout-transition-duration),
+      visibility 0s linear var(--admin-layout-transition-duration);
     visibility: hidden;
   }
 
   &:hover .admin-layout-sider__split-right {
     // hover：立即显示，transform 开始滑入动画
-    transition: transform var(--admin-layout-transition-duration), box-shadow var(--admin-layout-transition-duration), visibility 0s linear 0s;
+    transition:
+      transform var(--admin-layout-transition-duration),
+      box-shadow var(--admin-layout-transition-duration),
+      visibility 0s linear 0s;
     visibility: visible;
   }
 }

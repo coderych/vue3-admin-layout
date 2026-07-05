@@ -4,6 +4,8 @@ import type { AdminLayoutState } from './context'
 
 export type LayoutType = 'side' | 'mix' | 'top'
 
+export type MenuOptionLabel = string | ((option: MenuOption) => string)
+
 export interface MenuProps {
   collapsed?: boolean
   options?: any[]
@@ -17,7 +19,7 @@ export interface MenuProps {
 
 export interface MenuOption {
   key?: string
-  label?: string
+  label?: MenuOptionLabel
   icon?: Component | string
   children?: MenuOption[]
   [key: string]: any
