@@ -214,10 +214,10 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
                     :class="{ 'admin-layout-sider-left__menu-item--active': item.key === parentKey }"
                     @click="handleParentMenuClick(`${item.key}`)"
                   >
-                    <div v-if="item" class="admin-layout-sider-left__menu-icon">
+                    <div v-if="item.icon" class="admin-layout-sider-left__menu-icon">
                       <component :is="item.icon" />
                     </div>
-                    <div class="admin-layout-sider-left__menu-label">
+                    <div v-if="!collapsed || !item.icon" class="admin-layout-sider-left__menu-label">
                       {{ getLabel(item.label, item) }}
                     </div>
                   </li>
