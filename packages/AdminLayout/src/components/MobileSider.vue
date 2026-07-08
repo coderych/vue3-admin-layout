@@ -6,7 +6,6 @@ import { Logo } from '.'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { calculateInverted } from '../helper'
-import { CssVars, DefaultDarkColor } from '../typing'
 import Hamburger from './Hamburger.vue'
 
 defineSlots<{
@@ -21,30 +20,25 @@ defineSlots<{
 const state = useAdminLayoutState()
 const {
   menuOptions,
-  collapsed,
+  siderCollapsed,
   siderWidth,
-  isDark,
   headerHeight,
   activeKey,
   accordion,
   siderTheme,
-  toggleCollapsed,
-  toggleSiderFixed,
+  toggleSiderCollapsed,
+  toggleSiderRightFixed,
   sider,
   scrollbarProps,
 } = state
 
 const inverted = computed(() => {
-  return calculateInverted(siderTheme.value) || isDark.value
+  return calculateInverted(siderTheme.value)
 })
 
 const style = computed<CSSProperties>(() => ({
   width: `${siderWidth.value}px`,
-  backgroundColor: isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value,
-  ...(inverted.value && {
-    color: DefaultDarkColor.TextColor,
-    [CssVars.BorderColor]: DefaultDarkColor.BorderColor,
-  }),
+  backgroundColor: siderTheme.value,
 }))
 
 const siderProps = computed<AdminLayoutSiderProps>(() => ({
@@ -59,8 +53,8 @@ const siderProps = computed<AdminLayoutSiderProps>(() => ({
   _width: siderWidth.value,
   collapsedWidth: siderWidth.value,
   _collapsedWidth: siderWidth.value,
-  toggleCollapsed,
-  toggleFixed: toggleSiderFixed,
+  toggleSiderCollapsed: toggleSiderCollapsed,
+  toggleRightFixed: toggleSiderRightFixed,
 }))
 const logoProps = computed<AdminLayoutLogoProps>(() => ({
   state: proxyRefs(state),
@@ -80,7 +74,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 </script>
 
 <template>
-  <div class="admin-layout-mobile-sider" :class="{ 'admin-layout-mobile-sider--collapsed': collapsed }" :style="style">
+  <div class="admin-layout-mobile-sider" :class="{ 'admin-layout-mobile-sider--collapsed': siderCollapsed }" :style="style">
     <slot name="default" v-bind="siderProps">
       <slot name="header" v-bind="siderProps">
         <slot name="logo" v-bind="logoProps">
@@ -95,12 +89,12 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 
       <slot name="footer" v-bind="siderProps">
         <div class="admin-layout-mobile-sider__hamburger">
-          <Hamburger :value="collapsed" @update:value="toggleCollapsed" />
+          <Hamburger :value="siderCollapsed" @update:value="toggleSiderCollapsed" />
         </div>
       </slot>
     </slot>
   </div>
-  <div class="admin-layout-mobile-sider__mask" :class="{ 'admin-layout-mobile-sider__mask--show': !collapsed }" @click="toggleCollapsed(true)" />
+  <div class="admin-layout-mobile-sider__mask" :class="{ 'admin-layout-mobile-sider__mask--show': !siderCollapsed }" @click="toggleSiderCollapsed(true)" />
 </template>
 
 <style scoped lang="less">
