@@ -5,13 +5,13 @@ import { computed, h, proxyRefs } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
 import { AppMain, Header, MobileSider, Sider } from './components'
 import { useAdminLayoutProvider } from './context'
-import { adminLayoutProps, CssVars, DefaultColor, DefaultDarkColor } from './typing'
+import { AdminLayoutCssVars, adminLayoutProps } from './typing'
 
 const props = defineProps(adminLayoutProps)
 
 const emit = defineEmits<{
-  'update:collapsed': [value: boolean]
-  'update:siderFixed': [value: boolean]
+  'update:siderCollapsed': [value: boolean]
+  'update:siderRightFixed': [value: boolean]
 }>()
 
 const slots = defineSlots<{
@@ -40,8 +40,8 @@ const slots = defineSlots<{
 }>()
 
 const state = useAdminLayoutProvider(props, slots, {
-  onUpdateCollapsed: (value: boolean) => emit('update:collapsed', value),
-  onUpdateSiderFixed: (value: boolean) => emit('update:siderFixed', value),
+  onUpdateSiderCollapsed: (value: boolean) => emit('update:siderCollapsed', value),
+  onUpdateSiderRightFixed: (value: boolean) => emit('update:siderRightFixed', value),
 })
 
 const {
@@ -51,13 +51,12 @@ const {
   headerHeight,
   _headerHeight,
   siderWidth,
-  collapsed,
+  siderCollapsed,
   siderCollapsedWidth,
   isMobile,
-  siderFixed,
+  siderRightFixed,
   splitMenu,
-  isDark,
-  cssVars,
+  contentFull,
   sider,
   skin,
   hasSkin,
@@ -65,23 +64,9 @@ const {
 
 const style = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    color: `${DefaultColor.TextColor}`,
-    [CssVars.TransitionDuration]: `0.2s`,
-    [CssVars.TransitionBezier]: `cubic-bezier(0, 0, .2, 1)`,
-    [CssVars.HeaderHeight]: `${headerHeight.value}px`,
-
-    // 颜色变量
-    [CssVars.TextColor]: DefaultColor.TextColor,
-    [CssVars.BgColor]: DefaultColor.BgColor,
-    [CssVars.BaseColor]: DefaultColor.BaseColor,
-    [CssVars.BorderColor]: DefaultColor.BorderColor,
-  }
-
-  if (isDark.value) {
-    style[CssVars.TextColor] = DefaultDarkColor.TextColor
-    style[CssVars.BgColor] = DefaultDarkColor.BgColor
-    style[CssVars.BaseColor] = DefaultDarkColor.BaseColor
-    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
+    [AdminLayoutCssVars.Duration]: '0.2s',
+    [AdminLayoutCssVars.Bezier]: 'cubic-bezier(0, 0, .2, 1)',
+    [AdminLayoutCssVars.HeaderHeight]: `${headerHeight.value}px`,
   }
 
   if (mode.value === 'top' || isMobile.value) {
@@ -89,37 +74,32 @@ const style = computed<CSSProperties>(() => {
     if (mode.value !== 'top') {
       style.gridTemplateColumns = `0 minmax(0, 1fr)`
     }
-    style[CssVars.SiderWidth] = `${0}px`
+    style[AdminLayoutCssVars.SiderWidth] = '0px'
   }
   else if (mode.value === 'side' || mode.value === 'mix') {
-    // 计算侧边栏宽度
     let width = 0
     if (mode.value === 'side' && splitMenu.value) {
-      const collapsedWidth = siderCollapsedWidth.value >= 80 || collapsed.value ? siderCollapsedWidth.value : siderCollapsedWidth.value / 0.6
-
+      const collapsedWidth = siderCollapsedWidth.value >= 80 || siderCollapsed.value ? siderCollapsedWidth.value : siderCollapsedWidth.value / 0.6
       if (!sider.value) {
         width = 0
       }
       else {
-        width = siderFixed.value ? siderWidth.value + collapsedWidth : collapsedWidth
+        width = siderRightFixed.value ? siderWidth.value + collapsedWidth : collapsedWidth
       }
-      style[CssVars.SiderCollapsedWidth] = `${collapsedWidth}px`
+      style[AdminLayoutCssVars.SiderCollapsedWidth] = `${collapsedWidth}px`
     }
     else {
       if (!sider.value) {
         width = 0
       }
       else {
-        width = collapsed.value ? siderCollapsedWidth.value : siderWidth.value
+        width = siderCollapsed.value ? siderCollapsedWidth.value : siderWidth.value
       }
     }
-    style[CssVars.SiderWidth] = `${width}px`
-
+    style[AdminLayoutCssVars.SiderWidth] = `${width}px`
     style.gridTemplateColumns = `${width}px minmax(0, 1fr)`
     style.gridTemplateRows = `${_headerHeight.value}px minmax(0, 1fr)`
   }
-
-  Object.assign(style, cssVars.value)
 
   // skin 毛玻璃效果
   if (hasSkin.value) {
@@ -127,23 +107,19 @@ const style = computed<CSSProperties>(() => {
     style.backgroundSize = 'cover'
     style.backgroundPosition = 'center'
     style.backgroundRepeat = 'no-repeat'
-    style[CssVars.SkinBlur] = style[CssVars.SkinBlur] || 'blur(20px)'
-    style[CssVars.SkinBgLight] = style[CssVars.SkinBgLight] || 'rgba(255,255,255,0.18)'
+    style.backgroundColor = '#fff9'
+    style.backdropFilter = 'blur(8px)'
+    style.WebkitBackdropFilter = 'blur(8px)'
   }
 
-  // 过渡效果
-  style.transition = `all ${style[CssVars.TransitionDuration]} ${style[CssVars.TransitionBezier]}`
+  style.transition = `all ${style[AdminLayoutCssVars.Duration]} ${style[AdminLayoutCssVars.Bezier]}`
 
   return style
 })
 
 const mainStyle = computed<CSSProperties>(() => {
-  const style: CSSProperties = {}
-  if (hasSkin.value) {
-    style.backgroundColor = 'transparent'
-  }
-  else {
-    style.backgroundColor = `var(${CssVars.BgColor})`
+  const style: CSSProperties = {
+    backgroundColor: 'var(--admin-layout-bg-color)',
   }
   if (headerFixed.value) {
     style.height = `calc(100vh - ${_headerHeight.value}px)`
@@ -205,11 +181,14 @@ function renderContent() {
 
 defineExpose({
   state: proxyRefs(state),
+  toggleContentFull: state.toggleContentFull,
+  toggleSiderRightFixed: state.toggleSiderRightFixed,
+  toggleSiderCollapsed: state.toggleSiderCollapsed,
 })
 </script>
 
 <template>
-  <Scrollbar v-bind="{ ...scrollbarProps, height: '100vh', nativeScrollbar: !(!headerFixed && !isFull) }">
+  <Scrollbar calss="admin-layout-wrapper" v-bind="{ ...scrollbarProps, height: '100vh', nativeScrollbar: !(!headerFixed && !contentFull) }">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
       <header v-if="header" class="admin-layout__header">
         <component :is="renderHeader" />
@@ -218,7 +197,7 @@ defineExpose({
         <component :is="renderSider" />
       </aside>
       <main class="admin-layout__main" :style="mainStyle">
-        <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(headerFixed && !contentHeaderFixed && !isFull), height: '100%' }">
+        <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(headerFixed && !contentHeaderFixed && !contentFull), height: '100%' }">
           <component :is="renderContent">
             <slot name="default" v-bind="state" />
           </component>
@@ -229,6 +208,17 @@ defineExpose({
 </template>
 
 <style lang="less">
+.admin-layout-wrapper {
+  --admin-layout-border-color: var(--admin-layout-border-color);
+}
+.dark .admin-layout-wrapper {
+  --admin-layout-border-color: var(--admin-layout-border-color-dark);
+}
+
+:root {
+  --red: red;
+}
+
 .border-bottom {
   border-bottom: 1px solid var(--admin-layout-border-color);
   box-sizing: border-box;
