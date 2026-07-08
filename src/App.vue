@@ -21,13 +21,17 @@ const scrollbarConfig = reactive({
   inverted: false,
 })
 
+const contentFull = ref(false)
+watch(contentFull, (value) => {
+  adminLayoutRef.value?.toggleContentFull(value)
+})
+
 const props = ref<AdminLayoutProps>({
   // 布局模式
   mode: 'side',
   splitMenu: true,
-  collapsed: false,
+  siderCollapsed: false,
   isMobile: false,
-  isFull: false,
 
   // Logo
   logo: true,
@@ -44,7 +48,7 @@ const props = ref<AdminLayoutProps>({
   sider: true,
   siderWidth: 200,
   siderCollapsedWidth: 48,
-  siderFixed: false,
+  siderRightFixed: false,
   siderTheme: '#000',
 
   // Content Header
@@ -63,9 +67,6 @@ const props = ref<AdminLayoutProps>({
   // Menu
   accordion: false,
   activeKey: undefined,
-
-  // CSS Vars
-  cssVars: {},
 
   // Scrollbar
   scrollbarProps: scrollbarConfig,
@@ -169,8 +170,8 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
       Sider Left Header
     </template>
     <!-- <template #sider-left-footer="siderProps">
-      <button @click="siderProps.state?.toggleCollapsed(!siderProps.state?.collapsed.value)">
-        toggleSiderFixed
+      <button @click="siderProps.state?.toggleSiderCollapsed(!siderProps.state?.siderCollapsed.value)">
+        toggleSiderRightFixed
       </button>
     </template> -->
 
@@ -215,8 +216,8 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
       </select>
       <br>
       splitMenu: <input v-model="props.splitMenu" type="checkbox"><br>
-      collapsed: <input v-model="props.collapsed" type="checkbox"><br>
-      isFull: <input v-model="props.isFull" type="checkbox"><br>
+      siderCollapsed: <input v-model="props.siderCollapsed" type="checkbox"><br>
+      contentFull: <input v-model="contentFull" type="checkbox"><br>
       isMobile: <input v-model="props.isMobile" type="checkbox"><br>
 
       <h4 class="mb-4px mt-12px font-bold">
@@ -254,7 +255,7 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
         min="0"
         step="1"
       ><br>
-      siderFixed: <input v-model="props.siderFixed" type="checkbox"><br>
+      siderRightFixed: <input v-model="props.siderRightFixed" type="checkbox"><br>
       siderTheme: <input v-model="props.siderTheme" type="color"><br>
 
       <h4 class="mb-4px mt-12px font-bold">
