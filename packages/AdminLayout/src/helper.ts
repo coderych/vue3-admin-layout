@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'vue'
 import type { MenuOption, MenuOptionLabel } from './typing'
 import { rgba } from 'seemly'
-import { CssVars } from './typing'
 
 export function calculateInverted(color: string): boolean {
   if (color === 'transparent') {
@@ -18,13 +17,13 @@ export function calculateInverted(color: string): boolean {
   }
 }
 
-export function applySkinStyles(style: CSSProperties, isDark: boolean, options?: { blur?: boolean, border?: 'right' | 'bottom' }): void {
-  style.backgroundColor = `var(${CssVars.SkinBgLight})`
+export function applySkinStyles(style: CSSProperties, options?: { blur?: boolean, border?: 'right' | 'bottom' }): void {
+  style.backgroundColor = '#fff9'
   if (options?.blur !== false) {
-    style.backdropFilter = `var(${CssVars.SkinBlur})`
-    style.WebkitBackdropFilter = `var(${CssVars.SkinBlur})`
+    style.backdropFilter = 'blur(8px)'
+    style.WebkitBackdropFilter = 'blur(8px)'
   }
-  const borderColor = `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.2)'}`
+  const borderColor = '1px solid rgba(255,255,255,0.2)'
   if (options?.border === 'right') {
     style.borderRight = borderColor
   }
