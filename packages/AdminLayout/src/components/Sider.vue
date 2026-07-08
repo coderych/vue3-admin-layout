@@ -5,7 +5,7 @@ import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { applySkinStyles, calculateInverted, getLabel } from '../helper'
-import { CssVars, DefaultDarkColor } from '../typing'
+import { AdminLayoutCssVars } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
 
@@ -30,8 +30,8 @@ defineSlots<{
 const state = useAdminLayoutState()
 
 const {
-  collapsed,
-  siderFixed,
+  siderCollapsed,
+  siderRightFixed,
   siderCollapsedWidth,
   siderWidth,
   siderTheme,
@@ -46,52 +46,42 @@ const {
   parentMenuOptions,
   parentKey,
   childMenuOptions,
-  isDark,
   menuOptions,
   activeKey,
   accordion,
   sider,
   _siderCollapsedWidth,
-  toggleSiderFixed,
-  toggleCollapsed,
+  toggleSiderRightFixed,
+  toggleSiderCollapsed,
   scrollbarProps,
-  isFull,
   hasSkin,
 } = state
 
 const inverted = computed(() => {
   if (hasSkin.value)
     return false
-  return calculateInverted(siderTheme.value) || isDark.value
+  return calculateInverted(siderTheme.value)
 })
 
 const siderStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    width: `100%`,
-    color: `var(${CssVars.TextColor})`,
+    width: '100%',
+    color: 'var(--admin-layout-text-color)',
     boxSizing: 'border-box',
   }
   if (headerFixed.value) {
-    style.height = mode.value === 'side' ? `100vh` : `calc(100vh - ${_headerHeight.value}px)`
+    style.height = mode.value === 'side' ? '100vh' : `calc(100vh - ${_headerHeight.value}px)`
   }
 
   const isSplit = splitMenu.value && mode.value === 'side'
 
   if (hasSkin.value) {
     if (!isSplit) {
-      // 非 split 模式：main sider 就是可见面板，需要毛玻璃效果
-      // split 模式：main sider 是透明容器，不加 backdrop-filter（否则创建层叠上下文，
-      // 会困住 split-right 的 z-index，导致它显示在 content 下方）
-      applySkinStyles(style, isDark.value, { border: 'right' })
+      applySkinStyles(style, { border: 'right' })
     }
   }
   else if (!splitMenu.value || mode.value === 'mix') {
-    style.backgroundColor = isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value
-  }
-
-  if (inverted.value && !hasSkin.value) {
-    style.color = DefaultDarkColor.TextColor
-    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
+    style.backgroundColor = siderTheme.value
   }
 
   return style
@@ -99,13 +89,13 @@ const siderStyle = computed<CSSProperties>(() => {
 
 const leftStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    width: `var(${CssVars.SiderCollapsedWidth})`,
+    width: `var(${AdminLayoutCssVars.SiderCollapsedWidth})`,
   }
   if (hasSkin.value) {
-    applySkinStyles(style, isDark.value, { border: 'right' })
+    applySkinStyles(style, { border: 'right' })
   }
   else {
-    style.backgroundColor = isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value
+    style.backgroundColor = siderTheme.value
   }
   return style
 })
@@ -113,14 +103,14 @@ const leftStyle = computed<CSSProperties>(() => {
 const rightStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     'width': `${siderWidth.value}px !important`,
-    '--box-shadow': `8px 0 15px ${isDark.value ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)'}`,
+    '--box-shadow': '8px 0 15px rgba(0, 0, 0, 0.03)',
   }
   if (hasSkin.value) {
-    applySkinStyles(style, false)
-    style['--box-shadow'] = `8px 0 15px ${isDark.value ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`
+    applySkinStyles(style)
+    style['--box-shadow'] = '8px 0 15px rgba(0,0,0,0.05)'
   }
   else {
-    style.backgroundColor = isDark.value ? `var(${CssVars.BaseColor})` : siderTheme.value
+    style.backgroundColor = siderTheme.value
   }
   return style
 })
@@ -134,15 +124,15 @@ const siderProps = computed<AdminLayoutSiderProps>(() => ({
   show: sider.value,
   inverted: inverted.value,
   headerHeight: headerHeight.value,
-  collapsed: collapsed.value,
-  fixed: siderFixed.value,
+  collapsed: siderCollapsed.value,
+  fixed: siderRightFixed.value,
   theme: siderTheme.value,
   width: siderWidth.value,
   _width: siderWidth.value,
   collapsedWidth: siderWidth.value,
   _collapsedWidth: _siderCollapsedWidth.value,
-  toggleCollapsed,
-  toggleFixed: toggleSiderFixed,
+  toggleSiderCollapsed,
+  toggleRightFixed: toggleSiderRightFixed,
 }))
 
 const logoProps = computed<AdminLayoutLogoProps>(() => ({
@@ -150,7 +140,7 @@ const logoProps = computed<AdminLayoutLogoProps>(() => ({
   inverted: inverted.value,
   width: siderWidth.value,
   height: headerHeight.value,
-  collapsed: collapsed.value,
+  collapsed: siderCollapsed.value,
 }))
 
 const menuProps = computed<AdminLayoutMenuProps>(() => ({
@@ -159,7 +149,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
   inverted: inverted.value,
   accordion: accordion.value,
   value: `${activeKey.value}`,
-  collapsed: collapsed.value,
+  collapsed: siderCollapsed.value,
   collapsedWidth: siderCollapsedWidth.value,
 }))
 </script>
@@ -170,17 +160,16 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     :class="{
       'admin-layout-sider--split': splitMenu && mode === 'side',
       'border-right': (!splitMenu && mode === 'side') || mode === 'mix',
-      'admin-layout-sider--split-hover': !siderFixed && mode === 'side' && splitMenu,
+      'admin-layout-sider--split-hover': !siderRightFixed && mode === 'side' && splitMenu,
       'admin-layout-sider--skin': hasSkin,
-      'admin-layout-sider--hide': isFull,
     }"
     :style="{ ...siderStyle }"
   >
     <template v-if="(mode === 'side' && !splitMenu) || mode === 'mix'">
       <slot name="default" v-bind="{ ...siderProps }">
         <slot v-if="mode === 'side'" name="header" v-bind="siderProps">
-          <slot name="logo" v-bind="{ ...logoProps, width: collapsed ? siderCollapsedWidth : siderWidth }">
-            <Logo v-if="logo" :collapsed="collapsed" />
+          <slot name="logo" v-bind="{ ...logoProps, width: siderCollapsed ? siderCollapsedWidth : siderWidth }">
+            <Logo v-if="logo" :collapsed="siderCollapsed" />
           </slot>
         </slot>
         <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
@@ -190,34 +179,34 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
         </Scrollbar>
         <slot name="footer" v-bind="siderProps">
           <div class="admin-layout-sider__hamburger">
-            <Hamburger :value="collapsed" @update:value="toggleCollapsed" />
+            <Hamburger :value="siderCollapsed" @update:value="toggleSiderCollapsed" />
           </div>
         </slot>
       </slot>
     </template>
     <template v-else>
-      <div class="admin-layout-sider__split-left border-right" :style="leftStyle" :class="{ 'admin-layout-sider-left--collapsed': collapsed }">
+      <div class="admin-layout-sider__split-left border-right" :style="leftStyle" :class="{ 'admin-layout-sider__split-left--collapsed': siderCollapsed }">
         <slot name="left" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
           <slot name="leftHeader" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
-            <div v-if="logo && logoUrl" class="admin-layout-sider-left__logo">
+            <div v-if="logo && logoUrl" class="admin-layout-sider__split-left-logo">
               <img :src="logoUrl" alt="logo">
             </div>
           </slot>
           <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
             <slot name="leftContent" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
               <slot name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
-                <ul class="admin-layout-sider-left__menu">
+                <ul class="admin-layout-sider__split-left-menu">
                   <li
                     v-for="item in parentMenuOptions"
                     :key="item.key"
-                    class="admin-layout-sider-left__menu-item"
-                    :class="{ 'admin-layout-sider-left__menu-item--active': item.key === parentKey }"
+                    class="admin-layout-sider__split-left-menu-item"
+                    :class="{ 'admin-layout-sider__split-left-menu-item--active': item.key === parentKey }"
                     @click="handleParentMenuClick(`${item.key}`)"
                   >
-                    <div v-if="item.icon" class="admin-layout-sider-left__menu-icon">
+                    <div v-if="item.icon" class="admin-layout-sider__split-left-menu-icon">
                       <component :is="item.icon" />
                     </div>
-                    <div v-if="!collapsed || !item.icon" class="admin-layout-sider-left__menu-label">
+                    <div v-if="!siderCollapsed || !item.icon" class="admin-layout-sider__split-left-menu-label">
                       {{ getLabel(item.label, item) }}
                     </div>
                   </li>
@@ -227,15 +216,15 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
           </Scrollbar>
           <slot name="leftFooter" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
             <div class="admin-layout-sider__hamburger">
-              <Hamburger :value="collapsed" @update:value="toggleCollapsed" />
+              <Hamburger :value="siderCollapsed" @update:value="toggleSiderCollapsed" />
             </div>
           </slot>
         </slot>
       </div>
-      <div class="admin-layout-sider__split-right" :class="{ 'border-right': siderFixed }" :style="rightStyle">
+      <div class="admin-layout-sider__split-right" :class="{ 'border-right': siderRightFixed }" :style="rightStyle">
         <slot name="right" v-bind="{ ...siderProps }">
           <slot name="rightHeader" v-bind="{ ...siderProps }">
-            <div v-if="logo && title" class="admin-layout-sider-right__title">
+            <div v-if="logo && title" class="admin-layout-sider__split-right-title">
               <span>
                 {{ title }}
               </span>
@@ -248,8 +237,8 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
           </Scrollbar>
 
           <slot name="rightFooter" v-bind="{ ...siderProps }">
-            <div class="admin-layout-sider-right__fixed-switch" @click="toggleSiderFixed(!siderFixed)">
-              <div v-if="!siderFixed" class="i-lucide:pin" />
+            <div class="admin-layout-sider__split-right-fixed-switch" @click="toggleSiderRightFixed(!siderRightFixed)">
+              <div v-if="!siderRightFixed" class="i-lucide:pin" />
               <div v-else class="i-lucide:pin-off" />
             </div>
           </slot>
@@ -284,15 +273,6 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     }
   }
 
-  &--hide {
-    .admin-layout-sider__split-left {
-      z-index: auto;
-    }
-    .admin-layout-sider__split-right {
-      z-index: auto;
-    }
-  }
-
   &__split-left {
     height: 100%;
     flex-shrink: 0;
@@ -304,12 +284,12 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     flex-direction: column;
 
     &--collapsed {
-      .admin-layout-sider-left__logo > img {
+      .admin-layout-sider__split-left-logo > img {
         height: 75%;
         aspect-ratio: 1/1;
       }
 
-      .admin-layout-sider-left__menu-label {
+      .admin-layout-sider__split-left-menu-label {
         display: none;
       }
     }
@@ -334,123 +314,119 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
   }
 }
 
-.admin-layout-sider-left {
-  &__logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: var(--admin-layout-header-height);
+.admin-layout-sider__split-left-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--admin-layout-header-height);
 
-    & > img {
-      height: 95%;
-      aspect-ratio: 1/1;
-    }
-  }
-
-  &__menu {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    list-style: none;
-    margin-top: 6px;
-    will-change: transform;
-  }
-
-  &__menu-item {
-    width: 76%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+  & > img {
+    height: 95%;
     aspect-ratio: 1/1;
-    border-radius: 6px;
-    padding: 0 3px;
-    gap: 6px;
-    transition: background-color var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
-    box-sizing: border-box;
+  }
+}
 
-    &:hover:not(&--active) {
-      color: var(--primary-color);
-      background-color: rgba(0, 0, 0, 0.05);
+.admin-layout-sider__split-left-menu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin-top: 6px;
+  will-change: transform;
+}
 
-      .admin-layout-sider-left__menu-icon {
-        transform: scale(1.2);
-      }
-    }
+.admin-layout-sider__split-left-menu-item {
+  width: 76%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  aspect-ratio: 1/1;
+  border-radius: 6px;
+  padding: 0 3px;
+  gap: 6px;
+  transition: background-color var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
+  box-sizing: border-box;
 
-    &--active {
-      background-color: var(--primary-color);
-      color: #fff;
+  &:hover:not(&--active) {
+    color: var(--primary-color);
+    background-color: rgba(0, 0, 0, 0.05);
 
-      .admin-layout-sider-left__menu-icon {
-        transform: scale(1.1);
-      }
+    .admin-layout-sider__split-left-menu-icon {
+      transform: scale(1.2);
     }
   }
 
-  &__menu-icon {
-    font-size: 18px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
-  }
+  &--active {
+    background-color: var(--primary-color);
+    color: #fff;
 
-  &__menu-label {
-    width: 100%;
-    font-size: 12px;
+    .admin-layout-sider__split-left-menu-icon {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.admin-layout-sider__split-left-menu-icon {
+  font-size: 18px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
+}
+
+.admin-layout-sider__split-left-menu-label {
+  width: 100%;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.admin-layout-sider__split-right-title {
+  height: var(--admin-layout-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  width: 100%;
+  overflow: hidden;
+
+  & > span {
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 20px;
+    font-weight: 700;
+    width: calc(100% - 60px);
     text-align: center;
   }
 }
 
-.admin-layout-sider-right {
-  &__title {
-    height: var(--admin-layout-header-height);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    width: 100%;
-    overflow: hidden;
+.admin-layout-sider__split-right-fixed-switch {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  z-index: 5;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-sizing: border-box;
+  background-color: rgba(0, 0, 0, 0.05);
 
-    & > span {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      font-size: 20px;
-      font-weight: 700;
-      width: calc(100% - 60px);
-      text-align: center;
-    }
-  }
-
-  &__fixed-switch {
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-    z-index: 5;
-    cursor: pointer;
-    border-radius: 6px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    box-sizing: border-box;
-    background-color: rgba(0, 0, 0, 0.05);
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
   }
 }
 
