@@ -5,7 +5,7 @@ import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { applySkinStyles, calculateInverted, getLabel } from '../helper'
-import { CssVars, DefaultDarkColor } from '../typing'
+import { AdminLayoutCssVars } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
 
@@ -29,19 +29,18 @@ const {
   parentKey,
   splitMenu,
   menuOptions,
-  isDark,
-  collapsed,
+  siderCollapsed,
   logo,
   isMobile,
   headerFixed,
-  toggleCollapsed,
+  toggleSiderCollapsed,
   siderWidth,
   activeKey,
   scrollbarProps,
   hasSkin,
 } = state
 
-const inverted = computed(() => calculateInverted(headerTheme.value) || isDark.value)
+const inverted = computed(() => calculateInverted(headerTheme.value))
 
 const scrollbarStyle = computed(() => {
   const style: CSSProperties = {
@@ -49,14 +48,7 @@ const scrollbarStyle = computed(() => {
   }
 
   if (hasSkin.value) {
-    applySkinStyles(style, isDark.value, { border: 'bottom' })
-  }
-  else if (isDark.value) {
-    style.backgroundColor = `var(${CssVars.BaseColor})`
-  }
-
-  if (inverted.value && !hasSkin.value) {
-    style[CssVars.BorderColor] = DefaultDarkColor.BorderColor
+    applySkinStyles(style, { border: 'bottom' })
   }
 
   return style
@@ -64,11 +56,10 @@ const scrollbarStyle = computed(() => {
 
 const headerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    // 父容器有1px的边框，所以这里减去1px
     height: `${_headerHeight.value - 1}px`,
   }
   if (inverted.value) {
-    style.color = `${DefaultDarkColor.TextColor}`
+    style.color = 'rgba(255, 255, 255, 0.85)'
   }
   return style
 })
@@ -110,9 +101,9 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
         </slot>
         <Hamburger
           v-if="isMobile"
-          :value="collapsed"
+          :value="siderCollapsed"
           class="admin-layout-header__hamburger"
-          @update:value="toggleCollapsed"
+          @update:value="toggleSiderCollapsed"
         />
         <slot name="prefix" v-bind="headerProps" />
         <template v-if="!isMobile">
