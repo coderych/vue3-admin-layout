@@ -25,36 +25,13 @@ export interface MenuOption {
   [key: string]: any
 }
 
-export enum CssVars {
-  BgColor = '--admin-layout-bg-color',
-  BaseColor = '--admin-layout-base-color',
-  PrimaryColor = '--primary-color',
-  SiderCollapsedWidth = '--admin-layout-sider-collapsed-width',
-  SiderWidth = '--admin-layout-sider-width',
-  HeaderHeight = '--admin-layout-header-height',
-  TransitionDuration = '--admin-layout-transition-duration',
-  TransitionBezier = '--admin-layout-transition-bezier',
-  TextColor = '--admin-layout-text-color',
-  BorderColor = '--admin-layout-border-color',
-  SkinBlur = '--admin-layout-skin-blur',
-  SkinBgLight = '--admin-layout-skin-bg-light',
-}
-
-export const DefaultColor = {
-  BgColor: 'rgb(240, 242, 245)',
-  BaseColor: 'rgb(255,255,255)',
-  PrimaryColor: '#1890ff',
-  TextColor: 'rgb(51, 54, 57)',
-  BorderColor: 'rgb(239, 239, 245)',
-}
-
-export const DefaultDarkColor = {
-  BgColor: 'rgb(16, 16, 20)',
-  BaseColor: 'rgb(24, 24, 28)',
-  PrimaryColor: '#409eff',
-  TextColor: 'rgba(255, 255, 255, 0.85)',
-  BorderColor: 'rgba(255, 255, 255, 0.09)',
-}
+export const AdminLayoutCssVars = {
+  SiderCollapsedWidth: '--admin-layout-sider-collapsed-width',
+  SiderWidth: '--admin-layout-sider-width',
+  HeaderHeight: '--admin-layout-header-height',
+  Duration: '--admin-layout-duration',
+  Bezier: '--admin-layout-bezier',
+} as const
 
 export const adminLayoutProps = {
   mode: {
@@ -65,7 +42,7 @@ export const adminLayoutProps = {
     type: Boolean as PropType<boolean>,
     default: true,
   },
-  collapsed: {
+  siderCollapsed: {
     type: Boolean as PropType<boolean>,
     default: false,
   },
@@ -89,11 +66,6 @@ export const adminLayoutProps = {
     type: String as PropType<string>,
     default: '',
   },
-  isFull: {
-    type: Boolean as PropType<boolean>,
-    default: false,
-  },
-
   header: {
     type: Boolean as PropType<boolean>,
     default: true,
@@ -131,9 +103,13 @@ export const adminLayoutProps = {
     type: String as PropType<string>,
     default: undefined,
   },
-  siderFixed: {
+  siderRightFixed: {
     type: Boolean as PropType<boolean>,
     default: true,
+  },
+  siderBordered: {
+    type: Boolean as PropType<boolean>,
+    default: false,
   },
 
   contentHeader: {
@@ -176,10 +152,6 @@ export const adminLayoutProps = {
     type: String as PropType<string>,
     default: undefined,
   },
-  cssVars: {
-    type: Object as PropType<Record<CssVars | string, string>>,
-    default: () => ({}),
-  },
 
   scrollbarProps: {
     type: Object as PropType<ScrollbarProps>,
@@ -211,8 +183,8 @@ export interface AdminLayoutSiderProps {
   inverted: boolean
   headerHeight: number
   collapsed: boolean
-  toggleCollapsed: (collapsed: boolean) => void
-  toggleFixed: (fixed: boolean) => void
+  toggleSiderCollapsed: (collapsed: boolean) => void
+  toggleRightFixed: (fixed: boolean) => void
 }
 
 export interface AdminLayoutContentProps {
@@ -237,4 +209,7 @@ export interface AdminLayoutMenuProps extends MenuProps {
 
 export interface AdminLayoutInstance {
   state: ShallowUnwrapRef<AdminLayoutState>
+  toggleContentFull: (value: boolean) => void
+  toggleSiderRightFixed: (value?: boolean) => void
+  toggleSiderCollapsed: (value?: boolean) => void
 }
