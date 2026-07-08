@@ -5,7 +5,6 @@ import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { applySkinStyles, calculateInverted, getLabel } from '../helper'
-import { AdminLayoutCssVars } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
 

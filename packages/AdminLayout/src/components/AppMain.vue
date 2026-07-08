@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 import type { AdminLayoutContentProps } from '../typing'
-import { computed, proxyRefs } from 'vue'
+import { useFullscreen } from '@vueuse/core'
+import { computed, proxyRefs, ref, watch } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { applySkinStyles } from '../helper'
-import { CssVars } from '../typing'
 
 defineSlots<{
   header: (props: AdminLayoutContentProps) => any
@@ -22,7 +22,7 @@ const {
   _contentFooterHeight,
   contentHeaderFixed,
   _headerHeight,
-  isFull,
+  contentFull,
   contentFooterFixed,
   headerFixed,
   contentTop,
@@ -36,15 +36,33 @@ const {
   hasSkin,
 } = state
 
-const mainStyle = computed<CSSProperties>(() => {
-  const style: CSSProperties = {
-    color: `var(${CssVars.TextColor})`,
-  }
-  if (hasSkin.value) {
-    applySkinStyles(style, false)
+const el = ref<HTMLElement>()
+
+const { enter, exit,isFullscreen } = useFullscreen(el)
+
+watch(() => contentFull.value, (value) => {
+  if (value) {
+    enter()
   }
   else {
-    style.backgroundColor = `var(${CssVars.BgColor})`
+    exit()
+  }
+})
+
+watch(isFullscreen, (value) => {
+  contentFull.value = value
+})
+
+
+const mainStyle = computed<CSSProperties>(() => {
+  const style: CSSProperties = {
+    color: 'var(--admin-layout-text-color)',
+  }
+  if (hasSkin.value) {
+    applySkinStyles(style, { blur: false })
+  }
+  else {
+    style.backgroundColor = 'var(--admin-layout-bg-color)'
   }
   return style
 })
@@ -52,7 +70,7 @@ const mainStyle = computed<CSSProperties>(() => {
 const contentStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
   if (contentHeaderFixed.value && headerFixed.value) {
-    style.height = `calc(100vh - ${_contentHeaderHeight.value}px - ${isFull.value ? 0 : _headerHeight.value}px)`
+    style.height = `calc(100vh - ${_contentHeaderHeight.value}px - ${contentFull.value ? 0 : _headerHeight.value}px)`
   }
   return style
 })
@@ -62,10 +80,10 @@ const contentHeaderStyle = computed<CSSProperties>(() => {
     height: `${_contentHeaderHeight.value}px`,
   }
   if (hasSkin.value) {
-    applySkinStyles(style, false)
+    applySkinStyles(style, { blur: false })
   }
   else {
-    style.backgroundColor = `var(${CssVars.BaseColor})`
+    style.backgroundColor = 'var(--admin-layout-base-color)'
   }
   return style
 })
@@ -75,10 +93,10 @@ const contentFooterStyle = computed<CSSProperties>(() => {
     height: `${_contentFooterHeight.value}px`,
   }
   if (hasSkin.value) {
-    applySkinStyles(style, false)
+    applySkinStyles(style, { blur: false })
   }
   else {
-    style.backgroundColor = `var(${CssVars.BgColor})`
+    style.backgroundColor = 'var(--admin-layout-bg-color)'
   }
   if (contentFooterFixed.value) {
     style.position = 'sticky'
@@ -114,8 +132,8 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
 </script>
 
 <template>
-  <div class="admin-layout-main" :style="mainStyle" :class="{ 'admin-layout-main--full': isFull }">
-    <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(isFull && !contentHeaderFixed), height: isFull ? '100vh' : '100%' }">
+  <div ref="el" class="admin-layout-main" :style="mainStyle">
+    <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(contentFull && !contentHeaderFixed), height: contentFull ? '100vh' : '100%' }">
       <div v-if="contentHeader" class="admin-layout-main__header border-bottom" :style="contentHeaderStyle">
         <slot name="header" v-bind="contentProps" />
       </div>
@@ -138,17 +156,6 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
 
 <style scoped lang="less">
 .admin-layout-main {
-  &--full {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-  }
-
   &__header {
     overflow: hidden;
     display: flex;
