@@ -5,8 +5,8 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import { getParentsKeys } from './helper'
 
 export interface AdminLayoutProviderMethods {
-  onUpdateCollapsed?: (value: boolean) => void
-  onUpdateSiderFixed?: (value: boolean) => void
+  onUpdateSiderCollapsed?: (value: boolean) => void
+  onUpdateSiderRightFixed?: (value: boolean) => void
 }
 
 export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: AdminLayoutProviderMethods = {}) {
@@ -14,15 +14,15 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const splitMenu = computed(() => props.splitMenu)
   const isMobile = computed(() => props.isMobile)
   const menuOptions = computed(() => props.menuOptions)
-  const collapsed = ref(props.collapsed)
+  const siderCollapsed = ref(props.siderCollapsed)
   const scrollbarProps = computed(() => props.scrollbarProps)
 
   const logo = computed(() => props.logo)
   const logoUrl = computed(() => props.logoUrl)
   const title = computed(() => props.title)
-  const isFull = computed(() => props.isFull)
+  const contentFull = ref(false)
   const isDark = useDark()
-  const cssVars = computed(() => props.cssVars)
+
   const header = computed(() => props.header)
   const headerHeight = computed(() => props.headerHeight)
   const headerTheme = computed(() => props.headerTheme)
@@ -33,17 +33,17 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const siderWidth = computed(() => props.siderWidth)
   const siderTheme = computed(() => props.siderTheme)
   const siderCollapsedWidth = computed(() => props.siderCollapsedWidth)
-  const _siderCollapsedWidth = computed(() => siderCollapsedWidth.value >= 80 || collapsed.value ? siderCollapsedWidth.value : siderCollapsedWidth.value / 0.6)
+  const _siderCollapsedWidth = computed(() => siderCollapsedWidth.value >= 80 || siderCollapsed.value ? siderCollapsedWidth.value : siderCollapsedWidth.value / 0.6)
   const accordion = computed(() => props.accordion)
-  const siderFixed = ref(props.siderFixed)
+  const siderRightFixed = ref(props.siderRightFixed)
   const _siderWidth = computed(() => {
     if (!sider.value || mode.value === 'top' || isMobile.value) {
       return 0
     }
     if (mode.value === 'side' && splitMenu.value) {
-      return siderFixed.value ? siderWidth.value + _siderCollapsedWidth.value : _siderCollapsedWidth.value
+      return siderRightFixed.value ? siderWidth.value + _siderCollapsedWidth.value : _siderCollapsedWidth.value
     }
-    return collapsed.value ? siderCollapsedWidth.value : siderWidth.value
+    return siderCollapsed.value ? siderCollapsedWidth.value : siderWidth.value
   })
 
   const contentHeader = computed(() => props.contentHeader && Boolean(slots['content-header']))
@@ -72,7 +72,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const overlayRef = ref<HTMLDivElement>()
   const { height: overlayHeight, width: overlayWidth } = useElementSize(overlayRef)
   const contentTop = computed(() => {
-    return _contentHeaderHeight.value + (isFull.value ? 0 : _headerHeight.value)
+    return _contentHeaderHeight.value + (contentFull.value ? 0 : _headerHeight.value)
   })
   const contentLeft = computed(() => _siderWidth.value)
   const contentBottom = computed(() => _contentFooterHeight.value)
@@ -102,21 +102,25 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     }
   })
 
-  function toggleCollapsed(value: boolean) {
-    collapsed.value = value
-    methods?.onUpdateCollapsed?.(value)
+  function toggleSiderCollapsed(value: boolean) {
+    siderCollapsed.value = value
+    methods?.onUpdateSiderCollapsed?.(value)
   }
 
-  function toggleSiderFixed(value: boolean) {
-    siderFixed.value = value
-    methods?.onUpdateSiderFixed?.(value)
+  function toggleSiderRightFixed(value: boolean) {
+    siderRightFixed.value = value
+    methods?.onUpdateSiderRightFixed?.(value)
   }
 
-  watch(() => props.collapsed, (value) => {
-    collapsed.value = value
+  function toggleContentFull(value: boolean) {
+    contentFull.value = value
+  }
+
+  watch(() => props.siderCollapsed, (value) => {
+    siderCollapsed.value = value
   })
-  watch(() => props.siderFixed, (value) => {
-    siderFixed.value = value
+  watch(() => props.siderRightFixed, (value) => {
+    siderRightFixed.value = value
   })
 
   return {
@@ -124,13 +128,12 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     isMobile,
     splitMenu,
     menuOptions,
-    collapsed,
+    siderCollapsed,
     logo,
     logoUrl,
     title,
-    isFull,
+    contentFull,
     isDark,
-    cssVars,
     scrollbarProps,
 
     header,
@@ -143,7 +146,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     siderWidth,
     siderTheme,
     siderCollapsedWidth,
-    siderFixed,
+    siderRightFixed,
     accordion,
     _siderWidth,
     _siderCollapsedWidth,
@@ -174,8 +177,9 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     contentLeft,
     contentBottom,
 
-    toggleCollapsed,
-    toggleSiderFixed,
+    toggleSiderCollapsed,
+    toggleSiderRightFixed,
+    toggleContentFull,
   }
 }
 
