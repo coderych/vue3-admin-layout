@@ -10,32 +10,68 @@ export interface AdminLayoutProviderMethods {
 }
 
 export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: AdminLayoutProviderMethods = {}) {
+  // refs
+  const siderCollapsed = ref(props.siderCollapsed)
+  const contentFull = ref(false)
+  const siderRightFixed = ref(props.siderRightFixed)
+  const parentKey = ref<string | null>()
+  const overlayRef = ref<HTMLDivElement>()
+
+  // composables
+  const isDark = useDark()
+  const { height: overlayHeight, width: overlayWidth } = useElementSize(overlayRef)
+
+  // computed - props (no dependencies on refs/composables)
   const mode = computed(() => props.mode)
   const splitMenu = computed(() => props.splitMenu)
   const isMobile = computed(() => props.isMobile)
   const menuOptions = computed(() => props.menuOptions)
-  const siderCollapsed = ref(props.siderCollapsed)
   const scrollbarProps = computed(() => props.scrollbarProps)
 
   const logo = computed(() => props.logo)
   const logoUrl = computed(() => props.logoUrl)
   const title = computed(() => props.title)
-  const contentFull = ref(false)
-  const isDark = useDark()
 
   const header = computed(() => props.header)
   const headerHeight = computed(() => props.headerHeight)
   const headerTheme = computed(() => props.headerTheme)
   const headerFixed = computed(() => props.headerFixed)
-  const _headerHeight = computed(() => header.value ? headerHeight.value : 0)
+  const headerBordered = computed(() => props.headerBordered)
 
   const sider = computed(() => props.sider)
   const siderWidth = computed(() => props.siderWidth)
+  const siderBordered = computed(() => props.siderBordered)
   const siderTheme = computed(() => props.siderTheme)
   const siderCollapsedWidth = computed(() => props.siderCollapsedWidth)
-  const _siderCollapsedWidth = computed(() => siderCollapsedWidth.value >= 80 || siderCollapsed.value ? siderCollapsedWidth.value : siderCollapsedWidth.value / 0.6)
   const accordion = computed(() => props.accordion)
-  const siderRightFixed = ref(props.siderRightFixed)
+
+  const contentHeader = computed(() => props.contentHeader && Boolean(slots['content-header']))
+  const contentHeaderBordered = computed(() => props.contentHeaderBordered)
+  const contentHeaderHeight = computed(() => props.contentHeaderHeight)
+  const contentHeaderFixed = computed(() => props.contentHeaderFixed)
+
+  const contentFooter = computed(() => props.contentFooter && Boolean(slots['content-footer']))
+  const contentFooterHeight = computed(() => props.contentFooterHeight)
+  const contentFooterFixed = computed(() => props.contentFooterFixed)
+
+  const activeKey = computed(() => props.activeKey)
+
+  const skin = computed(() => props.skin)
+  const contentWidth = computed(() => {
+    const val = props.contentWidth
+    if (typeof val === 'number' || /^\d+$/.test(val)) {
+      return `${val}px`
+    }
+    return val
+  })
+
+  // computed - derived (depends on refs/composables)
+  const _headerHeight = computed(() => header.value ? headerHeight.value : 0)
+  const _siderCollapsedWidth = computed(() => {
+    const width = siderCollapsedWidth.value
+    const isLargeEnough = width >= 80
+    return isLargeEnough || siderCollapsed.value ? width : width / 0.6
+  })
   const _siderWidth = computed(() => {
     if (!sider.value || mode.value === 'top' || isMobile.value) {
       return 0
@@ -46,31 +82,11 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     return siderCollapsed.value ? siderCollapsedWidth.value : siderWidth.value
   })
 
-  const contentHeader = computed(() => props.contentHeader && Boolean(slots['content-header']))
-  const contentHeaderHeight = computed(() => props.contentHeaderHeight)
-  const contentHeaderFixed = computed(() => props.contentHeaderFixed)
-  const _contentHeaderHeight = computed(() => contentHeader.value ? contentHeaderHeight.value : 0)
+  const hasSkin = computed(() => !!skin.value && !isDark.value)
 
-  const contentFooter = computed(() => props.contentFooter && Boolean(slots['content-footer']))
-  const contentFooterHeight = computed(() => props.contentFooterHeight)
-  const contentFooterFixed = computed(() => props.contentFooterFixed)
+  const _contentHeaderHeight = computed(() => contentHeader.value ? contentHeaderHeight.value : 0)
   const _contentFooterHeight = computed(() => contentFooter.value ? contentFooterHeight.value : 0)
 
-  const activeKey = computed(() => props.activeKey)
-  const parentKey = ref<string | null>()
-
-  const skin = computed(() => props.skin)
-  const hasSkin = computed(() => !!skin.value)
-  const contentWidth = computed(() => {
-    const val = props.contentWidth
-    if (typeof val === 'number' || /^\d+$/.test(val)) {
-      return `${val}px`
-    }
-    return val
-  })
-
-  const overlayRef = ref<HTMLDivElement>()
-  const { height: overlayHeight, width: overlayWidth } = useElementSize(overlayRef)
   const contentTop = computed(() => {
     return _contentHeaderHeight.value + (contentFull.value ? 0 : _headerHeight.value)
   })
@@ -92,6 +108,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     return children.length === 0 ? [parentMenu] : children
   })
 
+  // watchEffect
   watchEffect(() => {
     if (parentsKeys.size === 0) {
       parentsKeys = getParentsKeys(menuOptions.value, { id: 'key', children: 'children' })
@@ -102,6 +119,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     }
   })
 
+  // functions
   function toggleSiderCollapsed(value: boolean) {
     siderCollapsed.value = value
     methods?.onUpdateSiderCollapsed?.(value)
@@ -116,6 +134,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     contentFull.value = value
   }
 
+  // watch
   watch(() => props.siderCollapsed, (value) => {
     siderCollapsed.value = value
   })
@@ -124,59 +143,63 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   })
 
   return {
-    mode,
-    isMobile,
-    splitMenu,
-    menuOptions,
+    // refs
     siderCollapsed,
+    contentFull,
+    siderRightFixed,
+    parentKey,
+    overlayRef,
+
+    // composables
+    isDark,
+    overlayWidth,
+    overlayHeight,
+
+    // computed - props
+    mode,
+    splitMenu,
+    isMobile,
+    menuOptions,
+    scrollbarProps,
     logo,
     logoUrl,
     title,
-    contentFull,
-    isDark,
-    scrollbarProps,
-
     header,
     headerHeight,
     headerTheme,
     headerFixed,
-    _headerHeight,
-
+    headerBordered,
     sider,
     siderWidth,
+    siderBordered,
     siderTheme,
     siderCollapsedWidth,
-    siderRightFixed,
     accordion,
-    _siderWidth,
-    _siderCollapsedWidth,
-
     contentHeader,
+    contentHeaderBordered,
     contentHeaderHeight,
     contentHeaderFixed,
-    _contentHeaderHeight,
-
     contentFooter,
     contentFooterHeight,
     contentFooterFixed,
-    _contentFooterHeight,
-
     activeKey,
-    parentKey,
-    parentMenuOptions,
-    childMenuOptions,
-
     skin,
-    hasSkin,
     contentWidth,
 
-    overlayRef,
-    overlayWidth,
-    overlayHeight,
+    // computed - derived
+    _headerHeight,
+    _siderCollapsedWidth,
+    _siderWidth,
+    hasSkin,
+    _contentHeaderHeight,
+    _contentFooterHeight,
     contentTop,
     contentLeft,
     contentBottom,
+    parentMenuOptions,
+    childMenuOptions,
 
+    // functions
     toggleSiderCollapsed,
     toggleSiderRightFixed,
     toggleContentFull,

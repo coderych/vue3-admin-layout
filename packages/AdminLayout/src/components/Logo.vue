@@ -8,8 +8,9 @@ const { collapsed = false } = defineProps<{
 }>()
 
 const {
-  logoUrl,
+  // computed - props
   logo,
+  logoUrl,
   title,
   headerHeight,
   siderWidth,
@@ -27,8 +28,13 @@ const style = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <div v-if="logo && (logoUrl || title)" class="admin-layout-logo" :style="{ ...style }">
-    <img v-if="logoUrl" class="admin-layout-logo__image" :src="logoUrl" alt="logo">
+  <div v-if="logo && (logoUrl || title)" class="admin-layout-logo" :style="style">
+    <img
+      v-if="logoUrl"
+      class="admin-layout-logo__image"
+      :src="logoUrl"
+      alt="logo"
+    >
     <span v-if="title && !collapsed" class="admin-layout-logo__title">{{ title }}</span>
   </div>
 </template>

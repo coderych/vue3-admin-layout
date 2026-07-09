@@ -18,13 +18,11 @@ const currentSkin = ref<string | undefined>(undefined)
 const scrollbarConfig = reactive({
   size: 5,
   autoHide: false,
-  inverted: false,
+  xScrollable: false,
+  nativeScrollbar: false,
 })
 
 const contentFull = ref(false)
-watch(contentFull, (value) => {
-  adminLayoutRef.value?.toggleContentFull(value)
-})
 
 const props = ref<AdminLayoutProps>({
   // 布局模式
@@ -32,6 +30,11 @@ const props = ref<AdminLayoutProps>({
   splitMenu: true,
   siderCollapsed: false,
   isMobile: false,
+
+  // Menu
+  menuOptions: [],
+  activeKey: undefined,
+  accordion: false,
 
   // Logo
   logo: true,
@@ -42,19 +45,22 @@ const props = ref<AdminLayoutProps>({
   header: true,
   headerHeight: 48,
   headerFixed: true,
-  headerTheme: '#000',
+  headerBordered: true,
+  headerTheme: '',
 
   // Sider
   sider: true,
   siderWidth: 200,
   siderCollapsedWidth: 48,
   siderRightFixed: false,
-  siderTheme: '#000',
+  siderBordered: true,
+  siderTheme: '',
 
   // Content Header
   contentHeader: true,
   contentHeaderHeight: 36,
   contentHeaderFixed: true,
+  contentHeaderBordered: true,
 
   // Content Footer
   contentFooter: true,
@@ -64,13 +70,11 @@ const props = ref<AdminLayoutProps>({
   // Content
   contentWidth: '100%',
 
-  // Menu
-  accordion: false,
-  activeKey: undefined,
-
   // Scrollbar
   scrollbarProps: scrollbarConfig,
 })
+
+const state = computed(() => adminLayoutRef.value?.state)
 
 function getCount() {
   const simplebarEls = document.querySelectorAll('.simplebar-wrapper')
@@ -81,14 +85,16 @@ function getCount() {
   console.log(simplebarEls.length, nativeEls.length)
 }
 
-const state = computed(() => adminLayoutRef.value?.state)
-
 function click(value: any) {
   console.log(value)
   console.log(value.state.isDark)
   console.log(state.value)
   console.log(adminLayoutRef.value?.state?.isDark)
 }
+
+watch(contentFull, (value) => {
+  adminLayoutRef.value?.toggleContentFull(value)
+})
 
 watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
   console.log('isDark change', value)
@@ -136,9 +142,6 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
     <template #parent-menu="menuProps">
       Parent Menu:
       {{ menuProps }}
-      <div v-for="i in 30" :key="i" class="border-bottom h-100px">
-        {{ i }}
-      </div>
     </template>
     <template #menu="menuProps">
       Menu:
@@ -184,8 +187,9 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
       Sider Right Footer
     </template> -->
 
-    <template #default="{ height }">
-      contentHeight: {{ height }}<br>
+    <template #default="defaultProps">
+      {{ defaultProps }}
+      contentHeight: {{ defaultProps.height }}<br>
 
       isDark: <input v-model="isDark" type="checkbox"><br>
       skin:
@@ -237,6 +241,7 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
         step="1"
       ><br>
       headerFixed: <input v-model="props.headerFixed" type="checkbox"><br>
+      headerBordered: <input v-model="props.headerBordered" type="checkbox"><br>
       headerTheme: <input v-model="props.headerTheme" type="color"><br>
 
       <h4 class="mb-4px mt-12px font-bold">
@@ -256,6 +261,7 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
         step="1"
       ><br>
       siderRightFixed: <input v-model="props.siderRightFixed" type="checkbox"><br>
+      siderBordered: <input v-model="props.siderBordered" type="checkbox"><br>
       siderTheme: <input v-model="props.siderTheme" type="color"><br>
 
       <h4 class="mb-4px mt-12px font-bold">
@@ -269,6 +275,7 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
         step="1"
       ><br>
       contentHeaderFixed: <input v-model="props.contentHeaderFixed" type="checkbox"><br>
+      contentHeaderBordered: <input v-model="props.contentHeaderBordered" type="checkbox"><br>
 
       <h4 class="mb-4px mt-12px font-bold">
         Content Footer
@@ -303,7 +310,8 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
         step="1"
       ><br>
       scrollbar.autoHide: <input v-model="scrollbarConfig.autoHide" type="checkbox"><br>
-      scrollbar.inverted: <input v-model="scrollbarConfig.inverted" type="checkbox"><br>
+      scrollbar.xScrollable: <input v-model="scrollbarConfig.xScrollable" type="checkbox"><br>
+      scrollbar.nativeScrollbar: <input v-model="scrollbarConfig.nativeScrollbar" type="checkbox"><br>
 
       {{ state }}
 
@@ -338,5 +346,9 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
 * {
   margin: 0;
   padding: 0;
+}
+
+body {
+  /* background-color: #000; */
 }
 </style>

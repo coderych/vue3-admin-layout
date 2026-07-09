@@ -18,8 +18,8 @@ const collapsed = defineModel('value', { default: false })
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 8;
-  transition: background-color var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
+  z-index: 5;
+  transition: background-color var(--admin-layout-duration) var(--admin-layout-bezier);
   font-size: 16px;
   box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.05);

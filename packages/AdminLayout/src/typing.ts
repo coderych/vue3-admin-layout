@@ -29,8 +29,11 @@ export const AdminLayoutCssVars = {
   SiderCollapsedWidth: '--admin-layout-sider-collapsed-width',
   SiderWidth: '--admin-layout-sider-width',
   HeaderHeight: '--admin-layout-header-height',
-  Duration: '--admin-layout-duration',
-  Bezier: '--admin-layout-bezier',
+  BaseColor: '--admin-layout-base-color',
+  TextColor: '--admin-layout-text-color',
+  BorderColor: '--admin-layout-border-color',
+  ScrollbarColor: '--admin-layout-scrollbar-color',
+  ScrollbarColorHover: '--admin-layout-scrollbar-color-hover',
 } as const
 
 export const adminLayoutProps = {
@@ -82,6 +85,10 @@ export const adminLayoutProps = {
     type: Boolean as PropType<boolean>,
     default: true,
   },
+  headerBordered: {
+    type: Boolean as PropType<boolean>,
+    default: true,
+  },
 
   sider: {
     type: Boolean as PropType<boolean>,
@@ -99,6 +106,7 @@ export const adminLayoutProps = {
     type: String as PropType<string>,
     default: '#fff',
   },
+
   skin: {
     type: String as PropType<string>,
     default: undefined,
@@ -109,7 +117,7 @@ export const adminLayoutProps = {
   },
   siderBordered: {
     type: Boolean as PropType<boolean>,
-    default: false,
+    default: true,
   },
 
   contentHeader: {
@@ -119,6 +127,10 @@ export const adminLayoutProps = {
   contentHeaderHeight: {
     type: Number as PropType<number>,
     default: 36,
+  },
+  contentHeaderBordered: {
+    type: Boolean as PropType<boolean>,
+    default: true,
   },
   contentHeaderFixed: {
     type: Boolean as PropType<boolean>,
@@ -167,6 +179,7 @@ export interface AdminLayoutHeaderProps {
   height: number
   _height: number
   fixed: boolean
+  bordered: boolean
   theme: string
   show: boolean
 }
@@ -183,7 +196,7 @@ export interface AdminLayoutSiderProps {
   inverted: boolean
   headerHeight: number
   collapsed: boolean
-  toggleSiderCollapsed: (collapsed: boolean) => void
+  toggleCollapsed: (collapsed: boolean) => void
   toggleRightFixed: (fixed: boolean) => void
 }
 

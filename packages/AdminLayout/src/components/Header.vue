@@ -4,7 +4,7 @@ import type { AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applySkinStyles, calculateInverted, getLabel } from '../helper'
+import { applySkinStyles, applyThemeStyles, calculateInverted, getLabel } from '../helper'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
 
@@ -19,53 +19,55 @@ defineSlots<{
 
 const state = useAdminLayoutState()
 const {
-  header,
-  headerTheme,
-  headerHeight,
-  _headerHeight,
-  mode,
-  parentMenuOptions,
-  parentKey,
-  splitMenu,
-  menuOptions,
+  // refs
   siderCollapsed,
-  logo,
+  parentKey,
+  // composables
+  isDark,
+  // computed - props
+  mode,
+  splitMenu,
   isMobile,
+  menuOptions,
+  scrollbarProps,
+  logo,
+  header,
+  headerHeight,
+  headerTheme,
   headerFixed,
-  toggleSiderCollapsed,
+  headerBordered,
   siderWidth,
   activeKey,
-  scrollbarProps,
+  // computed - derived
+  _headerHeight,
   hasSkin,
+  parentMenuOptions,
+  // functions
+  toggleSiderCollapsed,
 } = state
 
 const inverted = computed(() => calculateInverted(headerTheme.value))
 
-const scrollbarStyle = computed(() => {
-  const style: CSSProperties = {
-    backgroundColor: headerTheme.value,
+const containerStyle = computed<CSSProperties>(() => {
+  const style: CSSProperties = {}
+  if (hasSkin.value && !isDark.value) {
+    applySkinStyles(style)
   }
-
-  if (hasSkin.value) {
-    applySkinStyles(style, { border: 'bottom' })
+  else {
+    applyThemeStyles(style, headerTheme.value, inverted.value)
   }
-
   return style
 })
 
 const headerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    height: `${_headerHeight.value - 1}px`,
+    height: `${_headerHeight.value - (headerBordered.value ? 1 : 0)}px`,
   }
-  if (inverted.value) {
-    style.color = 'rgba(255, 255, 255, 0.85)'
+  if (!headerBordered.value) {
+    style.borderBottom = 'none'
   }
   return style
 })
-
-function handleParentMenuClick(key: string) {
-  parentKey.value = key
-}
 
 const headerProps = computed<AdminLayoutHeaderProps>(() => ({
   state: proxyRefs(state),
@@ -73,9 +75,11 @@ const headerProps = computed<AdminLayoutHeaderProps>(() => ({
   height: headerHeight.value,
   _height: _headerHeight.value,
   fixed: headerFixed.value,
+  bordered: headerBordered.value,
   theme: headerTheme.value,
   show: header.value,
 }))
+
 const logoProps = computed<AdminLayoutLogoProps>(() => ({
   state: proxyRefs(state),
   inverted: inverted.value,
@@ -83,16 +87,21 @@ const logoProps = computed<AdminLayoutLogoProps>(() => ({
   height: _headerHeight.value,
   collapsed: false,
 }))
+
 const menuProps = computed<AdminLayoutMenuProps>(() => ({
   state: proxyRefs(state),
   mode: 'horizontal',
   inverted: inverted.value,
   collapsed: false,
 }))
+
+function handleParentMenuClick(key: string) {
+  parentKey.value = key
+}
 </script>
 
 <template>
-  <Scrollbar v-bind="{ ...scrollbarProps, xScrollable: true, inverted, height: `${_headerHeight}px` }" :style="scrollbarStyle" class="border-bottom overflow-y-hidden">
+  <Scrollbar v-bind="{ ...scrollbarProps, xScrollable: true, height: `${_headerHeight}px` }" :style="containerStyle" class="admin-layout-header-container">
     <div class="admin-layout-header" :style="headerStyle">
       <slot name="default" v-bind="headerProps">
         <slot v-if="(mode === 'mix' || mode === 'top') && !isMobile" name="logo" v-bind="logoProps">
@@ -136,10 +145,17 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 </template>
 
 <style scoped lang="less">
+.admin-layout-header-container {
+  overflow-y: hidden;
+  background-color: var(--admin-layout-base-color);
+  color: var(--admin-layout-text-color);
+}
+
 .admin-layout-header {
   display: flex;
   align-items: center;
   gap: 6px;
+  border-bottom: 1px solid var(--admin-layout-border-color);
 
   & > * {
     flex-shrink: 0;
@@ -161,7 +177,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       cursor: pointer;
       border-radius: 6px;
       gap: 6px;
-      transition: var(--admin-layout-transition);
+      transition: all var(--admin-layout-duration) var(--admin-layout-bezier);
 
       &:hover:not(&--active) {
         color: var(--primary-color);

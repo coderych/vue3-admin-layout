@@ -5,7 +5,7 @@ import { computed, proxyRefs } from 'vue'
 import { Logo } from '.'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { calculateInverted } from '../helper'
+import { applyThemeStyles, calculateInverted } from '../helper'
 import Hamburger from './Hamburger.vue'
 
 defineSlots<{
@@ -19,27 +19,35 @@ defineSlots<{
 
 const state = useAdminLayoutState()
 const {
-  menuOptions,
+  // refs
   siderCollapsed,
-  siderWidth,
+  // composables
+  isDark,
+  // computed - props
+  menuOptions,
+  scrollbarProps,
   headerHeight,
-  activeKey,
-  accordion,
+  sider,
+  siderWidth,
   siderTheme,
+  accordion,
+  activeKey,
+  // functions
   toggleSiderCollapsed,
   toggleSiderRightFixed,
-  sider,
-  scrollbarProps,
 } = state
 
-const inverted = computed(() => {
-  return calculateInverted(siderTheme.value)
-})
+const inverted = computed(() => calculateInverted(siderTheme.value))
 
-const style = computed<CSSProperties>(() => ({
-  width: `${siderWidth.value}px`,
-  backgroundColor: siderTheme.value,
-}))
+const siderDrawerStyle = computed<CSSProperties>(() => {
+  const style: CSSProperties = {
+    width: `${siderWidth.value}px`,
+  }
+  if (!isDark.value) {
+    applyThemeStyles(style, siderTheme.value, inverted.value)
+  }
+  return style
+})
 
 const siderProps = computed<AdminLayoutSiderProps>(() => ({
   state: proxyRefs(state),
@@ -53,7 +61,7 @@ const siderProps = computed<AdminLayoutSiderProps>(() => ({
   _width: siderWidth.value,
   collapsedWidth: siderWidth.value,
   _collapsedWidth: siderWidth.value,
-  toggleSiderCollapsed: toggleSiderCollapsed,
+  toggleCollapsed: toggleSiderCollapsed,
   toggleRightFixed: toggleSiderRightFixed,
 }))
 const logoProps = computed<AdminLayoutLogoProps>(() => ({
@@ -74,40 +82,41 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 </script>
 
 <template>
-  <div class="admin-layout-mobile-sider" :class="{ 'admin-layout-mobile-sider--collapsed': siderCollapsed }" :style="style">
+  <div class="admin-layout-sider-drawer" :class="{ 'admin-layout-sider-drawer--collapsed': siderCollapsed }" :style="siderDrawerStyle">
     <slot name="default" v-bind="siderProps">
       <slot name="header" v-bind="siderProps">
         <slot name="logo" v-bind="logoProps">
           <Logo />
         </slot>
       </slot>
-      <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, inverted, height: '100%' }">
+      <Scrollbar class="flex-1" v-bind="{ ...scrollbarProps, height: '100%' }">
         <slot name="content" v-bind="siderProps">
           <slot name="menu" v-bind="menuProps" />
         </slot>
       </Scrollbar>
 
       <slot name="footer" v-bind="siderProps">
-        <div class="admin-layout-mobile-sider__hamburger">
+        <div class="admin-layout-sider-drawer__hamburger">
           <Hamburger :value="siderCollapsed" @update:value="toggleSiderCollapsed" />
         </div>
       </slot>
     </slot>
   </div>
-  <div class="admin-layout-mobile-sider__mask" :class="{ 'admin-layout-mobile-sider__mask--show': !siderCollapsed }" @click="toggleSiderCollapsed(true)" />
+  <div class="admin-layout-sider-drawer__mask" :class="{ 'admin-layout-sider-drawer__mask--show': !siderCollapsed }" @click="toggleSiderCollapsed(true)" />
 </template>
 
 <style scoped lang="less">
-.admin-layout-mobile-sider {
+.admin-layout-sider-drawer {
   height: 100vh;
   max-width: 100%;
   position: fixed;
   left: 0;
-  transition: transform var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
-  z-index: 7;
+  transition: transform var(--admin-layout-duration) var(--admin-layout-bezier);
+  z-index: 3;
   top: 0;
   display: flex;
   flex-direction: column;
+  background-color: var(--admin-layout-base-color);
 
   &--collapsed {
     overflow: hidden;
@@ -133,8 +142,8 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 6;
-    transition: opacity var(--admin-layout-transition-duration) var(--admin-layout-transition-bezier);
+    z-index: 2;
+    transition: opacity var(--admin-layout-duration) var(--admin-layout-bezier);
     opacity: 0;
     visibility: hidden;
 

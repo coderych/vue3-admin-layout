@@ -3,7 +3,7 @@ import type { CSSProperties } from 'vue'
 import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps } from './typing'
 import { computed, h, proxyRefs } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
-import { AppMain, Header, MobileSider, Sider } from './components'
+import { AppMain, Header, Sider, SiderDrawer } from './components'
 import { useAdminLayoutProvider } from './context'
 import { AdminLayoutCssVars, adminLayoutProps } from './typing'
 
@@ -45,27 +45,29 @@ const state = useAdminLayoutProvider(props, slots, {
 })
 
 const {
-  header,
-  mode,
-  headerFixed,
-  headerHeight,
-  _headerHeight,
-  siderWidth,
+  // refs
   siderCollapsed,
-  siderCollapsedWidth,
-  isMobile,
-  siderRightFixed,
-  splitMenu,
   contentFull,
+  siderRightFixed,
+  // computed - props
+  mode,
+  splitMenu,
+  isMobile,
+  header,
+  headerHeight,
+  headerFixed,
   sider,
+  siderWidth,
+  siderCollapsedWidth,
   skin,
+  // computed - derived
+  _headerHeight,
+  _siderCollapsedWidth,
   hasSkin,
 } = state
 
 const style = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    [AdminLayoutCssVars.Duration]: '0.2s',
-    [AdminLayoutCssVars.Bezier]: 'cubic-bezier(0, 0, .2, 1)',
     [AdminLayoutCssVars.HeaderHeight]: `${headerHeight.value}px`,
   }
 
@@ -79,7 +81,7 @@ const style = computed<CSSProperties>(() => {
   else if (mode.value === 'side' || mode.value === 'mix') {
     let width = 0
     if (mode.value === 'side' && splitMenu.value) {
-      const collapsedWidth = siderCollapsedWidth.value >= 80 || siderCollapsed.value ? siderCollapsedWidth.value : siderCollapsedWidth.value / 0.6
+      const collapsedWidth = _siderCollapsedWidth.value
       if (!sider.value) {
         width = 0
       }
@@ -112,14 +114,11 @@ const style = computed<CSSProperties>(() => {
     style.WebkitBackdropFilter = 'blur(8px)'
   }
 
-  style.transition = `all ${style[AdminLayoutCssVars.Duration]} ${style[AdminLayoutCssVars.Bezier]}`
-
   return style
 })
 
 const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    backgroundColor: 'var(--admin-layout-bg-color)',
   }
   if (headerFixed.value) {
     style.height = `calc(100vh - ${_headerHeight.value}px)`
@@ -140,7 +139,7 @@ function renderHeader() {
 
 function renderSider() {
   if (isMobile.value) {
-    return h(MobileSider, {}, {
+    return h(SiderDrawer, {}, {
       default: slots.sider,
       logo: slots.logo,
       menu: slots.menu,
@@ -188,7 +187,7 @@ defineExpose({
 </script>
 
 <template>
-  <Scrollbar calss="admin-layout-wrapper" v-bind="{ ...scrollbarProps, height: '100vh', nativeScrollbar: !(!headerFixed && !contentFull) }">
+  <Scrollbar class="admin-layout-wrapper" v-bind="{ ...scrollbarProps, height: '100vh', nativeScrollbar: !(!headerFixed && !contentFull) }">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
       <header v-if="header" class="admin-layout__header">
         <component :is="renderHeader" />
@@ -199,7 +198,7 @@ defineExpose({
       <main class="admin-layout__main" :style="mainStyle">
         <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(headerFixed && !contentHeaderFixed && !contentFull), height: '100%' }">
           <component :is="renderContent">
-            <slot name="default" v-bind="state" />
+            <slot name="default" v-bind="(state as any)" />
           </component>
         </Scrollbar>
       </main>
@@ -208,15 +207,34 @@ defineExpose({
 </template>
 
 <style lang="less">
-.admin-layout-wrapper {
-  --admin-layout-border-color: var(--admin-layout-border-color);
-}
-.dark .admin-layout-wrapper {
-  --admin-layout-border-color: var(--admin-layout-border-color-dark);
+:root {
+  --text-color-light: #000;
+  --text-color-dark: #fff;
+
+  --border-color-light: rgb(224, 224, 230);
+  --border-color-dark: rgba(255, 255, 255, 0.24);
+
+  --scrollbar-color-light: rgba(0, 0, 0, 0.25);
+  --scrollbar-color-dark: rgba(255, 255, 255, 0.25);
+
+  --scrollbar-color-hover-light: rgba(0, 0, 0, 0.4);
+  --scrollbar-color-hover-dark: rgba(255, 255, 255, 0.4);
+
+  --admin-layout-duration: 0.3s;
+  --admin-layout-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+  --admin-layout-base-color: #fff;
+  --admin-layout-text-color: var(--text-color-light);
+  --admin-layout-border-color: var(--border-color-light);
+  --admin-layout-scrollbar-color: var(--scrollbar-color-light);
+  --admin-layout-scrollbar-color-hover: var(--scrollbar-color-hover-light);
 }
 
-:root {
-  --red: red;
+:root.dark {
+  --admin-layout-base-color: #000;
+  --admin-layout-text-color: var(--text-color-dark);
+  --admin-layout-border-color: var(--border-color-dark);
+  --admin-layout-scrollbar-color: var(--scrollbar-color-dark);
+  --admin-layout-scrollbar-color-hover: var(--scrollbar-color-hover-dark);
 }
 
 .border-bottom {
@@ -238,6 +256,9 @@ defineExpose({
 <style scoped lang="less">
 .admin-layout {
   display: grid;
+  background-color: var(--admin-layout-base-color);
+  color: var(--admin-layout-text-color);
+  transition: all var(--admin-layout-duration) var(--admin-layout-bezier);
 
   &--side {
     grid-template-areas:

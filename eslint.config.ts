@@ -6,7 +6,7 @@ export default antfu({
   vue: true,
   isInEditor: false,
   rules: {
-    'vue/max-attributes-per-line': ['error', { singleline: 3 }],
+    'vue/max-attributes-per-line': ['error', { singleline: 4 }],
     'no-console': 'off',
   },
   ignores: ['*.md'],

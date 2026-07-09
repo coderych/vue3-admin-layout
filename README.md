@@ -61,9 +61,8 @@ import 'vue3-admin-layout/dist/style.css'
 | --- | --- | --- | --- |
 | `mode` | `'side' \| 'mix' \| 'top'` | `'side'` | 布局模式 |
 | `splitMenu` | `boolean` | `true` | 是否拆分菜单（仅在 `side`/`mix` 模式下有效） |
-| `collapsed` | `boolean` | `false` | 侧边栏是否折叠 |
+| `siderCollapsed` | `boolean` | `false` | 侧边栏是否折叠 |
 | `isMobile` | `boolean` | `false` | 是否移动端模式 |
-| `isFull` | `boolean` | `false` | 是否全屏模式 |
 | `scrollbarProps` | `ScrollbarProps` | `undefined` | 滚动条配置，详见 [ScrollbarProps](#scrollbarprops) |
 
 ### Logo 配置
@@ -90,6 +89,7 @@ import 'vue3-admin-layout/dist/style.css'
 | `headerHeight` | `number` | `48` | 头部高度（像素） |
 | `headerTheme` | `string` | `'#fff'` | 头部主题颜色 |
 | `headerFixed` | `boolean` | `true` | 头部是否固定 |
+| `headerBordered` | `boolean` | `true` | 头部是否显示底部边框 |
 
 ### 侧边栏配置
 
@@ -99,7 +99,8 @@ import 'vue3-admin-layout/dist/style.css'
 | `siderWidth` | `number` | `200` | 侧边栏宽度（像素） |
 | `siderCollapsedWidth` | `number` | `48` | 侧边栏折叠宽度（像素） |
 | `siderTheme` | `string` | `'#fff'` | 侧边栏主题颜色 |
-| `siderFixed` | `boolean` | `true` | 侧边栏是否固定 |
+| `siderRightFixed` | `boolean` | `true` | 拆分菜单右侧是否固定（仅 `side` + `splitMenu` 模式） |
+| `siderBordered` | `boolean` | `true` | 侧边栏是否显示右边框 |
 | `skin` | `string` | `undefined` | 毛玻璃皮肤背景图片 URL，设置后启用毛玻璃效果 |
 
 ### 内容区域配置
@@ -110,22 +111,17 @@ import 'vue3-admin-layout/dist/style.css'
 | `contentHeader` | `boolean` | `true` | 是否显示内容头部（需配合 `content-header` 插槽） |
 | `contentHeaderHeight` | `number` | `36` | 内容头部高度（像素） |
 | `contentHeaderFixed` | `boolean` | `true` | 内容头部是否固定 |
+| `contentHeaderBordered` | `boolean` | `true` | 内容头部是否显示底部边框 |
 | `contentFooter` | `boolean` | `true` | 是否显示内容底部（需配合 `content-footer` 插槽） |
 | `contentFooterHeight` | `number` | `32` | 内容底部高度（像素） |
 | `contentFooterFixed` | `boolean` | `false` | 内容底部是否固定 |
-
-### 样式配置
-
-| 属性名 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `cssVars` | `Record<string, string>` | `{}` | 自定义 CSS 变量，可覆盖内置变量 |
 
 ## 事件 Events
 
 | 事件名 | 参数 | 说明 |
 | --- | --- | --- |
-| `update:collapsed` | `(value: boolean)` | 侧边栏折叠状态变化时触发 |
-| `update:siderFixed` | `(value: boolean)` | 侧边栏固定状态变化时触发 |
+| `update:siderCollapsed` | `(value: boolean)` | 侧边栏折叠状态变化时触发 |
+| `update:siderRightFixed` | `(value: boolean)` | 拆分菜单右侧固定状态变化时触发 |
 
 ## 插槽 Slots
 
@@ -133,7 +129,7 @@ import 'vue3-admin-layout/dist/style.css'
 
 | 插槽名 | 参数 | 说明 |
 | --- | --- | --- |
-| `default` | `AdminLayoutState` | 主要内容区域 |
+| `default` | `AdminLayoutContentProps` | 主要内容区域 |
 | `logo` | `AdminLayoutLogoProps` | 自定义 Logo 区域 |
 | `header` | `AdminLayoutHeaderProps` | 头部区域（完全覆盖默认头部） |
 | `header-prefix` | `AdminLayoutHeaderProps` | 头部前缀区域（Logo 之后） |
@@ -198,12 +194,11 @@ const menuOptions: MenuOption[] = [
 
 ```ts
 interface ScrollbarProps {
-  autoHide?: boolean    // 是否自动隐藏滚动条，默认 true
-  xScrollable?: boolean // 是否支持横向滚动，默认 false
+  autoHide?: boolean       // 是否自动隐藏滚动条，默认 true
+  xScrollable?: boolean    // 是否支持横向滚动，默认 false
   nativeScrollbar?: boolean // 是否使用原生滚动条，默认 false
-  size?: number         // 滚动条宽度（像素），默认 5
-  height?: string       // 容器高度
-  inverted?: boolean    // 是否反转滚动条颜色（深色背景上使用浅色滚动条），默认 false
+  size?: number            // 滚动条宽度（像素），默认 5
+  height?: string          // 容器高度
 }
 ```
 
@@ -211,7 +206,88 @@ interface ScrollbarProps {
 
 ```ts
 interface AdminLayoutInstance {
-  state: AdminLayoutState // 组件内部状态，可通过 ref 访问
+  state: AdminLayoutState                  // 组件内部状态，可通过 ref 访问
+  toggleContentFull: (value: boolean) => void   // 切换内容全屏
+  toggleSiderRightFixed: (value?: boolean) => void // 切换拆分菜单右侧固定
+  toggleSiderCollapsed: (value?: boolean) => void  // 切换侧边栏折叠
+}
+```
+
+### AdminLayoutHeaderProps
+
+```ts
+interface AdminLayoutHeaderProps {
+  state: AdminLayoutState
+  inverted: boolean     // 主题是否反色（深色背景上使用浅色文字）
+  height: number        // 头部高度
+  _height: number       // 实际头部高度（header 为 false 时为 0）
+  fixed: boolean        // 是否固定
+  bordered: boolean     // 是否有边框
+  theme: string         // 主题颜色
+  show: boolean         // 是否显示
+}
+```
+
+### AdminLayoutSiderProps
+
+```ts
+interface AdminLayoutSiderProps {
+  state: AdminLayoutState
+  show: boolean                    // 是否显示
+  fixed: boolean                   // 右侧是否固定
+  theme: string                    // 主题颜色
+  width: number                    // 宽度
+  _width: number                   // 实际宽度
+  collapsedWidth: number           // 折叠宽度
+  _collapsedWidth: number          // 实际折叠宽度
+  inverted: boolean                // 是否反色
+  headerHeight: number             // 头部高度
+  collapsed: boolean               // 是否折叠
+  toggleCollapsed: (value: boolean) => void   // 切换折叠
+  toggleRightFixed: (value: boolean) => void  // 切换右侧固定
+}
+```
+
+### AdminLayoutContentProps
+
+```ts
+interface AdminLayoutContentProps {
+  state: AdminLayoutState
+  height: number        // 内容区域高度
+  width: number         // 内容区域宽度
+  scrollHeight: string  // 滚动高度（如 '600px'）
+  contentWidth: string  // 内容宽度配置值
+}
+```
+
+### AdminLayoutLogoProps
+
+```ts
+interface AdminLayoutLogoProps {
+  state: AdminLayoutState
+  width: number         // Logo 区域宽度
+  height: number        // Logo 区域高度
+  inverted: boolean     // 是否反色
+  collapsed: boolean    // 是否折叠状态
+}
+```
+
+### AdminLayoutMenuProps
+
+```ts
+interface AdminLayoutMenuProps extends MenuProps {
+  state: AdminLayoutState
+}
+
+interface MenuProps {
+  collapsed?: boolean
+  options?: any[]
+  mode?: 'vertical' | 'horizontal'
+  accordion?: boolean
+  collapsedWidth?: number
+  inverted?: boolean
+  value?: string
+  [key: string]: any
 }
 ```
 
@@ -237,7 +313,6 @@ import type {
   MenuOptionLabel,
   MenuProps,
   LayoutType,
-  CssVars,
 } from 'vue3-admin-layout'
 
 // 工具函数
@@ -246,16 +321,15 @@ import { calculateInverted, getParentsKeys, getLabel } from 'vue3-admin-layout'
 
 ## CSS 变量
 
-组件支持以下 CSS 变量，可通过 `cssVars` prop 或全局 CSS 覆盖：
+组件支持以下 CSS 变量，可通过全局 CSS 覆盖：
 
 ```css
 :root {
   /* 颜色 */
-  --admin-layout-bg-color: rgb(240, 242, 245);       /* 页面背景色 */
-  --admin-layout-base-color: rgb(255, 255, 255);      /* 组件基础底色 */
-  --primary-color: #1890ff;                            /* 主题色 */
-  --admin-layout-text-color: rgb(51, 54, 57);          /* 文字颜色 */
-  --admin-layout-border-color: rgb(239, 239, 245);     /* 边框颜色 */
+  --admin-layout-base-color: #fff;                   /* 组件基础底色 */
+  --primary-color: #1890ff;                           /* 主题色 */
+  --admin-layout-text-color: var(--text-color-light); /* 文字颜色 */
+  --admin-layout-border-color: var(--border-color-light); /* 边框颜色 */
 
   /* 尺寸 */
   --admin-layout-header-height: 48px;
@@ -263,24 +337,20 @@ import { calculateInverted, getParentsKeys, getLabel } from 'vue3-admin-layout'
   --admin-layout-sider-collapsed-width: 48px;
 
   /* 过渡动画 */
-  --admin-layout-transition-duration: 0.2s;
-  --admin-layout-transition-bezier: cubic-bezier(0, 0, 0.2, 1);
-
-  /* 毛玻璃皮肤 */
-  --admin-layout-skin-blur: blur(20px);
-  --admin-layout-skin-bg-light: rgba(255, 255, 255, 0.18);
+  --admin-layout-duration: 0.3s;
+  --admin-layout-bezier: cubic-bezier(0.4, 0, 0.2, 1);
 }
 ```
 
-暗黑模式下，颜色变量会自动切换为：
+暗黑模式下，颜色变量会自动切换：
 
 | 变量 | 亮色模式 | 暗黑模式 |
 | --- | --- | --- |
-| `--admin-layout-bg-color` | `rgb(240, 242, 245)` | `rgb(16, 16, 20)` |
-| `--admin-layout-base-color` | `rgb(255, 255, 255)` | `rgb(24, 24, 28)` |
-| `--primary-color` | `#1890ff` | `#409eff` |
-| `--admin-layout-text-color` | `rgb(51, 54, 57)` | `rgba(255, 255, 255, 0.85)` |
-| `--admin-layout-border-color` | `rgb(239, 239, 245)` | `rgba(255, 255, 255, 0.09)` |
+| `--admin-layout-base-color` | `#fff` | `#000` |
+| `--admin-layout-text-color` | `#000` | `#fff` |
+| `--admin-layout-border-color` | `rgb(224, 224, 230)` | `rgba(255, 255, 255, 0.24)` |
+| `--admin-layout-scrollbar-color` | `rgba(0, 0, 0, 0.25)` | `rgba(255, 255, 255, 0.25)` |
+| `--admin-layout-scrollbar-color-hover` | `rgba(0, 0, 0, 0.4)` | `rgba(255, 255, 255, 0.4)` |
 
 ## 暗黑主题
 
@@ -320,18 +390,6 @@ const isDark = useDark()
 </template>
 ```
 
-可通过 CSS 变量自定义毛玻璃参数：
-
-```vue
-<AdminLayout
-  :skin="bgUrl"
-  :css-vars="{
-    '--admin-layout-skin-blur': 'blur(30px)',
-    '--admin-layout-skin-bg-light': 'rgba(255,255,255,0.25)',
-  }"
->
-```
-
 ## 移动端适配
 
 组件提供 `isMobile` prop，移动端模式下侧边栏会以抽屉形式展示：
@@ -365,25 +423,25 @@ const layoutRef = ref<AdminLayoutInstance>()
 
 // 切换侧边栏折叠
 function toggleSidebar() {
-  const state = layoutRef.value?.state
-  if (state) {
-    state.toggleCollapsed(!state.collapsed)
-  }
+  layoutRef.value?.toggleSiderCollapsed()
 }
 
-// 切换侧边栏固定
-function toggleSiderFixed() {
-  const state = layoutRef.value?.state
-  if (state) {
-    state.toggleSiderFixed(!state.siderFixed)
-  }
+// 切换内容全屏
+function toggleContentFull() {
+  layoutRef.value?.toggleContentFull(true)
+}
+
+// 切换拆分菜单右侧固定
+function toggleSiderRightFixed() {
+  layoutRef.value?.toggleSiderRightFixed()
 }
 </script>
 
 <template>
   <AdminLayout ref="layoutRef" :menu-options="menuOptions">
     <button @click="toggleSidebar">折叠/展开</button>
-    <button @click="toggleSiderFixed">固定/取消固定</button>
+    <button @click="toggleContentFull">全屏</button>
+    <button @click="toggleSiderRightFixed">固定/取消固定</button>
   </AdminLayout>
 </template>
 ```
@@ -392,13 +450,17 @@ function toggleSiderFixed() {
 
 | 属性/方法 | 类型 | 说明 |
 | --- | --- | --- |
-| `collapsed` | `boolean` | 当前折叠状态 |
-| `siderFixed` | `boolean` | 侧边栏固定状态 |
+| `siderCollapsed` | `boolean` | 侧边栏折叠状态 |
+| `siderRightFixed` | `boolean` | 拆分菜单右侧固定状态 |
+| `contentFull` | `boolean` | 内容全屏状态 |
 | `isDark` | `boolean` | 是否暗黑模式 |
 | `mode` | `string` | 当前布局模式 |
 | `isMobile` | `boolean` | 是否移动端 |
-| `toggleCollapsed(value)` | `(value: boolean) => void` | 切换折叠状态 |
-| `toggleSiderFixed(value)` | `(value: boolean) => void` | 切换侧边栏固定 |
+| `headerHeight` | `number` | 头部高度 |
+| `siderWidth` | `number` | 侧边栏宽度 |
+| `toggleSiderCollapsed(value?)` | `(value?: boolean) => void` | 切换侧边栏折叠 |
+| `toggleSiderRightFixed(value?)` | `(value?: boolean) => void` | 切换拆分菜单右侧固定 |
+| `toggleContentFull(value)` | `(value: boolean) => void` | 切换内容全屏 |
 
 ## 完整示例
 
@@ -514,10 +576,10 @@ const activeKey = ref('dashboard')
 
 1. **样式导入**：使用时必须导入样式文件 `import 'vue3-admin-layout/dist/style.css'`。
 2. **暗黑模式**：组件通过 `useDark()` 自动检测，配合 `@vueuse/core` 使用即可，无需额外配置。
-3. **样式覆盖**：可通过 `cssVars` prop 或 CSS 变量覆盖组件默认样式。
-4. **路由集成**：通过 `activeKey` 绑定当前路由路径，配合 Vue Router 实现菜单联动。
-5. **拆分菜单**：`splitMenu` 仅在 `side` 和 `mix` 模式下生效，左侧显示一级菜单，右侧显示子菜单。
-6. **毛玻璃皮肤**：`skin` 设置背景图后，侧边栏和头部自动应用毛玻璃效果。
+3. **路由集成**：通过 `activeKey` 绑定当前路由路径，配合 Vue Router 实现菜单联动。
+4. **拆分菜单**：`splitMenu` 仅在 `side` 和 `mix` 模式下生效，左侧显示一级菜单，右侧显示子菜单。
+5. **毛玻璃皮肤**：`skin` 设置背景图后，侧边栏和头部自动应用毛玻璃效果；暗黑模式下自动禁用。
+6. **边框控制**：`headerBordered`、`siderBordered`、`contentHeaderBordered` 可分别控制各区域的边框显示。
 
 ## 故障排除
 

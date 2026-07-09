@@ -20,10 +20,6 @@ export const scrollbarProps = {
   height: {
     type: String as PropType<string>,
   },
-  inverted: {
-    type: Boolean as PropType<boolean>,
-    default: false,
-  },
 }
 
 export type ScrollbarProps = ExtractPublicPropTypes<typeof scrollbarProps>

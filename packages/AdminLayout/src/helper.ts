@@ -1,8 +1,12 @@
 import type { CSSProperties } from 'vue'
 import type { MenuOption, MenuOptionLabel } from './typing'
 import { rgba } from 'seemly'
+import { AdminLayoutCssVars } from './typing'
 
 export function calculateInverted(color: string): boolean {
+  if (!color) {
+    return false
+  }
   if (color === 'transparent') {
     return false
   }
@@ -14,21 +18,6 @@ export function calculateInverted(color: string): boolean {
   catch (error) {
     console.error(error)
     return false
-  }
-}
-
-export function applySkinStyles(style: CSSProperties, options?: { blur?: boolean, border?: 'right' | 'bottom' }): void {
-  style.backgroundColor = '#fff9'
-  if (options?.blur !== false) {
-    style.backdropFilter = 'blur(8px)'
-    style.WebkitBackdropFilter = 'blur(8px)'
-  }
-  const borderColor = '1px solid rgba(255,255,255,0.2)'
-  if (options?.border === 'right') {
-    style.borderRight = borderColor
-  }
-  else if (options?.border === 'bottom') {
-    style.borderBottom = borderColor
   }
 }
 
@@ -69,4 +58,18 @@ export function getLabel(label: MenuOptionLabel | undefined, option: MenuOption)
     return label(option)
   }
   return label ?? ''
+}
+
+export function applyThemeStyles(style: CSSProperties, color: string, inverted: boolean) {
+  style[AdminLayoutCssVars.BaseColor] = color
+  style[AdminLayoutCssVars.TextColor] = inverted ? 'var(--text-color-dark)' : 'var(--text-color-light)'
+  style[AdminLayoutCssVars.BorderColor] = inverted ? 'var(--border-color-dark)' : 'var(--border-color-light)'
+  style[AdminLayoutCssVars.ScrollbarColor] = inverted ? 'var(--scrollbar-color-dark)' : 'var(--scrollbar-color-light)'
+  style[AdminLayoutCssVars.ScrollbarColorHover] = inverted ? 'var(--scrollbar-color-hover-dark)' : 'var(--scrollbar-color-hover-light)'
+}
+
+export function applySkinStyles(style: CSSProperties): void {
+  style.backgroundColor = '#fff9'
+  style.backdropFilter = 'blur(8px)'
+  style.WebkitBackdropFilter = 'blur(8px)'
 }
