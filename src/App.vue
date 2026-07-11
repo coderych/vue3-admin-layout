@@ -28,7 +28,7 @@ const props = ref<AdminLayoutProps>({
   splitMenu: false,
   siderCollapsed: false,
   isMobile: false,
-  wrapperHeight: '100vh',
+  wrapperHeight: '50vh',
 
   // Menu
   menuOptions: [],
@@ -99,10 +99,8 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
 
 <template>
   <AdminLayout ref="adminLayoutRef" v-bind="props" :skin="currentSkin">
-    <template #header-contentHeader>
-      <div @click="isDark = !isDark">
-        {{ isDark ? '☀️' : '🌙' }}
-      </div>
+    <template #header-prefix="{ inverted }">
+      {{ inverted }}
     </template>
 
     <template #header-suffix="slotProps">

@@ -48,6 +48,16 @@ export function calculateInverted(color?: string): boolean {
   }
 }
 
+export function isInverted(isDark: boolean, hasSkin: boolean, color?: string): boolean {
+  if (isDark) {
+    return true
+  }
+  if (hasSkin) {
+    return false
+  }
+  return calculateInverted(color)
+}
+
 export interface TreeOption {
   id?: string
   parentId?: string
@@ -103,5 +113,5 @@ export function applySkinStyles(style: CSSProperties): void {
   style.backgroundColor = '#fff9'
   style.backdropFilter = 'blur(8px)'
   style.WebkitBackdropFilter = 'blur(8px)'
-  style[AdminLayoutCssVars.BaseColor] = '#fff9'
+  style[AdminLayoutCssVars.BaseColor] = 'transparent'
 }

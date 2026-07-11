@@ -1,39 +1,82 @@
-# Changelog
+# 更新日志
 
-## [1.0.2] - 2026-07-10
+## v1.0.4
 
-### Changed
+`2026-07-11`
 
-- **dependencies**: removed `lodash-es` and `seemly` from runtime dependencies
-- **dependencies**: moved `@iconify/json`, `@iconify/utils`, `unocss` to devDependencies (build-time only)
-- **dependencies**: added `vitest`, `@vue/test-utils`, `happy-dom`, `vue-tsc` to devDependencies
-- **context.ts**: replaced `lodash-es/omit` with native destructuring
-- **helper.ts**: replaced `seemly/rgba` with local `parseColor()` supporting hex and rgb/rgba formats
+### 🐛 Bug 修复
 
-### Added
+- 修复毛玻璃皮肤激活时反色逻辑不正确的问题，新增 `isInverted()` 统一判断
+- 修复 SiderDrawer 抽屉层级过低被遮挡的问题，z-index 提升至 1000/999
+- 修复拆分菜单右侧区域在皮肤激活时背景色不透明的问题
 
-- **a11y**: Hamburger — `role="button"`, `tabindex`, `aria-label`, `aria-expanded`, keyboard support
-- **a11y**: Sider — `role="navigation"`, collapse button keyboard support, menu item `role="button"`, pin switch keyboard support
-- **a11y**: SiderDrawer — `role="dialog"`, `aria-modal`, `aria-hidden`, Escape key to close
-- **a11y**: Header — `role="menubar"` / `role="menuitem"`, keyboard support for parent menu items
-- **testing**: Vitest configuration with happy-dom environment
-- **testing**: unit tests for `parseColor`, `calculateInverted`, `getParentsKeys`, `getLabel`, `applyThemeStyles`, `applySkinStyles`
-- **ci**: GitHub Actions workflow (lint → typecheck → test → build, Node 18/20 matrix)
-- **changelog**: this file
+### 🔨 重构
 
-### Fixed
+- `applySkinStyles()` 基色由 `#fff9` 改为 `transparent`，提升毛玻璃通透感
+- Header / Sider / SiderDrawer 统一使用 `isInverted()` 替代 `calculateInverted()`
+- 移除未使用的 `.admin-layout-sider--skin` CSS 类
+- index.vue computed `style` 重命名为 `layoutStyle` 避免命名遮蔽
 
-- **package.json**: added `engines` field (`node >= 18`)
-- **package.json**: added `typecheck` and `test` scripts
+---
 
-## [1.0.1] - 2026-07-10
+## v1.0.3
 
-### Fixed
+`2026-07-11`
 
-- fix(AdminLayout): fix AppMain.vue and Header.vue imports after CssVars removal
+### ✨ 新功能
 
-## [1.0.0] - 2026-07-10
+- 新增 `wrapperHeight` prop，支持自定义布局容器高度（默认 `'100vh'`），适用于嵌入非全屏场景
 
-### Changed
+### 🔨 重构
 
-- refactor!: v1.0.0 重构样式系统与 API 命名
+- SiderDrawer 定位由 `position: fixed` 改为 `position: absolute`，配合 `wrapperHeight` 实现相对定位
+- Sider 折叠按钮背景色简化，移除 `color-mix()` 计算
+- Scrollbar 组件 `nativeScrollbar` 优先级调整为高于用户传入的 `scrollbarProps`
+
+---
+
+## v1.0.2
+
+`2026-07-10`
+
+### 🐛 Bug 修复
+
+- 修复 `AppMain.vue` 和 `Header.vue` 在移除 CssVars 后的导入问题
+
+### ✨ 新功能
+
+- 新增无障碍支持：ARIA role、键盘事件、Escape 关闭抽屉
+- 新增单元测试框架和 CI 工作流
+
+### 🔨 重构
+
+- 移除 `lodash-es` 依赖，使用原生解构替代
+- 移除 `seemly` 依赖，使用本地 `parseColor()` 函数替代
+
+---
+
+## v1.0.1
+
+`2026-07-10`
+
+### 🐛 Bug 修复
+
+- 修复 CssVars 移除后的导入路径问题
+
+---
+
+## v1.0.0
+
+`2026-07-10`
+
+### 🎉 首次发布
+
+- 重构样式系统与 API 命名
+- 支持 `side`、`mix`、`top` 三种布局模式
+- 支持拆分菜单（`splitMenu`）
+- 支持暗黑主题（内置 `useDark()`）
+- 支持毛玻璃皮肤（`skin` prop）
+- 支持移动端适配（`isMobile` prop）
+- 支持自定义滚动条（`Scrollbar` 组件）
+- 完整的 TypeScript 类型定义
+- 20+ 个插槽，完全自定义每个区域

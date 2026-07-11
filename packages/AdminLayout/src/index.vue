@@ -67,7 +67,7 @@ const {
   hasSkin,
 } = state
 
-const style = computed<CSSProperties>(() => {
+const layoutStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     [AdminLayoutCssVars.HeaderHeight]: `${headerHeight.value}px`,
   }
@@ -191,7 +191,7 @@ defineExpose({
 
 <template>
   <Scrollbar class="admin-layout-wrapper" v-bind="{ nativeScrollbar: !(!headerFixed && !contentFull), ...scrollbarProps, height: wrapperHeight }">
-    <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
+    <div class="admin-layout" :class="`admin-layout--${mode}`" :style="layoutStyle">
       <header v-if="header" class="admin-layout__header">
         <component :is="renderHeader" />
       </header>

@@ -4,7 +4,7 @@ import type { AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applySkinStyles, applyThemeStyles, calculateInverted, getLabel } from '../helper'
+import { applySkinStyles, applyThemeStyles, getLabel, isInverted } from '../helper'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
 
@@ -46,7 +46,7 @@ const {
   toggleSiderCollapsed,
 } = state
 
-const inverted = computed(() => isDark.value || calculateInverted(headerTheme.value))
+const inverted = computed(() => isInverted(isDark.value, hasSkin.value, headerTheme.value))
 
 const containerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}

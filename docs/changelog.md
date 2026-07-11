@@ -1,5 +1,24 @@
 # 更新日志
 
+## v1.0.4
+
+`2026-07-11`
+
+### 🐛 Bug 修复
+
+- 修复毛玻璃皮肤激活时反色逻辑不正确的问题，新增 `isInverted()` 统一判断
+- 修复 SiderDrawer 抽屉层级过低被遮挡的问题，z-index 提升至 1000/999
+- 修复拆分菜单右侧区域在皮肤激活时背景色不透明的问题
+
+### 🔨 重构
+
+- `applySkinStyles()` 基色由 `#fff9` 改为 `transparent`，提升毛玻璃通透感
+- Header / Sider / SiderDrawer 统一使用 `isInverted()` 替代 `calculateInverted()`
+- 移除未使用的 `.admin-layout-sider--skin` CSS 类
+- index.vue computed `style` 重命名为 `layoutStyle` 避免命名遮蔽
+
+---
+
 ## v1.0.3
 
 `2026-07-11`

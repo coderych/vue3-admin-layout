@@ -4,7 +4,7 @@ import type { AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps 
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applySkinStyles, applyThemeStyles, calculateInverted, getLabel } from '../helper'
+import { applySkinStyles, applyThemeStyles, getLabel, isInverted } from '../helper'
 import { AdminLayoutCssVars } from '../typing'
 import Hamburger from './Hamburger.vue'
 import Logo from './Logo.vue'
@@ -66,7 +66,7 @@ const {
   toggleSiderRightFixed,
 } = state
 
-const inverted = computed(() => isDark.value || calculateInverted(siderTheme.value))
+const inverted = computed(() => isInverted(isDark.value, hasSkin.value, siderTheme.value))
 
 const siderStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -119,6 +119,7 @@ const rightStyle = computed<CSSProperties>(() => {
   }
   if (hasSkin.value) {
     applySkinStyles(style)
+    style.backgroundColor = 'transparent'
     style['--admin-layout-sider-right-translate-x'] = 'calc(-100% - var(--admin-layout-sider-width))'
   }
   return style
@@ -171,7 +172,6 @@ function handleParentMenuClick(key: string) {
     :class="{
       'admin-layout-sider--split': splitMenu && mode === 'side',
       'admin-layout-sider--split-hover': !siderRightFixed && mode === 'side' && splitMenu,
-      'admin-layout-sider--skin': hasSkin,
     }"
     :style="{ ...siderStyle }"
   >

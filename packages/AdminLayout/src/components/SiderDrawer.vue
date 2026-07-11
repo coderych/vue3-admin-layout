@@ -5,7 +5,7 @@ import { computed, onMounted, onUnmounted, proxyRefs } from 'vue'
 import { Logo } from '.'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applySkinStyles, applyThemeStyles, calculateInverted } from '../helper'
+import { applySkinStyles, applyThemeStyles, isInverted } from '../helper'
 import Hamburger from './Hamburger.vue'
 
 defineSlots<{
@@ -48,7 +48,7 @@ function handleEscape(e: KeyboardEvent) {
 onMounted(() => document.addEventListener('keydown', handleEscape))
 onUnmounted(() => document.removeEventListener('keydown', handleEscape))
 
-const inverted = computed(() => isDark.value || calculateInverted(siderTheme.value))
+const inverted = computed(() => isInverted(isDark.value, hasSkin.value, siderTheme.value))
 
 const siderDrawerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -134,7 +134,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
   position: absolute;
   left: 0;
   transition: transform var(--admin-layout-duration) var(--admin-layout-bezier);
-  z-index: 2;
+  z-index: 1000;
   top: 0;
   display: flex;
   flex-direction: column;
@@ -158,13 +158,13 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
   }
 
   &__mask {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1;
+    z-index: 999;
     transition: opacity var(--admin-layout-duration) var(--admin-layout-bezier);
     opacity: 0;
     visibility: hidden;
