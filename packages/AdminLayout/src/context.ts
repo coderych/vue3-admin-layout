@@ -44,6 +44,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const siderShowTrigger = computed(() => props.siderShowTrigger)
   const accordion = computed(() => props.accordion)
 
+  const contentEmbedded = computed(() => props.contentEmbedded)
   const contentFull = computed(() => props.contentFull)
   const contentHeader = computed(() => props.contentHeader && Boolean(slots['content-header']))
   const contentHeaderBordered = computed(() => props.contentHeaderBordered)
@@ -172,6 +173,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     siderCollapsedWidth,
     siderShowTrigger,
     accordion,
+    contentEmbedded,
     contentHeader,
     contentHeaderBordered,
     contentHeaderHeight,

@@ -22,6 +22,7 @@ const {
   overlayHeight,
   // computed - props
   scrollbarProps,
+  contentEmbedded,
   contentFull,
   headerFixed,
   contentHeader,
@@ -45,14 +46,7 @@ const mainStyle = computed<CSSProperties>(() => {
   if (hasSkin.value) {
     applySkinStyles(style)
   }
-  return style
-})
 
-const contentStyle = computed<CSSProperties>(() => {
-  const style: CSSProperties = {}
-  if (contentHeaderFixed.value && headerFixed.value) {
-    style.height = `calc(100vh - ${_contentHeaderHeight.value}px - ${contentFull.value ? 0 : _headerHeight.value}px)`
-  }
   return style
 })
 
@@ -62,6 +56,17 @@ const contentHeaderStyle = computed<CSSProperties>(() => {
   }
   if (!contentHeaderBordered.value) {
     style.borderBottom = 'none'
+  }
+  return style
+})
+
+const contentStyle = computed<CSSProperties>(() => {
+  const style: CSSProperties = {}
+  if (contentHeaderFixed.value && headerFixed.value) {
+    style.height = `calc(100vh - ${_contentHeaderHeight.value}px - ${contentFull.value ? 0 : _headerHeight.value}px)`
+  }
+  if (!hasSkin.value && contentEmbedded.value) {
+    style.backgroundColor = 'var(--admin-layout-embedded-color)'
   }
   return style
 })

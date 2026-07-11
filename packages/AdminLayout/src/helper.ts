@@ -30,7 +30,7 @@ export function parseColor(color: string): [number, number, number] {
   throw new Error(`Unsupported color format: ${color}`)
 }
 
-export function calculateInverted(color: string): boolean {
+export function calculateInverted(color?: string): boolean {
   if (!color) {
     return false
   }
@@ -87,7 +87,7 @@ export function getLabel(label: MenuOptionLabel | undefined, option: MenuOption)
   return label ?? ''
 }
 
-export function applyThemeStyles(style: CSSProperties, color: string, inverted: boolean) {
+export function applyThemeStyles(style: CSSProperties, color?: string, inverted?: boolean) {
   if (!color) {
     return
   }

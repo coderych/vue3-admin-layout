@@ -11,7 +11,7 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "erasableSyntaxOnly": false,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": false
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "packages/**/*.ts", "packages/**/*.vue"]
 }

@@ -28,8 +28,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       rollupOptions: {
         external: ['vue', 'simplebar-vue'],
         output: {
+          exports: 'named',
           globals: {
             vue: 'Vue',
+            'simplebar-vue': 'SimplebarVue',
           },
         },
       },

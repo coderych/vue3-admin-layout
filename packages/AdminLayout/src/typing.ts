@@ -43,7 +43,7 @@ export const adminLayoutProps = {
   },
   splitMenu: {
     type: Boolean as PropType<boolean>,
-    default: true,
+    default: false,
   },
   siderCollapsed: {
     type: Boolean as PropType<boolean>,
@@ -53,10 +53,25 @@ export const adminLayoutProps = {
     type: Boolean as PropType<boolean>,
     default: false,
   },
+
+  skin: {
+    type: String as PropType<string>,
+    default: undefined,
+  },
+
   menuOptions: {
     type: Array as PropType<MenuOption[]>,
     default: () => [],
   },
+  accordion: {
+    type: Boolean as PropType<boolean>,
+    default: false,
+  },
+  activeKey: {
+    type: String as PropType<string>,
+    default: undefined,
+  },
+
   logo: {
     type: Boolean as PropType<boolean>,
     default: true,
@@ -69,6 +84,7 @@ export const adminLayoutProps = {
     type: String as PropType<string>,
     default: '',
   },
+
   header: {
     type: Boolean as PropType<boolean>,
     default: true,
@@ -79,7 +95,7 @@ export const adminLayoutProps = {
   },
   headerTheme: {
     type: String as PropType<string>,
-    default: '#fff',
+    default: undefined,
   },
   headerFixed: {
     type: Boolean as PropType<boolean>,
@@ -104,16 +120,11 @@ export const adminLayoutProps = {
   },
   siderTheme: {
     type: String as PropType<string>,
-    default: '#fff',
+    default: undefined,
   },
   siderShowTrigger: {
     type: Boolean as PropType<boolean>,
     default: true,
-  },
-
-  skin: {
-    type: String as PropType<string>,
-    default: undefined,
   },
   siderRightFixed: {
     type: Boolean as PropType<boolean>,
@@ -128,6 +139,14 @@ export const adminLayoutProps = {
     type: Boolean as PropType<boolean>,
     default: false,
   },
+  contentEmbedded: {
+    type: Boolean as PropType<boolean>,
+    default: true,
+  },
+  contentWidth: {
+    type: [String, Number] as PropType<string | number>,
+    default: '100%',
+  },
   contentHeader: {
     type: Boolean as PropType<boolean>,
     default: true,
@@ -138,13 +157,12 @@ export const adminLayoutProps = {
   },
   contentHeaderBordered: {
     type: Boolean as PropType<boolean>,
-    default: true,
+    default: false,
   },
   contentHeaderFixed: {
     type: Boolean as PropType<boolean>,
     default: true,
   },
-
   contentFooter: {
     type: Boolean as PropType<boolean>,
     default: true,
@@ -156,21 +174,6 @@ export const adminLayoutProps = {
   contentFooterFixed: {
     type: Boolean as PropType<boolean>,
     default: false,
-  },
-
-  contentWidth: {
-    type: [String, Number] as PropType<string | number>,
-    default: '100%',
-  },
-
-  accordion: {
-    type: Boolean as PropType<boolean>,
-    default: false,
-  },
-
-  activeKey: {
-    type: String as PropType<string>,
-    default: undefined,
   },
 
   scrollbarProps: {
@@ -188,7 +191,7 @@ export interface AdminLayoutHeaderProps {
   _height: number
   fixed: boolean
   bordered: boolean
-  theme: string
+  theme?: string
   show: boolean
 }
 
@@ -196,7 +199,7 @@ export interface AdminLayoutSiderProps {
   state: ShallowUnwrapRef<AdminLayoutState>
   show: boolean
   fixed: boolean
-  theme: string
+  theme?: string
   width: number
   _width: number
   collapsedWidth: number

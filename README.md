@@ -1,6 +1,6 @@
 # vue3-admin-layout
 
-> v1.0.1 · 一个灵活的 Vue 3 管理后台布局组件
+> v1.0.2 · 一个灵活的 Vue 3 管理后台布局组件
 
 功能丰富的管理后台布局组件，支持侧边栏、顶部导航、混合模式三种布局，内置响应式设计、暗黑主题、毛玻璃皮肤、菜单导航、自定义滚动条等功能。
 
@@ -60,7 +60,7 @@ import 'vue3-admin-layout/dist/style.css'
 | 属性名 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `mode` | `'side' \| 'mix' \| 'top'` | `'side'` | 布局模式 |
-| `splitMenu` | `boolean` | `true` | 是否拆分菜单（仅在 `side`/`mix` 模式下有效） |
+| `splitMenu` | `boolean` | `false` | 是否拆分菜单（仅在 `side`/`mix` 模式下有效） |
 | `siderCollapsed` | `boolean` | `false` | 侧边栏是否折叠 |
 | `isMobile` | `boolean` | `false` | 是否移动端模式 |
 | `scrollbarProps` | `ScrollbarProps` | `undefined` | 滚动条配置，详见 [ScrollbarProps](#scrollbarprops) |
@@ -87,7 +87,7 @@ import 'vue3-admin-layout/dist/style.css'
 | --- | --- | --- | --- |
 | `header` | `boolean` | `true` | 是否显示头部 |
 | `headerHeight` | `number` | `48` | 头部高度（像素） |
-| `headerTheme` | `string` | `'#fff'` | 头部主题颜色 |
+| `headerTheme` | `string` | `undefined` | 头部主题颜色 |
 | `headerFixed` | `boolean` | `true` | 头部是否固定 |
 | `headerBordered` | `boolean` | `true` | 头部是否显示底部边框 |
 
@@ -98,7 +98,7 @@ import 'vue3-admin-layout/dist/style.css'
 | `sider` | `boolean` | `true` | 是否显示侧边栏 |
 | `siderWidth` | `number` | `200` | 侧边栏宽度（像素） |
 | `siderCollapsedWidth` | `number` | `48` | 侧边栏折叠宽度（像素） |
-| `siderTheme` | `string` | `'#fff'` | 侧边栏主题颜色 |
+| `siderTheme` | `string` | `undefined` | 侧边栏主题颜色 |
 | `siderRightFixed` | `boolean` | `true` | 拆分菜单右侧是否固定（仅 `side` + `splitMenu` 模式） |
 | `siderBordered` | `boolean` | `true` | 侧边栏是否显示右边框 |
 | `skin` | `string` | `undefined` | 毛玻璃皮肤背景图片 URL，设置后启用毛玻璃效果 |
@@ -107,11 +107,12 @@ import 'vue3-admin-layout/dist/style.css'
 
 | 属性名 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
+| `contentEmbedded` | `boolean` | `true` | 是否启用嵌入式内容背景色 |
 | `contentWidth` | `string \| number` | `'100%'` | 内容区域宽度（数字自动转为 `px`） |
 | `contentHeader` | `boolean` | `true` | 是否显示内容头部（需配合 `content-header` 插槽） |
 | `contentHeaderHeight` | `number` | `36` | 内容头部高度（像素） |
 | `contentHeaderFixed` | `boolean` | `true` | 内容头部是否固定 |
-| `contentHeaderBordered` | `boolean` | `true` | 内容头部是否显示底部边框 |
+| `contentHeaderBordered` | `boolean` | `false` | 内容头部是否显示底部边框 |
 | `contentFooter` | `boolean` | `true` | 是否显示内容底部（需配合 `content-footer` 插槽） |
 | `contentFooterHeight` | `number` | `32` | 内容底部高度（像素） |
 | `contentFooterFixed` | `boolean` | `false` | 内容底部是否固定 |
@@ -331,6 +332,7 @@ import { AdminLayoutCssVars } from 'vue3-admin-layout'
 :root {
   /* 颜色 */
   --admin-layout-base-color: #fff;                   /* 组件基础底色 */
+  --admin-layout-embedded-color: #f1f3f6;            /* 嵌入式内容背景色 */
   --admin-layout-text-color: var(--text-color-light); /* 文字颜色 */
   --admin-layout-border-color: var(--border-color-light); /* 边框颜色 */
   --admin-layout-scrollbar-color: var(--scrollbar-color-light); /* 滚动条颜色 */
@@ -351,7 +353,8 @@ import { AdminLayoutCssVars } from 'vue3-admin-layout'
 
 | 变量 | 亮色模式 | 暗黑模式 |
 | --- | --- | --- |
-| `--admin-layout-base-color` | `#fff` | `#000` |
+| `--admin-layout-base-color` | `#fff` | `#18181c` |
+| `--admin-layout-embedded-color` | `#f1f3f6` | `#101014` |
 | `--admin-layout-text-color` | `#000` | `#fff` |
 | `--admin-layout-border-color` | `rgb(224, 224, 230)` | `rgba(255, 255, 255, 0.24)` |
 | `--admin-layout-scrollbar-color` | `rgba(0, 0, 0, 0.25)` | `rgba(255, 255, 255, 0.25)` |

@@ -225,7 +225,8 @@ defineExpose({
   --admin-layout-duration: 0.3s;
   --admin-layout-bezier: cubic-bezier(0.4, 0, 0.2, 1);
 
-  --admin-layout-base-color: #fff;
+  --admin-layout-base-color: #ffffff;
+  --admin-layout-embedded-color: #f1f3f6;
   --admin-layout-text-color: var(--text-color-light);
   --admin-layout-border-color: var(--border-color-light);
   --admin-layout-scrollbar-color: var(--scrollbar-color-light);
@@ -233,7 +234,8 @@ defineExpose({
 }
 
 :root.dark {
-  --admin-layout-base-color: #000;
+  --admin-layout-base-color: #18181c;
+  --admin-layout-embedded-color: #101014;
   --admin-layout-text-color: var(--text-color-dark);
   --admin-layout-border-color: var(--border-color-dark);
   --admin-layout-scrollbar-color: var(--scrollbar-color-dark);
