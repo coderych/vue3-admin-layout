@@ -176,6 +176,11 @@ export const adminLayoutProps = {
     default: false,
   },
 
+  wrapperHeight: {
+    type: String as PropType<string>,
+    default: '100vh',
+  },
+
   scrollbarProps: {
     type: Object as PropType<ScrollbarProps>,
   },

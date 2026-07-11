@@ -41,6 +41,7 @@ const {
   splitMenu,
   menuOptions,
   scrollbarProps,
+  wrapperHeight,
   logo,
   logoUrl,
   title,
@@ -73,7 +74,7 @@ const siderStyle = computed<CSSProperties>(() => {
     boxSizing: 'border-box',
   }
   if (headerFixed.value) {
-    style.height = mode.value === 'side' ? '100vh' : `calc(100vh - ${_headerHeight.value}px)`
+    style.height = mode.value === 'side' ? wrapperHeight.value : `calc(${wrapperHeight.value} - ${_headerHeight.value}px)`
   }
   if (!siderBordered.value) {
     style.borderRight = 'none'
@@ -378,7 +379,7 @@ function handleParentMenuClick(key: string) {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background-color: color-mix(in hsl, var(--admin-layout-base-color) 94%, #000);
+  background-color: var(--admin-layout-base-color);
   border: 1px solid var(--admin-layout-border-color);
   display: flex;
   align-items: center;

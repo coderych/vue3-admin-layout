@@ -9,5 +9,5 @@ export default antfu({
     'vue/max-attributes-per-line': ['error', { singleline: 4 }],
     'no-console': 'off',
   },
-  ignores: ['*.md'],
+  ignores: ['**/*.md'],
 })

@@ -24,6 +24,7 @@ const {
   // composables
   isDark,
   // computed - props
+  wrapperHeight,
   hasSkin,
   menuOptions,
   scrollbarProps,
@@ -52,6 +53,7 @@ const inverted = computed(() => isDark.value || calculateInverted(siderTheme.val
 const siderDrawerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     width: `${siderWidth.value}px`,
+    height: wrapperHeight.value,
   }
   if (hasSkin.value) {
     applySkinStyles(style)
@@ -128,9 +130,8 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 
 <style scoped lang="less">
 .admin-layout-sider-drawer {
-  height: 100vh;
   max-width: 100%;
-  position: fixed;
+  position: absolute;
   left: 0;
   transition: transform var(--admin-layout-duration) var(--admin-layout-bezier);
   z-index: 2;

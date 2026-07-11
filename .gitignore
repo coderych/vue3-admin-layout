@@ -25,3 +25,7 @@ dist-ssr
 *.sw?
 
 .eslintcache
+
+# VitePress
+docs/.vitepress/cache
+docs/.vitepress/dist

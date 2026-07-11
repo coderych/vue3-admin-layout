@@ -30,7 +30,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         output: {
           exports: 'named',
           globals: {
-            vue: 'Vue',
+            'vue': 'Vue',
             'simplebar-vue': 'SimplebarVue',
           },
         },

@@ -56,6 +56,7 @@ const {
   header,
   headerHeight,
   headerFixed,
+  wrapperHeight,
   sider,
   siderWidth,
   siderCollapsedWidth,
@@ -121,7 +122,7 @@ const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
   }
   if (headerFixed.value) {
-    style.height = `calc(100vh - ${_headerHeight.value}px)`
+    style.height = `calc(${wrapperHeight.value} - ${_headerHeight.value}px)`
   }
   if (contentFull.value) {
     style.zIndex = 2
@@ -189,7 +190,7 @@ defineExpose({
 </script>
 
 <template>
-  <Scrollbar class="admin-layout-wrapper" v-bind="{ ...scrollbarProps, height: '100vh', nativeScrollbar: !(!headerFixed && !contentFull) }">
+  <Scrollbar class="admin-layout-wrapper" v-bind="{ nativeScrollbar: !(!headerFixed && !contentFull), ...scrollbarProps, height: wrapperHeight }">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="style">
       <header v-if="header" class="admin-layout__header">
         <component :is="renderHeader" />
@@ -198,7 +199,7 @@ defineExpose({
         <component :is="renderSider" />
       </aside>
       <main class="admin-layout__main" :style="mainStyle">
-        <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(headerFixed && !contentHeaderFixed && !contentFull), height: '100%' }">
+        <Scrollbar v-bind="{ nativeScrollbar: !(headerFixed && !contentHeaderFixed && !contentFull), ...scrollbarProps, height: '100%' }">
           <component :is="renderContent">
             <slot name="default" v-bind="(state as any)" />
           </component>

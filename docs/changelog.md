@@ -1,0 +1,63 @@
+# 更新日志
+
+## v1.0.3
+
+`2026-07-11`
+
+### ✨ 新功能
+
+- 新增 `wrapperHeight` prop，支持自定义布局容器高度（默认 `'100vh'`），适用于嵌入非全屏场景
+
+### 🔨 重构
+
+- SiderDrawer 定位由 `position: fixed` 改为 `position: absolute`，配合 `wrapperHeight` 实现相对定位
+- Sider 折叠按钮背景色简化，移除 `color-mix()` 计算
+- Scrollbar 组件 `nativeScrollbar` 优先级调整为高于用户传入的 `scrollbarProps`
+
+---
+
+## v1.0.2
+
+`2026-07-10`
+
+### 🐛 Bug 修复
+
+- 修复 `AppMain.vue` 和 `Header.vue` 在移除 CssVars 后的导入问题
+
+### ✨ 新功能
+
+- 新增无障碍支持：ARIA role、键盘事件、Escape 关闭抽屉
+- 新增单元测试框架和 CI 工作流
+
+### 🔨 重构
+
+- 移除 `lodash-es` 依赖，使用原生解构替代
+- 移除 `seemly` 依赖，使用本地 `parseColor()` 函数替代
+
+---
+
+## v1.0.1
+
+`2026-07-10`
+
+### 🐛 Bug 修复
+
+- 修复 CssVars 移除后的导入路径问题
+
+---
+
+## v1.0.0
+
+`2026-07-10`
+
+### 🎉 首次发布
+
+- 重构样式系统与 API 命名
+- 支持 `side`、`mix`、`top` 三种布局模式
+- 支持拆分菜单（`splitMenu`）
+- 支持暗黑主题（内置 `useDark()`）
+- 支持毛玻璃皮肤（`skin` prop）
+- 支持移动端适配（`isMobile` prop）
+- 支持自定义滚动条（`Scrollbar` 组件）
+- 完整的 TypeScript 类型定义
+- 20+ 个插槽，完全自定义每个区域

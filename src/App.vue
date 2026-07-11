@@ -25,9 +25,10 @@ const scrollbarConfig = reactive({
 const props = ref<AdminLayoutProps>({
   // 布局模式
   mode: 'side',
-  splitMenu: true,
+  splitMenu: false,
   siderCollapsed: false,
   isMobile: false,
+  wrapperHeight: '100vh',
 
   // Menu
   menuOptions: [],

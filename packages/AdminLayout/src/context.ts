@@ -25,6 +25,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const isMobile = computed(() => props.isMobile)
   const menuOptions = computed(() => props.menuOptions)
   const scrollbarProps = computed(() => props.scrollbarProps)
+  const wrapperHeight = computed(() => props.wrapperHeight)
 
   const logo = computed(() => props.logo)
   const logoUrl = computed(() => props.logoUrl)
@@ -158,6 +159,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     isMobile,
     menuOptions,
     scrollbarProps,
+    wrapperHeight,
     logo,
     logoUrl,
     title,

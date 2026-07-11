@@ -1,6 +1,6 @@
 # vue3-admin-layout
 
-> v1.0.2 · 一个灵活的 Vue 3 管理后台布局组件
+> v1.0.3 · 一个灵活的 Vue 3 管理后台布局组件
 
 功能丰富的管理后台布局组件，支持侧边栏、顶部导航、混合模式三种布局，内置响应式设计、暗黑主题、毛玻璃皮肤、菜单导航、自定义滚动条等功能。
 
@@ -107,6 +107,7 @@ import 'vue3-admin-layout/dist/style.css'
 
 | 属性名 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
+| `wrapperHeight` | `string` | `'100vh'` | 布局容器高度，适用于嵌入非全屏场景（如 `'100%'`、`'600px'`） |
 | `contentEmbedded` | `boolean` | `true` | 是否启用嵌入式内容背景色 |
 | `contentWidth` | `string \| number` | `'100%'` | 内容区域宽度（数字自动转为 `px`） |
 | `contentHeader` | `boolean` | `true` | 是否显示内容头部（需配合 `content-header` 插槽） |
@@ -382,6 +383,7 @@ const isDark = useDark()
   </AdminLayout>
 </template>
 ```
+
 
 ## 毛玻璃皮肤
 

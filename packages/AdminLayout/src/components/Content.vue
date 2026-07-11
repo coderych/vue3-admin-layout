@@ -22,6 +22,7 @@ const {
   overlayHeight,
   // computed - props
   scrollbarProps,
+  wrapperHeight,
   contentEmbedded,
   contentFull,
   headerFixed,
@@ -63,7 +64,7 @@ const contentHeaderStyle = computed<CSSProperties>(() => {
 const contentStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
   if (contentHeaderFixed.value && headerFixed.value) {
-    style.height = `calc(100vh - ${_contentHeaderHeight.value}px - ${contentFull.value ? 0 : _headerHeight.value}px)`
+    style.height = `calc(${wrapperHeight.value} - ${_contentHeaderHeight.value}px - ${contentFull.value ? 0 : _headerHeight.value}px)`
   }
   if (!hasSkin.value && contentEmbedded.value) {
     style.backgroundColor = 'var(--admin-layout-embedded-color)'
@@ -110,12 +111,12 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
 
 <template>
   <div class="admin-layout-main" :class="{ 'admin-layout-main--full': contentFull }" :style="mainStyle">
-    <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(contentFull && !contentHeaderFixed), height: contentFull ? '100vh' : '100%' }">
+    <Scrollbar v-bind="{ nativeScrollbar: !(contentFull && !contentHeaderFixed), ...scrollbarProps, height: contentFull ? wrapperHeight : '100%' }">
       <div v-if="contentHeader" class="admin-layout-main__header" :style="contentHeaderStyle">
         <slot name="header" v-bind="contentProps" />
       </div>
       <div class="admin-layout-main__content" :style="contentStyle">
-        <Scrollbar v-bind="{ ...scrollbarProps, height: '100%', nativeScrollbar: !(headerFixed && contentHeaderFixed) }">
+        <Scrollbar v-bind="{ nativeScrollbar: !(headerFixed && contentHeaderFixed), ...scrollbarProps, height: '100%' }">
           <div :style="innerStyle">
             <slot name="default" v-bind="contentProps" />
           </div>
