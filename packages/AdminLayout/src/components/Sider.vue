@@ -51,6 +51,7 @@ const {
   siderTheme,
   siderBordered,
   siderCollapsedWidth,
+  siderShowTrigger,
   accordion,
   activeKey,
   // computed - derived
@@ -64,7 +65,7 @@ const {
   toggleSiderRightFixed,
 } = state
 
-const inverted = computed(() => calculateInverted(siderTheme.value))
+const inverted = computed(() => isDark.value || calculateInverted(siderTheme.value))
 
 const siderStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -82,13 +83,12 @@ const siderStyle = computed<CSSProperties>(() => {
     style.backgroundColor = `var(${AdminLayoutCssVars.BaseColor})`
   }
 
-  if (!isDark.value) {
-    if (hasSkin.value && !isSplit) {
-      applySkinStyles(style)
-    }
-    else {
-      applyThemeStyles(style, siderTheme.value, inverted.value)
-    }
+  if (hasSkin.value && !isSplit) {
+    applySkinStyles(style)
+    style.zIndex = 1
+  }
+  else if (!isDark.value) {
+    applyThemeStyles(style, siderTheme.value, inverted.value)
   }
 
   return style
@@ -118,6 +118,7 @@ const rightStyle = computed<CSSProperties>(() => {
   }
   if (hasSkin.value) {
     applySkinStyles(style)
+    style['--admin-layout-sider-right-translate-x'] = 'calc(-100% - var(--admin-layout-sider-width))'
   }
   return style
 })
@@ -162,8 +163,10 @@ function handleParentMenuClick(key: string) {
 </script>
 
 <template>
-  <div
+  <nav
     class="admin-layout-sider"
+    role="navigation"
+    aria-label="Sidebar"
     :class="{
       'admin-layout-sider--split': splitMenu && mode === 'side',
       'admin-layout-sider--split-hover': !siderRightFixed && mode === 'side' && splitMenu,
@@ -183,12 +186,21 @@ function handleParentMenuClick(key: string) {
             <slot name="menu" v-bind="{ ...menuProps, options: splitMenu ? childMenuOptions : menuOptions }" />
           </slot>
         </Scrollbar>
-        <slot name="footer" v-bind="siderProps">
-          <div class="admin-layout-sider__hamburger">
-            <Hamburger :value="siderCollapsed" @update:value="toggleSiderCollapsed" />
-          </div>
-        </slot>
       </slot>
+      <slot name="footer" v-bind="siderProps" />
+
+      <div
+        v-if="siderShowTrigger"
+        class="admin-layout-sider__collapse-button"
+        role="button"
+        tabindex="0"
+        :aria-label="siderCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+        @click="toggleSiderCollapsed(!siderCollapsed)"
+        @keydown.enter.prevent="toggleSiderCollapsed(!siderCollapsed)"
+        @keydown.space.prevent="toggleSiderCollapsed(!siderCollapsed)"
+      >
+        <div :class="siderCollapsed ? 'i-lucide:chevron-right' : 'i-lucide:chevron-left'" />
+      </div>
     </template>
     <template v-else>
       <div class="admin-layout-sider__split-left" :style="leftStyle" :class="{ 'admin-layout-sider__split-left--collapsed': siderCollapsed }">
@@ -207,7 +219,12 @@ function handleParentMenuClick(key: string) {
                     :key="item.key"
                     class="admin-layout-sider__split-left__menu-item"
                     :class="{ 'admin-layout-sider__split-left__menu-item--active': item.key === parentKey }"
+                    role="button"
+                    tabindex="0"
+                    :aria-label="getLabel(item.label, item)"
                     @click="handleParentMenuClick(`${item.key}`)"
+                    @keydown.enter.prevent="handleParentMenuClick(`${item.key}`)"
+                    @keydown.space.prevent="handleParentMenuClick(`${item.key}`)"
                   >
                     <div v-if="item.icon" class="admin-layout-sider__split-left__menu-icon">
                       <component :is="item.icon" />
@@ -220,14 +237,10 @@ function handleParentMenuClick(key: string) {
               </slot>
             </slot>
           </Scrollbar>
-          <slot name="leftFooter" v-bind="{ ...siderProps, width: _siderCollapsedWidth }">
-            <div class="admin-layout-sider__split-left__footer">
-              <Hamburger :value="siderCollapsed" @update:value="toggleSiderCollapsed" />
-            </div>
-          </slot>
+          <slot name="leftFooter" v-bind="{ ...siderProps, width: _siderCollapsedWidth }" />
         </slot>
       </div>
-      <div class="admin-layout-sider__split-right" :class="{ 'border-right': siderRightFixed }" :style="rightStyle">
+      <div class="admin-layout-sider__split-right" :style="rightStyle">
         <slot name="right" v-bind="{ ...siderProps }">
           <slot name="rightHeader" v-bind="{ ...siderProps }">
             <div v-if="logo && title" class="admin-layout-sider__split-right__title">
@@ -244,7 +257,16 @@ function handleParentMenuClick(key: string) {
 
           <slot name="rightFooter" v-bind="{ ...siderProps }">
             <div class="admin-layout-sider__split-right__footer">
-              <div class="admin-layout-sider__split-right__fixed-switch" @click="toggleSiderRightFixed(!siderRightFixed)">
+              <Hamburger :value="siderCollapsed" @update:value="toggleSiderCollapsed" />
+              <div
+                class="admin-layout-sider__split-right__fixed-switch"
+                role="button"
+                tabindex="0"
+                :aria-label="siderRightFixed ? 'Unpin sidebar' : 'Pin sidebar'"
+                @click="toggleSiderRightFixed(!siderRightFixed)"
+                @keydown.enter.prevent="toggleSiderRightFixed(!siderRightFixed)"
+                @keydown.space.prevent="toggleSiderRightFixed(!siderRightFixed)"
+              >
                 <div v-if="!siderRightFixed" class="i-lucide:pin" />
                 <div v-else class="i-lucide:pin-off" />
               </div>
@@ -253,7 +275,7 @@ function handleParentMenuClick(key: string) {
         </slot>
       </div>
     </template>
-  </div>
+  </nav>
 </template>
 
 <style scoped lang="less">
@@ -269,14 +291,13 @@ function handleParentMenuClick(key: string) {
 
     &-hover {
       .admin-layout-sider__split-right {
-        transform: translateX(-100%);
+        transform: translateX(var(--admin-layout-sider-right-translate-x, -100%));
         transition: transform var(--admin-layout-duration);
       }
 
       &:hover {
         .admin-layout-sider__split-right {
           transform: translateX(0);
-          z-index: 3;
           box-shadow: var(--box-shadow);
         }
       }
@@ -287,7 +308,7 @@ function handleParentMenuClick(key: string) {
     height: 100%;
     flex-shrink: 0;
     position: relative;
-    z-index: 4;
+    z-index: 2;
     overflow-x: hidden;
     box-sizing: border-box;
     display: flex;
@@ -295,6 +316,7 @@ function handleParentMenuClick(key: string) {
     color: var(--admin-layout-text-color);
     border-right: 1px solid var(--admin-layout-border-color);
     background-color: var(--admin-layout-base-color);
+    transition: width var(--admin-layout-duration) var(--admin-layout-bezier);
 
     &--collapsed {
       .admin-layout-sider__split-left__logo > img {
@@ -306,20 +328,12 @@ function handleParentMenuClick(key: string) {
         display: none;
       }
     }
-
-    &__footer {
-      width: 100%;
-      height: 48px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
   }
 
   &__split-right {
     flex-shrink: 0;
     position: relative;
-    z-index: 3;
+    z-index: 1;
     height: 100%;
     transition: transform var(--admin-layout-duration) var(--admin-layout-bezier);
     display: flex;
@@ -330,11 +344,11 @@ function handleParentMenuClick(key: string) {
 
     &__footer {
       width: 100%;
-      height: 48px;
+      height: 36px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
-      padding: 0 8px;
+      padding: 0 6px;
 
       .admin-layout-sider__split-right__fixed-switch {
         cursor: pointer;
@@ -344,7 +358,7 @@ function handleParentMenuClick(key: string) {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
+        font-size: 14px;
         box-sizing: border-box;
         background-color: rgba(0, 0, 0, 0.05);
 
@@ -354,6 +368,25 @@ function handleParentMenuClick(key: string) {
       }
     }
   }
+}
+
+.admin-layout-sider__collapse-button {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translate(50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: color-mix(in hsl, var(--admin-layout-base-color) 94%, #000);
+  border: 1px solid var(--admin-layout-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+  font-size: 16px;
+  color: var(--admin-layout-text-color);
 }
 
 .admin-layout-sider__split-left__logo {
@@ -448,26 +481,6 @@ function handleParentMenuClick(key: string) {
     font-weight: 700;
     width: calc(100% - 60px);
     text-align: center;
-  }
-}
-
-// skin 模式下：折叠时隐藏右侧面板，hover 时显示
-.admin-layout-sider--split-hover.admin-layout-sider--skin {
-  .admin-layout-sider__split-right {
-    // 基态：visibility 延迟到 transform 动画结束后再隐藏
-    transition:
-      transform var(--admin-layout-duration) var(--admin-layout-bezier),
-      visibility 0s var(--admin-layout-bezier) var(--admin-layout-duration);
-    visibility: hidden;
-  }
-
-  &:hover .admin-layout-sider__split-right {
-    // hover：立即显示，transform 开始滑入动画
-    transition:
-      transform var(--admin-layout-duration) var(--admin-layout-bezier),
-      box-shadow var(--admin-layout-duration) var(--admin-layout-bezier),
-      visibility 0s var(--admin-layout-bezier) 0s;
-    visibility: visible;
   }
 }
 </style>

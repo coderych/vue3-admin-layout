@@ -46,25 +46,25 @@ const {
   toggleSiderCollapsed,
 } = state
 
-const inverted = computed(() => calculateInverted(headerTheme.value))
+const inverted = computed(() => isDark.value || calculateInverted(headerTheme.value))
 
 const containerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
-  if (hasSkin.value && !isDark.value) {
+  if (hasSkin.value) {
     applySkinStyles(style)
   }
-  else {
+  else if (!isDark.value) {
     applyThemeStyles(style, headerTheme.value, inverted.value)
+  }
+  if (!headerBordered.value) {
+    style.borderBottom = 'none'
   }
   return style
 })
 
 const headerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
-    height: `${_headerHeight.value - (headerBordered.value ? 1 : 0)}px`,
-  }
-  if (!headerBordered.value) {
-    style.borderBottom = 'none'
+    height: `${_headerHeight.value}px`,
   }
   return style
 })
@@ -116,13 +116,18 @@ function handleParentMenuClick(key: string) {
         <slot name="prefix" v-bind="headerProps" />
         <template v-if="!isMobile">
           <slot v-if="mode === 'mix' && splitMenu" name="parentMenu" v-bind="{ ...menuProps, options: parentMenuOptions, value: `${parentKey}` }">
-            <ul class="admin-layout-header__parent-menu">
+            <ul class="admin-layout-header__parent-menu" role="menubar">
               <li
                 v-for="item in parentMenuOptions"
                 :key="item.key"
                 :class="{ 'admin-layout-header__parent-menu-item--active': item.key === parentKey }"
                 class="admin-layout-header__parent-menu-item"
+                role="menuitem"
+                tabindex="0"
+                :aria-label="getLabel(item.label, item)"
                 @click="handleParentMenuClick(`${item.key}`)"
+                @keydown.enter.prevent="handleParentMenuClick(`${item.key}`)"
+                @keydown.space.prevent="handleParentMenuClick(`${item.key}`)"
               >
                 <div v-if="item.icon" class="admin-layout-header__parent-menu-icon">
                   <component :is="item.icon" />
@@ -149,13 +154,13 @@ function handleParentMenuClick(key: string) {
   overflow-y: hidden;
   background-color: var(--admin-layout-base-color);
   color: var(--admin-layout-text-color);
+  border-bottom: 1px solid var(--admin-layout-border-color);
 }
 
 .admin-layout-header {
   display: flex;
   align-items: center;
   gap: 6px;
-  border-bottom: 1px solid var(--admin-layout-border-color);
 
   & > * {
     flex-shrink: 0;

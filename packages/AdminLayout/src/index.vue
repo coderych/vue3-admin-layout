@@ -3,7 +3,7 @@ import type { CSSProperties } from 'vue'
 import type { AdminLayoutContentProps, AdminLayoutHeaderProps, AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps } from './typing'
 import { computed, h, proxyRefs } from 'vue'
 import { Scrollbar } from '../../Scrollbar'
-import { AppMain, Header, Sider, SiderDrawer } from './components'
+import { Content, Header, Sider, SiderDrawer } from './components'
 import { useAdminLayoutProvider } from './context'
 import { AdminLayoutCssVars, adminLayoutProps } from './typing'
 
@@ -123,6 +123,9 @@ const mainStyle = computed<CSSProperties>(() => {
   if (headerFixed.value) {
     style.height = `calc(100vh - ${_headerHeight.value}px)`
   }
+  if (contentFull.value) {
+    style.zIndex = 2
+  }
   return style
 })
 
@@ -170,7 +173,7 @@ function renderSider() {
 }
 
 function renderContent() {
-  return h(AppMain, {}, {
+  return h(Content, {}, {
     default: slots.default,
     header: slots['content-header'],
     footer: slots['content-footer'],
@@ -180,7 +183,6 @@ function renderContent() {
 
 defineExpose({
   state: proxyRefs(state),
-  toggleContentFull: state.toggleContentFull,
   toggleSiderRightFixed: state.toggleSiderRightFixed,
   toggleSiderCollapsed: state.toggleSiderCollapsed,
 })
@@ -222,6 +224,7 @@ defineExpose({
 
   --admin-layout-duration: 0.3s;
   --admin-layout-bezier: cubic-bezier(0.4, 0, 0.2, 1);
+
   --admin-layout-base-color: #fff;
   --admin-layout-text-color: var(--text-color-light);
   --admin-layout-border-color: var(--border-color-light);
@@ -235,21 +238,6 @@ defineExpose({
   --admin-layout-border-color: var(--border-color-dark);
   --admin-layout-scrollbar-color: var(--scrollbar-color-dark);
   --admin-layout-scrollbar-color-hover: var(--scrollbar-color-hover-dark);
-}
-
-.border-bottom {
-  border-bottom: 1px solid var(--admin-layout-border-color);
-  box-sizing: border-box;
-}
-
-.border-right {
-  border-right: 1px solid var(--admin-layout-border-color);
-  box-sizing: border-box;
-}
-
-.border-top {
-  border-top: 1px solid var(--admin-layout-border-color);
-  box-sizing: border-box;
 }
 </style>
 
@@ -290,7 +278,6 @@ defineExpose({
 
   &__main {
     grid-area: main;
-    z-index: 1;
   }
 }
 </style>

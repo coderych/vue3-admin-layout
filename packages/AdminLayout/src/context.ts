@@ -1,6 +1,5 @@
 import type { _AdminLayoutProps, MenuOption } from './typing'
 import { createInjectionState, useDark, useElementSize } from '@vueuse/core'
-import { omit } from 'lodash-es'
 import { computed, ref, watch, watchEffect } from 'vue'
 import { getParentsKeys } from './helper'
 
@@ -12,7 +11,6 @@ export interface AdminLayoutProviderMethods {
 export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: AdminLayoutProviderMethods = {}) {
   // refs
   const siderCollapsed = ref(props.siderCollapsed)
-  const contentFull = ref(false)
   const siderRightFixed = ref(props.siderRightFixed)
   const parentKey = ref<string | null>()
   const overlayRef = ref<HTMLDivElement>()
@@ -43,8 +41,10 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   const siderBordered = computed(() => props.siderBordered)
   const siderTheme = computed(() => props.siderTheme)
   const siderCollapsedWidth = computed(() => props.siderCollapsedWidth)
+  const siderShowTrigger = computed(() => props.siderShowTrigger)
   const accordion = computed(() => props.accordion)
 
+  const contentFull = computed(() => props.contentFull)
   const contentHeader = computed(() => props.contentHeader && Boolean(slots['content-header']))
   const contentHeaderBordered = computed(() => props.contentHeaderBordered)
   const contentHeaderHeight = computed(() => props.contentHeaderHeight)
@@ -96,7 +96,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   let parentsKeys = new Map<string, string[]>()
 
   const parentMenuOptions = computed<MenuOption[]>(() => {
-    return menuOptions.value?.map(item => omit(item, 'children'))
+    return menuOptions.value?.map(({ children: _, ...rest }) => rest)
   })
 
   const childMenuOptions = computed<MenuOption[]>(() => {
@@ -128,10 +128,6 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
   function toggleSiderRightFixed(value: boolean) {
     siderRightFixed.value = value
     methods?.onUpdateSiderRightFixed?.(value)
-  }
-
-  function toggleContentFull(value: boolean) {
-    contentFull.value = value
   }
 
   // watch
@@ -174,6 +170,7 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     siderBordered,
     siderTheme,
     siderCollapsedWidth,
+    siderShowTrigger,
     accordion,
     contentHeader,
     contentHeaderBordered,
@@ -202,7 +199,6 @@ export function adminLayoutState(props: _AdminLayoutProps, slots: any, methods: 
     // functions
     toggleSiderCollapsed,
     toggleSiderRightFixed,
-    toggleContentFull,
   }
 }
 

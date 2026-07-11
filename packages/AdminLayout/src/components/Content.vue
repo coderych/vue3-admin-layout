@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 import type { AdminLayoutContentProps } from '../typing'
-import { useFullscreen } from '@vueuse/core'
-import { computed, proxyRefs, ref, watch } from 'vue'
+import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
 import { applySkinStyles } from '../helper'
@@ -17,13 +16,13 @@ defineSlots<{
 const state = useAdminLayoutState()
 const {
   // refs
-  contentFull,
   overlayRef,
   // composables
   overlayWidth,
   overlayHeight,
   // computed - props
   scrollbarProps,
+  contentFull,
   headerFixed,
   contentHeader,
   contentHeaderBordered,
@@ -40,10 +39,6 @@ const {
   contentLeft,
   contentBottom,
 } = state
-
-const el = ref<HTMLElement>()
-
-const { enter, exit, isFullscreen } = useFullscreen(el)
 
 const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
@@ -106,18 +101,10 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
   scrollHeight: `${overlayHeight.value}px`,
   contentWidth: contentWidth.value,
 }))
-
-watch(() => contentFull.value, (value) => {
-  value ? enter() : exit()
-})
-
-watch(isFullscreen, (value) => {
-  contentFull.value = value
-})
 </script>
 
 <template>
-  <div ref="el" class="admin-layout-main" :style="mainStyle">
+  <div class="admin-layout-main" :class="{ 'admin-layout-main--full': contentFull }" :style="mainStyle">
     <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(contentFull && !contentHeaderFixed), height: contentFull ? '100vh' : '100%' }">
       <div v-if="contentHeader" class="admin-layout-main__header" :style="contentHeaderStyle">
         <slot name="header" v-bind="contentProps" />
@@ -143,6 +130,14 @@ watch(isFullscreen, (value) => {
 .admin-layout-main {
   background-color: var(--admin-layout-base-color);
 
+  &--full {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+
   &__header {
     overflow: hidden;
     display: flex;
@@ -158,7 +153,7 @@ watch(isFullscreen, (value) => {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
+    z-index: 1;
   }
 }
 </style>

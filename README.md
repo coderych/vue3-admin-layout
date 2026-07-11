@@ -1,6 +1,6 @@
 # vue3-admin-layout
 
-> v0.9.1 · 一个灵活的 Vue 3 管理后台布局组件
+> v1.0.1 · 一个灵活的 Vue 3 管理后台布局组件
 
 功能丰富的管理后台布局组件，支持侧边栏、顶部导航、混合模式三种布局，内置响应式设计、暗黑主题、毛玻璃皮肤、菜单导航、自定义滚动条等功能。
 
@@ -309,6 +309,7 @@ import type {
   AdminLayoutContentProps,
   AdminLayoutLogoProps,
   AdminLayoutMenuProps,
+  AdminLayoutState,
   MenuOption,
   MenuOptionLabel,
   MenuProps,
@@ -317,6 +318,9 @@ import type {
 
 // 工具函数
 import { calculateInverted, getParentsKeys, getLabel } from 'vue3-admin-layout'
+
+// CSS 变量常量
+import { AdminLayoutCssVars } from 'vue3-admin-layout'
 ```
 
 ## CSS 变量
@@ -327,9 +331,10 @@ import { calculateInverted, getParentsKeys, getLabel } from 'vue3-admin-layout'
 :root {
   /* 颜色 */
   --admin-layout-base-color: #fff;                   /* 组件基础底色 */
-  --primary-color: #1890ff;                           /* 主题色 */
   --admin-layout-text-color: var(--text-color-light); /* 文字颜色 */
   --admin-layout-border-color: var(--border-color-light); /* 边框颜色 */
+  --admin-layout-scrollbar-color: var(--scrollbar-color-light); /* 滚动条颜色 */
+  --admin-layout-scrollbar-color-hover: var(--scrollbar-color-hover-light); /* 滚动条悬停颜色 */
 
   /* 尺寸 */
   --admin-layout-header-height: 48px;
@@ -354,7 +359,7 @@ import { calculateInverted, getParentsKeys, getLabel } from 'vue3-admin-layout'
 
 ## 暗黑主题
 
-组件内部使用 `@vueuse/core` 的 `useDark()` 自动检测和切换暗黑主题，无需手动传入 prop。
+组件内置 `@vueuse/core` 的 `useDark()` 自动检测和切换暗黑主题，无需手动传入 prop。
 
 ```vue
 <script setup>
@@ -389,6 +394,8 @@ const isDark = useDark()
   </AdminLayout>
 </template>
 ```
+
+> 暗黑模式下毛玻璃效果会自动禁用。
 
 ## 移动端适配
 
@@ -575,7 +582,7 @@ const activeKey = ref('dashboard')
 ## 注意事项
 
 1. **样式导入**：使用时必须导入样式文件 `import 'vue3-admin-layout/dist/style.css'`。
-2. **暗黑模式**：组件通过 `useDark()` 自动检测，配合 `@vueuse/core` 使用即可，无需额外配置。
+2. **暗黑模式**：组件通过内置的 `useDark()` 自动检测暗黑主题，配合 `@vueuse/core` 使用即可，无需额外配置。
 3. **路由集成**：通过 `activeKey` 绑定当前路由路径，配合 Vue Router 实现菜单联动。
 4. **拆分菜单**：`splitMenu` 仅在 `side` 和 `mix` 模式下生效，左侧显示一级菜单，右侧显示子菜单。
 5. **毛玻璃皮肤**：`skin` 设置背景图后，侧边栏和头部自动应用毛玻璃效果；暗黑模式下自动禁用。
@@ -597,5 +604,6 @@ const activeKey = ref('dashboard')
 
 ### 暗黑模式不生效
 
-- 确认已安装 `@vueuse/core`（组件的 peer 依赖）。
-- 检查 `useDark()` 是否正确调用。
+- 确认 `@vueuse/core` 已正确安装（组件内置依赖）。
+- 检查 HTML 根元素是否有 `dark` 类名（`useDark()` 默认行为）。
+- 毛玻璃皮肤在暗黑模式下会自动禁用，这是预期行为。

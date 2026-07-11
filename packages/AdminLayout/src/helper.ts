@@ -1,7 +1,34 @@
 import type { CSSProperties } from 'vue'
 import type { MenuOption, MenuOptionLabel } from './typing'
-import { rgba } from 'seemly'
 import { AdminLayoutCssVars } from './typing'
+
+/**
+ * Parse a CSS color string into [r, g, b] values (0-255).
+ * Supports hex (#RGB, #RGBA, #RRGGBB, #RRGGBBAA) and rgb()/rgba() formats.
+ */
+export function parseColor(color: string): [number, number, number] {
+  // hex patterns
+  const hexMatch = color.match(/^#([0-9a-f]{3,8})$/i)
+  if (hexMatch) {
+    let hex = hexMatch[1]
+    // expand shorthand #RGB → #RRGGBB, #RGBA → #RRGGBBAA
+    if (hex.length <= 4) {
+      hex = hex.split('').map(c => c + c).join('')
+    }
+    const r = Number.parseInt(hex.slice(0, 2), 16)
+    const g = Number.parseInt(hex.slice(2, 4), 16)
+    const b = Number.parseInt(hex.slice(4, 6), 16)
+    return [r, g, b]
+  }
+
+  // rgb/rgba patterns
+  const rgbMatch = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/)
+  if (rgbMatch) {
+    return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])]
+  }
+
+  throw new Error(`Unsupported color format: ${color}`)
+}
 
 export function calculateInverted(color: string): boolean {
   if (!color) {
@@ -11,7 +38,7 @@ export function calculateInverted(color: string): boolean {
     return false
   }
   try {
-    const [r, g, b] = rgba(color)
+    const [r, g, b] = parseColor(color)
     const luminance = 0.299 * r + 0.587 * g + 0.114 * b
     return luminance < 186
   }
@@ -61,6 +88,10 @@ export function getLabel(label: MenuOptionLabel | undefined, option: MenuOption)
 }
 
 export function applyThemeStyles(style: CSSProperties, color: string, inverted: boolean) {
+  if (!color) {
+    return
+  }
+
   style[AdminLayoutCssVars.BaseColor] = color
   style[AdminLayoutCssVars.TextColor] = inverted ? 'var(--text-color-dark)' : 'var(--text-color-light)'
   style[AdminLayoutCssVars.BorderColor] = inverted ? 'var(--border-color-dark)' : 'var(--border-color-light)'
@@ -72,4 +103,5 @@ export function applySkinStyles(style: CSSProperties): void {
   style.backgroundColor = '#fff9'
   style.backdropFilter = 'blur(8px)'
   style.WebkitBackdropFilter = 'blur(8px)'
+  style[AdminLayoutCssVars.BaseColor] = '#fff9'
 }

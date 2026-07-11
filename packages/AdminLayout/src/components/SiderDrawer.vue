@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 import type { AdminLayoutLogoProps, AdminLayoutMenuProps, AdminLayoutSiderProps } from '../typing'
-import { computed, proxyRefs } from 'vue'
+import { computed, onMounted, onUnmounted, proxyRefs } from 'vue'
 import { Logo } from '.'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applyThemeStyles, calculateInverted } from '../helper'
+import { applySkinStyles, applyThemeStyles, calculateInverted } from '../helper'
 import Hamburger from './Hamburger.vue'
 
 defineSlots<{
@@ -24,6 +24,7 @@ const {
   // composables
   isDark,
   // computed - props
+  hasSkin,
   menuOptions,
   scrollbarProps,
   headerHeight,
@@ -37,13 +38,25 @@ const {
   toggleSiderRightFixed,
 } = state
 
-const inverted = computed(() => calculateInverted(siderTheme.value))
+function handleEscape(e: KeyboardEvent) {
+  if (e.key === 'Escape' && !siderCollapsed.value) {
+    toggleSiderCollapsed(true)
+  }
+}
+
+onMounted(() => document.addEventListener('keydown', handleEscape))
+onUnmounted(() => document.removeEventListener('keydown', handleEscape))
+
+const inverted = computed(() => isDark.value || calculateInverted(siderTheme.value))
 
 const siderDrawerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     width: `${siderWidth.value}px`,
   }
-  if (!isDark.value) {
+  if (hasSkin.value) {
+    applySkinStyles(style)
+  }
+  else {
     applyThemeStyles(style, siderTheme.value, inverted.value)
   }
   return style
@@ -82,7 +95,15 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 </script>
 
 <template>
-  <div class="admin-layout-sider-drawer" :class="{ 'admin-layout-sider-drawer--collapsed': siderCollapsed }" :style="siderDrawerStyle">
+  <div
+    class="admin-layout-sider-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation menu"
+    :aria-hidden="siderCollapsed"
+    :class="{ 'admin-layout-sider-drawer--collapsed': siderCollapsed }"
+    :style="siderDrawerStyle"
+  >
     <slot name="default" v-bind="siderProps">
       <slot name="header" v-bind="siderProps">
         <slot name="logo" v-bind="logoProps">
@@ -102,7 +123,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
       </slot>
     </slot>
   </div>
-  <div class="admin-layout-sider-drawer__mask" :class="{ 'admin-layout-sider-drawer__mask--show': !siderCollapsed }" @click="toggleSiderCollapsed(true)" />
+  <div class="admin-layout-sider-drawer__mask" aria-hidden="true" :class="{ 'admin-layout-sider-drawer__mask--show': !siderCollapsed }" @click="toggleSiderCollapsed(true)" />
 </template>
 
 <style scoped lang="less">
@@ -112,7 +133,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
   position: fixed;
   left: 0;
   transition: transform var(--admin-layout-duration) var(--admin-layout-bezier);
-  z-index: 3;
+  z-index: 2;
   top: 0;
   display: flex;
   flex-direction: column;
@@ -129,7 +150,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
 
   &__hamburger {
     width: 100%;
-    height: 48px;
+    height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -142,7 +163,7 @@ const menuProps = computed<AdminLayoutMenuProps>(() => ({
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 2;
+    z-index: 1;
     transition: opacity var(--admin-layout-duration) var(--admin-layout-bezier);
     opacity: 0;
     visibility: hidden;

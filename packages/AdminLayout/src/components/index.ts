@@ -1,11 +1,11 @@
-import AppMain from './AppMain.vue'
+import Content from './Content.vue'
 import Header from './Header.vue'
 import Logo from './Logo.vue'
 import Sider from './Sider.vue'
 import SiderDrawer from './SiderDrawer.vue'
 
 export {
-  AppMain,
+  Content,
   Header,
   Logo,
   Sider,

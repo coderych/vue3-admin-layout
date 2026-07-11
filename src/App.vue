@@ -22,8 +22,6 @@ const scrollbarConfig = reactive({
   nativeScrollbar: false,
 })
 
-const contentFull = ref(false)
-
 const props = ref<AdminLayoutProps>({
   // 布局模式
   mode: 'side',
@@ -57,6 +55,7 @@ const props = ref<AdminLayoutProps>({
   siderTheme: '',
 
   // Content Header
+  contentFull: false,
   contentHeader: true,
   contentHeaderHeight: 36,
   contentHeaderFixed: true,
@@ -91,10 +90,6 @@ function click(value: any) {
   console.log(state.value)
   console.log(adminLayoutRef.value?.state?.isDark)
 }
-
-watch(contentFull, (value) => {
-  adminLayoutRef.value?.toggleContentFull(value)
-})
 
 watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
   console.log('isDark change', value)
@@ -188,9 +183,6 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
     </template> -->
 
     <template #default="defaultProps">
-      {{ defaultProps }}
-      contentHeight: {{ defaultProps.height }}<br>
-
       isDark: <input v-model="isDark" type="checkbox"><br>
       skin:
       <select v-model="currentSkin">
@@ -221,7 +213,7 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
       <br>
       splitMenu: <input v-model="props.splitMenu" type="checkbox"><br>
       siderCollapsed: <input v-model="props.siderCollapsed" type="checkbox"><br>
-      contentFull: <input v-model="contentFull" type="checkbox"><br>
+      contentFull: <input v-model="props.contentFull" type="checkbox"><br>
       isMobile: <input v-model="props.isMobile" type="checkbox"><br>
 
       <h4 class="mb-4px mt-12px font-bold">
@@ -319,6 +311,9 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
         统计 Simplebar 数量
       </button>
       <br>
+
+      {{ defaultProps }}
+      contentHeight: {{ defaultProps.height }}<br>
       <div
         v-for="i in 30"
         :key="i"

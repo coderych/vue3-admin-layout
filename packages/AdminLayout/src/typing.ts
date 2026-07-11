@@ -106,6 +106,10 @@ export const adminLayoutProps = {
     type: String as PropType<string>,
     default: '#fff',
   },
+  siderShowTrigger: {
+    type: Boolean as PropType<boolean>,
+    default: true,
+  },
 
   skin: {
     type: String as PropType<string>,
@@ -120,6 +124,10 @@ export const adminLayoutProps = {
     default: true,
   },
 
+  contentFull: {
+    type: Boolean as PropType<boolean>,
+    default: false,
+  },
   contentHeader: {
     type: Boolean as PropType<boolean>,
     default: true,
@@ -222,7 +230,6 @@ export interface AdminLayoutMenuProps extends MenuProps {
 
 export interface AdminLayoutInstance {
   state: ShallowUnwrapRef<AdminLayoutState>
-  toggleContentFull: (value: boolean) => void
   toggleSiderRightFixed: (value?: boolean) => void
   toggleSiderCollapsed: (value?: boolean) => void
 }
