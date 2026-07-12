@@ -79,6 +79,7 @@ const siderProps = computed<AdminLayoutSiderProps>(() => ({
   toggleCollapsed: toggleSiderCollapsed,
   toggleRightFixed: toggleSiderRightFixed,
 }))
+
 const logoProps = computed<AdminLayoutLogoProps>(() => ({
   state: proxyRefs(state),
   inverted: inverted.value,
@@ -86,6 +87,7 @@ const logoProps = computed<AdminLayoutLogoProps>(() => ({
   height: headerHeight.value,
   collapsed: false,
 }))
+
 const menuProps = computed<AdminLayoutMenuProps>(() => ({
   state: proxyRefs(state),
   options: menuOptions.value,

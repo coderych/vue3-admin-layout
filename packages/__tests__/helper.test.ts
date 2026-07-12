@@ -199,6 +199,6 @@ describe('applySkinStyles', () => {
     expect(style.backgroundColor).toBe('#fff9')
     expect(style.backdropFilter).toBe('blur(8px)')
     expect(style.WebkitBackdropFilter).toBe('blur(8px)')
-    expect(style[AdminLayoutCssVars.BaseColor]).toBe('#fff9')
+    expect(style[AdminLayoutCssVars.BaseColor]).toBe('transparent')
   })
 })

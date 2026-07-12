@@ -34,7 +34,7 @@ const slots = defineSlots<{
   'sider-right-footer': (props: AdminLayoutSiderProps) => void
   'content-header': (props: AdminLayoutContentProps) => void
   'content-footer': (props: AdminLayoutContentProps) => void
-  'content-overlay': (props: AdminLayoutContentProps) => void
+  'content-overlay': () => void
   'menu': (props: AdminLayoutMenuProps) => void
   'parent-menu': (props: AdminLayoutMenuProps) => void
 }>()
@@ -49,6 +49,7 @@ const {
   siderCollapsed,
   contentFull,
   siderRightFixed,
+  overlayRef,
   // computed - props
   mode,
   splitMenu,
@@ -65,6 +66,9 @@ const {
   _headerHeight,
   _siderCollapsedWidth,
   hasSkin,
+  contentLeft,
+  contentBottom,
+  contentTop,
 } = state
 
 const layoutStyle = computed<CSSProperties>(() => {
@@ -130,6 +134,15 @@ const mainStyle = computed<CSSProperties>(() => {
   return style
 })
 
+const overlayStyle = computed<CSSProperties>(() => ({
+  position: 'absolute',
+  top: `${contentTop.value}px`,
+  left: `${contentLeft.value}px`,
+  bottom: `${contentBottom.value}px`,
+  right: 0,
+  zIndex: -999,
+}))
+
 function renderHeader() {
   return h(Header, {}, {
     default: slots.header,
@@ -190,7 +203,7 @@ defineExpose({
 </script>
 
 <template>
-  <Scrollbar class="admin-layout-wrapper" v-bind="{ nativeScrollbar: !(!headerFixed && !contentFull), ...scrollbarProps, height: wrapperHeight }">
+  <Scrollbar class="admin-layout-wrapper" v-bind="{ ...scrollbarProps, nativeScrollbar: !(!headerFixed && !contentFull) || scrollbarProps?.nativeScrollbar, height: wrapperHeight }">
     <div class="admin-layout" :class="`admin-layout--${mode}`" :style="layoutStyle">
       <header v-if="header" class="admin-layout__header">
         <component :is="renderHeader" />
@@ -199,12 +212,15 @@ defineExpose({
         <component :is="renderSider" />
       </aside>
       <main class="admin-layout__main" :style="mainStyle">
-        <Scrollbar v-bind="{ nativeScrollbar: !(headerFixed && !contentHeaderFixed && !contentFull), ...scrollbarProps, height: '100%' }">
+        <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(headerFixed && !contentHeaderFixed && !contentFull) || scrollbarProps?.nativeScrollbar, height: '100%' }">
           <component :is="renderContent">
             <slot name="default" v-bind="(state as any)" />
           </component>
         </Scrollbar>
       </main>
+    </div>
+    <div ref="overlayRef" :style="overlayStyle">
+      <slot name="content-overlay" />
     </div>
   </Scrollbar>
 </template>
@@ -245,6 +261,10 @@ defineExpose({
 </style>
 
 <style scoped lang="less">
+.admin-layout-wrapper {
+  position: relative;
+}
+
 .admin-layout {
   display: grid;
   background-color: var(--admin-layout-base-color);

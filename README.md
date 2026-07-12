@@ -1,6 +1,6 @@
 # vue3-admin-layout
 
-> v1.0.4 · 一个灵活的 Vue 3 管理后台布局组件
+> v1.0.5 · 一个灵活的 Vue 3 管理后台布局组件
 
 功能丰富的管理后台布局组件，支持侧边栏、顶部导航、混合模式三种布局，内置响应式设计、暗黑主题、毛玻璃皮肤、菜单导航、自定义滚动条等功能。
 
@@ -162,7 +162,7 @@ import 'vue3-admin-layout/dist/style.css'
 | --- | --- | --- |
 | `content-header` | `AdminLayoutContentProps` | 内容区域头部 |
 | `content-footer` | `AdminLayoutContentProps` | 内容区域底部 |
-| `content-overlay` | `AdminLayoutContentProps` | 内容区域遮罩层 |
+| `content-overlay` | — | 内容区域遮罩层 |
 
 ### 菜单插槽
 

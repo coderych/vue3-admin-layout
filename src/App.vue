@@ -182,6 +182,7 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
     </template> -->
 
     <template #default="defaultProps">
+      {{ defaultProps.scrollHeight }}
       isDark: <input v-model="isDark" type="checkbox"><br>
       skin:
       <select v-model="currentSkin">

@@ -1,5 +1,22 @@
 # 更新日志
 
+## v1.0.5
+
+`2026-07-12`
+
+### 🐛 Bug 修复
+
+- 修复 `content-overlay` 使用 `position: fixed` 导致定位异常的问题，移至布局根层级并改为 `position: absolute`
+- 修复 Scrollbar `nativeScrollbar` 默认逻辑无法被 `scrollbarProps.nativeScrollbar` 覆盖的问题
+
+### 🔨 重构
+
+- `content-overlay` 插槽从 Content 区域提升至 AdminLayout 根层级，避免 fixed 定位与滚动容器冲突
+- 所有 Scrollbar 组件的 `nativeScrollbar` 计算逻辑统一为 `默认值 || scrollbarProps?.nativeScrollbar`，用户配置优先
+- `.admin-layout-wrapper` 添加 `position: relative` 作为 overlay 定位上下文
+
+---
+
 ## v1.0.4
 
 `2026-07-11`

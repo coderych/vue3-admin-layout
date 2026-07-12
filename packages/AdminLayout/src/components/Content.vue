@@ -15,8 +15,6 @@ defineSlots<{
 
 const state = useAdminLayoutState()
 const {
-  // refs
-  overlayRef,
   // composables
   overlayWidth,
   overlayHeight,
@@ -37,9 +35,6 @@ const {
   hasSkin,
   _contentHeaderHeight,
   _contentFooterHeight,
-  contentTop,
-  contentLeft,
-  contentBottom,
 } = state
 
 const mainStyle = computed<CSSProperties>(() => {
@@ -83,15 +78,6 @@ const contentFooterStyle = computed<CSSProperties>(() => {
   return style
 })
 
-const overlayStyle = computed<CSSProperties>(() => ({
-  position: 'fixed',
-  top: `${contentTop.value}px`,
-  left: `${contentLeft.value}px`,
-  bottom: `${contentBottom.value}px`,
-  right: 0,
-  zIndex: -999,
-}))
-
 const innerStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
     minHeight: `${overlayHeight.value}px`,
@@ -111,20 +97,17 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
 
 <template>
   <div class="admin-layout-main" :class="{ 'admin-layout-main--full': contentFull }" :style="mainStyle">
-    <Scrollbar v-bind="{ nativeScrollbar: !(contentFull && !contentHeaderFixed), ...scrollbarProps, height: contentFull ? wrapperHeight : '100%' }">
+    <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(contentFull && !contentHeaderFixed) || scrollbarProps?.nativeScrollbar, height: contentFull ? wrapperHeight : '100%' }">
       <div v-if="contentHeader" class="admin-layout-main__header" :style="contentHeaderStyle">
         <slot name="header" v-bind="contentProps" />
       </div>
       <div class="admin-layout-main__content" :style="contentStyle">
-        <Scrollbar v-bind="{ nativeScrollbar: !(headerFixed && contentHeaderFixed), ...scrollbarProps, height: '100%' }">
+        <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(headerFixed && contentHeaderFixed) || scrollbarProps?.nativeScrollbar, height: '100%' }">
           <div :style="innerStyle">
             <slot name="default" v-bind="contentProps" />
           </div>
           <div v-if="contentFooter" :style="contentFooterStyle" class="admin-layout-main__footer">
             <slot name="footer" v-bind="contentProps" />
-          </div>
-          <div ref="overlayRef" :style="overlayStyle">
-            <slot name="overlay" v-bind="contentProps" />
           </div>
         </Scrollbar>
       </div>
