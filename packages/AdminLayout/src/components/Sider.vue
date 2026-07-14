@@ -119,7 +119,9 @@ const rightStyle = computed<CSSProperties>(() => {
   }
   if (hasSkin.value) {
     applySkinStyles(style)
-    style.backgroundColor = 'transparent'
+    if (!siderRightFixed.value) {
+      style.backgroundColor = 'transparent'
+    }
     style['--admin-layout-sider-right-translate-x'] = 'calc(-100% - var(--admin-layout-sider-width))'
   }
   return style

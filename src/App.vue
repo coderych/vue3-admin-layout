@@ -28,7 +28,7 @@ const props = ref<AdminLayoutProps>({
   splitMenu: false,
   siderCollapsed: false,
   isMobile: false,
-  wrapperHeight: '50vh',
+  wrapperHeight: '100vh',
 
   // Menu
   menuOptions: [],
