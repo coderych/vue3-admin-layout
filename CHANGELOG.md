@@ -1,5 +1,23 @@
 # 更新日志
 
+## v1.0.7
+
+`2026-07-20`
+
+### 🐛 Bug 修复
+
+- 修复 `contentFull` 模式下层级过低被其他元素遮挡的问题，添加 `z-index: 999`
+
+### 🔨 重构
+
+- Sider `isSplit` 从局部变量重构为 `computed`，提升响应性
+- Sider `z-index: 1` 从 JS 内联样式迁移至 CSS 样式表，皮肤模式下不再动态设置
+- 移除 `mainStyle` 中 `contentFull` 的 `z-index: 2` 逻辑，简化层级管理
+- `docs/changelog.md` 改为 `@include` 引用根目录 `CHANGELOG.md`，避免内容重复
+- `package.json` 新增 `prepublishOnly` 脚本，发布前自动构建
+
+---
+
 ## v1.0.6
 
 `2026-07-14`

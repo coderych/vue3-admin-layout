@@ -1,7 +1,7 @@
 {
   "name": "vue3-admin-layout",
   "type": "module",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "packageManager": "pnpm@10.33.4",
   "description": "一个灵活的 Vue 管理后台布局组件",
   "author": "YCH",
@@ -37,6 +37,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "prepublishOnly": "pnpm run build",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

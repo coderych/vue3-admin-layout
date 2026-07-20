@@ -128,9 +128,6 @@ const mainStyle = computed<CSSProperties>(() => {
   if (headerFixed.value) {
     style.height = `calc(${wrapperHeight.value} - ${_headerHeight.value}px)`
   }
-  if (contentFull.value) {
-    style.zIndex = 2
-  }
   return style
 })
 

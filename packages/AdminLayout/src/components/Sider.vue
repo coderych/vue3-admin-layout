@@ -67,6 +67,7 @@ const {
 } = state
 
 const inverted = computed(() => isInverted(isDark.value, hasSkin.value, siderTheme.value))
+const isSplit = computed(() => splitMenu.value && mode.value === 'side')
 
 const siderStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {
@@ -79,14 +80,12 @@ const siderStyle = computed<CSSProperties>(() => {
   if (!siderBordered.value) {
     style.borderRight = 'none'
   }
-  const isSplit = splitMenu.value && mode.value === 'side'
-  if (!isSplit) {
+  if (!isSplit.value) {
     style.backgroundColor = `var(${AdminLayoutCssVars.BaseColor})`
   }
 
-  if (hasSkin.value && !isSplit) {
+  if (hasSkin.value && !isSplit.value) {
     applySkinStyles(style)
-    style.zIndex = 1
   }
   else if (!isDark.value) {
     applyThemeStyles(style, siderTheme.value, inverted.value)
@@ -284,6 +283,7 @@ function handleParentMenuClick(key: string) {
 <style scoped lang="less">
 .admin-layout-sider {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   color: var(--admin-layout-text-color);
