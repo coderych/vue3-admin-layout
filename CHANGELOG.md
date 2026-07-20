@@ -1,5 +1,23 @@
 # 更新日志
 
+## v1.0.8
+
+`2026-07-20`
+
+### 🐛 Bug 修复
+
+- 修复 Content 区域 `simplebar-mask` 层级遮挡问题，添加 `z-index: auto`
+- 修复 Sider 拆分菜单层级不正确的问题，调整 `z-index`：sider `1→2`、左侧 `2→100`、右侧 `1→99`
+
+### 🔨 重构
+
+- Content 毛玻璃效果从内联 `backdrop-filter` 重构为独立 `backdrop` 层，提升渲染隔离性
+- 提取 `applySkinBaseStyles()` 从 `applySkinStyles()`，Content 仅应用基色，Header/Sider 保留完整毛玻璃
+- 移除 `index.vue` 布局根级 `backdropFilter`，毛玻璃统一由 Content 背景层处理
+- `contentFull` 样式简化，使用 `inset: 0` 替代四方向定位
+
+---
+
 ## v1.0.7
 
 `2026-07-20`

@@ -15,6 +15,8 @@ const skinImages = [
 ]
 const currentSkin = ref<string | undefined>(undefined)
 
+const isFull = ref(false)
+
 const scrollbarConfig = reactive({
   size: 5,
   autoHide: false,
@@ -292,6 +294,10 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
       accordion: <input v-model="props.accordion" type="checkbox"><br>
       activeKey: <input v-model="props.activeKey" type="text" placeholder="undefined"><br>
 
+      <div :class="{ full: isFull }" @click="isFull = !isFull">
+        full
+      </div>
+
       <h4 class="mb-4px mt-12px font-bold">
         Scrollbar
       </h4>
@@ -345,5 +351,12 @@ watch(() => adminLayoutRef.value?.state?.isDark, (value) => {
 
 body {
   /* background-color: #000; */
+}
+
+.full {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: #eee;
 }
 </style>

@@ -4,7 +4,7 @@ import type { AdminLayoutContentProps } from '../typing'
 import { computed, proxyRefs } from 'vue'
 import { Scrollbar } from '../../../Scrollbar'
 import { useAdminLayoutState } from '../context'
-import { applySkinStyles } from '../helper'
+import { applySkinBaseStyles } from '../helper'
 
 defineSlots<{
   header: (props: AdminLayoutContentProps) => any
@@ -40,7 +40,7 @@ const {
 const mainStyle = computed<CSSProperties>(() => {
   const style: CSSProperties = {}
   if (hasSkin.value) {
-    applySkinStyles(style)
+    applySkinBaseStyles(style)
   }
 
   return style
@@ -96,8 +96,15 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
 </script>
 
 <template>
-  <div class="admin-layout-main" :class="{ 'admin-layout-main--full': contentFull }" :style="mainStyle">
-    <Scrollbar v-bind="{ ...scrollbarProps, nativeScrollbar: !(contentFull && !contentHeaderFixed) || scrollbarProps?.nativeScrollbar, height: contentFull ? wrapperHeight : '100%' }">
+  <div
+    class="admin-layout-main"
+    :class="{
+      'admin-layout-main--full': contentFull,
+    }"
+    :style="mainStyle"
+  >
+    <div v-if="hasSkin" class="admin-layout-main__backdrop" aria-hidden="true" />
+    <Scrollbar class="admin-layout-main__body" v-bind="{ ...scrollbarProps, nativeScrollbar: !(contentFull && !contentHeaderFixed) || scrollbarProps?.nativeScrollbar, height: contentFull ? wrapperHeight : '100%' }">
       <div v-if="contentHeader" class="admin-layout-main__header" :style="contentHeaderStyle">
         <slot name="header" v-bind="contentProps" />
       </div>
@@ -117,15 +124,26 @@ const contentProps = computed<AdminLayoutContentProps>(() => ({
 
 <style scoped lang="less">
 .admin-layout-main {
+  height: 100%;
+  position: relative;
   background-color: var(--admin-layout-base-color);
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  &__body {
+    position: relative;
+  }
 
   &--full {
     position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
     z-index: 999;
+    inset: 0;
   }
 
   &__header {

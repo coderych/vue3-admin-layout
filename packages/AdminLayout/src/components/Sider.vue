@@ -283,7 +283,7 @@ function handleParentMenuClick(key: string) {
 <style scoped lang="less">
 .admin-layout-sider {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   color: var(--admin-layout-text-color);
@@ -311,7 +311,7 @@ function handleParentMenuClick(key: string) {
     height: 100%;
     flex-shrink: 0;
     position: relative;
-    z-index: 2;
+    z-index: 100;
     overflow-x: hidden;
     box-sizing: border-box;
     display: flex;
@@ -336,7 +336,7 @@ function handleParentMenuClick(key: string) {
   &__split-right {
     flex-shrink: 0;
     position: relative;
-    z-index: 1;
+    z-index: 99;
     height: 100%;
     transition: transform var(--admin-layout-duration) var(--admin-layout-bezier);
     display: flex;

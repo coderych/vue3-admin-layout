@@ -115,8 +115,6 @@ const layoutStyle = computed<CSSProperties>(() => {
     style.backgroundPosition = 'center'
     style.backgroundRepeat = 'no-repeat'
     style.backgroundColor = '#fff9'
-    style.backdropFilter = 'blur(8px)'
-    style.WebkitBackdropFilter = 'blur(8px)'
   }
 
   return style
@@ -298,6 +296,10 @@ defineExpose({
 
   &__main {
     grid-area: main;
+
+    :deep(.simplebar-mask) {
+      z-index: auto;
+    }
   }
 }
 </style>

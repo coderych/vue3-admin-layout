@@ -109,9 +109,13 @@ export function applyThemeStyles(style: CSSProperties, color?: string, inverted?
   style[AdminLayoutCssVars.ScrollbarColorHover] = inverted ? 'var(--scrollbar-color-hover-dark)' : 'var(--scrollbar-color-hover-light)'
 }
 
-export function applySkinStyles(style: CSSProperties): void {
+export function applySkinBaseStyles(style: CSSProperties): void {
   style.backgroundColor = '#fff9'
+  style[AdminLayoutCssVars.BaseColor] = 'transparent'
+}
+
+export function applySkinStyles(style: CSSProperties): void {
+  applySkinBaseStyles(style)
   style.backdropFilter = 'blur(8px)'
   style.WebkitBackdropFilter = 'blur(8px)'
-  style[AdminLayoutCssVars.BaseColor] = 'transparent'
 }
